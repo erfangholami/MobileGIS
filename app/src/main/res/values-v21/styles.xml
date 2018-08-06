@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="mainButtonStyle">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:layout_margin">@dimen/main_button_margins</item>
+        <item name="android:elevation">@dimen/main_button_elevation</item>
+        <item name="android:elevation">@dimen/main_button_elevation</item>
+    </style>
+</resources>

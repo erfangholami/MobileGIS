@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="action_bar_margin">12dp</dimen>
+    <dimen name="action_bar_elevation">16dp</dimen>
+    <dimen name="main_button_margins">8dp</dimen>
+    <dimen name="main_button_elevation">16dp</dimen>
+    <dimen name="navigation_drawer_elevation">16dp</dimen>
+</resources>

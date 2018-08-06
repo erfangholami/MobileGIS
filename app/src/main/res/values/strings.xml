@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">MobileGIS</string>
+    <string name="find_direction_item">Find Direction</string>
+    <string name="histogram_item">Histogram</string>
+    <string name="draw_item">Draw(with measure)</string>
+    <string name="moving_detail_item">Moving detail</string>
+    <string name="user_locations_item">User Locations</string>
+    <string name="setting_item">Setting</string>
+    <string name="exit_item">Exit</string>
+</resources>
