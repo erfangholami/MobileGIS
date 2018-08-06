@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="visible">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_margin="@dimen/card_view_detail_point_margin"
+        android:layout_marginTop="8dp"
+        android:elevation="@dimen/card_view_detail_point_elevation"
+        app:contentPadding="@dimen/card_view_detail_point_padding"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/map_settings_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/map_settings_title"
+                    android:textColor="@android:color/black"
+                    android:textSize="24sp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                <View
+                    android:id="@+id/divider1"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_margin="8dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintTop_toBottomOf="@id/map_settings_title" />
+
+                <ImageView
+                    android:id="@+id/polygon_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:src="@mipmap/ic_polygon"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/divider1" />
+
+                <LinearLayout
+                    android:id="@+id/linear1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintStart_toEndOf="@id/polygon_image"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/polygon_image">
+
+                    <include layout="@layout/layer_item" />
+
+                    <include layout="@layout/layer_item" />
+
+                    <include layout="@layout/layer_item" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/polyline_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/ic_polyline"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/linear1" />
+                <LinearLayout
+                    android:id="@+id/linear2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintLeft_toLeftOf="@+id/polygon_image"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/polyline_image">
+
+                    <include layout="@layout/layer_item" />
+
+                    <include layout="@layout/layer_item" />
+
+                    <include layout="@layout/layer_item" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/marker_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:src="@mipmap/ic_marker"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/linear2"/>
+                <LinearLayout
+                    android:id="@+id/linear3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintLeft_toLeftOf="@+id/polygon_image"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/marker_image">
+
+                    <include layout="@layout/layer_item" />
+
+                    <include layout="@layout/layer_item" />
+
+                    <include layout="@layout/layer_item" />
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/add_layer_map"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/add_layer_map_string"
+                    app:layout_constraintBottom_toBottomOf="@+id/add_layer_map_button"
+                    app:layout_constraintTop_toTopOf="@+id/add_layer_map_button" />
+
+                <ImageButton
+                    android:id="@+id/add_layer_map_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:src="@mipmap/ic_zoom_in"
+                    app:layout_constraintLeft_toRightOf="@+id/add_layer_map"
+                    app:layout_constraintTop_toBottomOf="@+id/linear3"/>
+                    -->
+
+            </android.support.constraint.ConstraintLayout>
+        </ScrollView>
+    </android.support.v7.widget.CardView>
+
+</android.support.constraint.ConstraintLayout>

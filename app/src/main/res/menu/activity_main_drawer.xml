@@ -2,28 +2,48 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
-    <item
-        android:icon="@mipmap/ic_direction"
-        android:title="@string/find_direction_item"/>
-    <item
+    <group android:checkableBehavior="single"
+        android:id="@+id/group1">
+        <item
+            android:icon="@mipmap/ic_direction"
+            android:title="@string/find_direction_item"/>
+    </group>
+    <group android:checkableBehavior="single"
+        android:id="@+id/group2">
+        <item
         android:icon="@mipmap/ic_histogram"
         android:title="@string/histogram_item" />
-    <item
-        android:icon="@mipmap/ic_draw"
-        android:title="@string/draw_item" />
-    <item
-        android:icon="@mipmap/ic_moving_detail"
-        android:title="@string/moving_detail_item" />
-    <item
-        android:icon="@drawable/ic_map_marker_multiple"
-        android:title="@string/user_locations_item" />
-    <item
-        android:icon="@mipmap/ic_setting"
-        android:title="@string/setting_item" />
-    <item
-        android:icon="@mipmap/ic_exit"
-        android:title="@string/exit_item" />
+    </group>
+    <group android:checkableBehavior="single"
+        android:id="@+id/group3">
+        <item
+            android:icon="@mipmap/ic_draw"
+            android:title="@string/draw_item" />
+    </group>
+    <group android:checkableBehavior="single"
+        android:id="@+id/group4">
+        <item
+            android:icon="@mipmap/ic_moving_detail"
+            android:title="@string/moving_detail_item" />
+    </group>
+    <group android:checkableBehavior="single"
+        android:id="@+id/group5">
+        <item
+            android:icon="@drawable/ic_map_marker_multiple"
+            android:title="@string/user_locations_item" />
+    </group>
+    <group android:checkableBehavior="single"
+        android:id="@+id/group6">
+        <item
+            android:icon="@mipmap/ic_setting"
+            android:title="@string/setting_item" />
+    </group>
+    <group android:checkableBehavior="single"
+        android:id="@+id/group7">
+        <item
+            android:icon="@mipmap/ic_exit"
+            android:title="@string/exit_item" />
+    </group>
 
 
 </menu>

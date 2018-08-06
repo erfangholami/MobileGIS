@@ -123,7 +123,15 @@
                 app:layout_constraintBottom_toTopOf="@+id/zoom_out_button"
                 app:layout_constraintRight_toRightOf="parent"/>
 
-
+            <include
+                android:id="@+id/detail_point_card_view"
+                layout="@layout/detail_point_view"/>
+            <include
+                android:id="@+id/detail_polygon_card_view"
+                layout="@layout/polygon_layer_details"/>
+            <include
+                android:id="@+id/map_settings_card_view"
+                layout="@layout/map_settings"/>
         </android.support.constraint.ConstraintLayout>
         <android.support.design.widget.NavigationView
             android:id="@+id/nav_view"
@@ -135,6 +143,7 @@
             app:menu="@menu/activity_main_drawer"
             android:elevation="@dimen/navigation_drawer_elevation"
             />
+
 
     </android.support.v4.widget.DrawerLayout>
 </android.support.constraint.ConstraintLayout>

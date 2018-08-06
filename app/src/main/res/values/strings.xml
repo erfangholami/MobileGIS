@@ -7,4 +7,12 @@
     <string name="user_locations_item">User Locations</string>
     <string name="setting_item">Setting</string>
     <string name="exit_item">Exit</string>
+    <string name="card_view_detail_point_direction_text">Direction</string>
+    <string name="card_view_detail_point_share_text">Share</string>
+    <string name="card_view_detail_point_save_text">Save</string>
+    <string name="card_view_detail_point_address_text">Address : </string>
+    <string name="card_view_detail_point_location_text">Location : </string>
+    <string name="card_view_detail_point_add_layer_text">Add to layer</string>
+    <string name="map_settings_title">Layers :</string>
+    <string name="add_layer_map_string">Add Layer to Map</string>
 </resources>
