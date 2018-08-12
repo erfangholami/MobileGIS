@@ -5,7 +5,6 @@
       <GradleProjectSettings>
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="E:/develop/sdk/gradle-4.4-all/gradle-4.4/bin" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />

@@ -1,6 +1,7 @@
 package com.kandaidea.mobilegis;
 
 import android.annotation.SuppressLint;
+import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,9 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+import com.kandaidea.mobilegis.ViewModel.MapsActivityViewModel;
+import com.kandaidea.mobilegis.databinding.ActivityMainBinding;
+
 import org.osmdroid.bonuspack.BuildConfig;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
@@ -25,44 +29,27 @@ import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 
 import java.util.zip.Inflater;
 
-public class MainActivity extends AppCompatActivity implements MapEventsReceiver
+public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = MainActivity.class.getSimpleName();
+    private MapsActivityViewModel mapsViewModel;
     private MapView mMapView;
     private Toolbar mToolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        //set view by data binding
+        ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        mapsViewModel = new MapsActivityViewModel();
+        mapsViewModel.init(this);
+        binding.setMapsViewModel(mapsViewModel);
 
-        //region ScreenSettings
-        View decorView = getWindow().getDecorView();
-        //hide navigation & fullscreen
-        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION ;
-        decorView.setSystemUiVisibility(uiOptions);
-        Toolbar toolbar = findViewById(R.id.main_toolbar);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-        {
-            setSupportActionBar(toolbar);
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-        }
-        //endregion
+        //set screen settings
+        initialScreenSettings();
 
-        //region MapSettinga
         mapCashSet();
-        mMapView = findViewById(R.id.map_view_main);
-        mMapView.setTileSource(TileSourceFactory.MAPNIK);
-        mMapView.setBuiltInZoomControls(true);
-        mMapView.setClickable(true);
-        mMapView.setLongClickable(true);
-        RotationGestureOverlay mRotationGestureOverlay = new RotationGestureOverlay(getApplicationContext(), mMapView);
-        mRotationGestureOverlay.setEnabled(true);
-        mMapView.setMultiTouchControls(true);
-        mMapView.getOverlays().add(mRotationGestureOverlay);
-        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
-        mMapView.getOverlays().add(0, mapEventsOverlay);
-        //endregion
+        initialMapSettings();
 
         //region Toolbar
         mToolbar = findViewById(R.id.main_toolbar);
@@ -94,47 +81,8 @@ public class MainActivity extends AppCompatActivity implements MapEventsReceiver
 
 
     }
-    private void mapCashSet()
-    {
-        org.osmdroid.config.Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
-    }
 
-    @Override
-    public boolean singleTapConfirmedHelper(GeoPoint p)
-    {
-        Log.d(TAG, "click map");
-        if(findViewById(R.id.detail_point_card_view).getVisibility() == View.VISIBLE)
-        {
-            Log.d(TAG, "hiding detail point");
-            findViewById(R.id.detail_point_card_view).setVisibility(View.GONE);
-        }
-        if(findViewById(R.id.map_settings_card_view).getVisibility() == View.VISIBLE)
-        {
-            Log.d(TAG, "hiding detail polygon");
-            findViewById(R.id.map_settings_card_view).setVisibility(View.GONE);
-        }
-        showMainTools(true);
-        return false;
-    }
 
-    @Override
-    public boolean longPressHelper(GeoPoint p)
-    {
-        Log.d(TAG, "mMapViewLongClicked");
-        if(findViewById(R.id.map_settings_card_view).getVisibility() == View.VISIBLE)
-        {
-            Log.d(TAG, "hiding detail polygon");
-            findViewById(R.id.map_settings_card_view).setVisibility(View.GONE);
-        }
-        showMainTools(false);
-
-        View vieww = findViewById(R.id.detail_point_card_view);
-        Animation animation = AnimationUtils.makeInAnimation(getApplicationContext(), false);
-        vieww.setAnimation(animation);
-        vieww.setVisibility(View.VISIBLE);
-        vieww.startAnimation(animation);
-        return false;
-    }
     private void showMainTools(boolean  show)
     {
         if(show)
@@ -149,5 +97,34 @@ public class MainActivity extends AppCompatActivity implements MapEventsReceiver
             findViewById(R.id.zoom_out_button).setVisibility(View.GONE);
             findViewById(R.id.my_location_button).setVisibility(View.GONE);
         }
+    }
+    private void initialScreenSettings()
+    {
+        View decorView = getWindow().getDecorView();
+        //hide navigation & fullscreen
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION ;
+        decorView.setSystemUiVisibility(uiOptions);
+        Toolbar toolbar = findViewById(R.id.main_toolbar);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+    }
+    private void mapCashSet()
+    {
+        org.osmdroid.config.Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
+    }
+    private void initialMapSettings()
+    {
+        mMapView = findViewById(R.id.map_view_main);
+        mMapView.setTileSource(TileSourceFactory.MAPNIK);
+        mMapView.setBuiltInZoomControls(true);
+        mMapView.setClickable(true);
+        mMapView.setLongClickable(true);
+        RotationGestureOverlay mRotationGestureOverlay = new RotationGestureOverlay(getApplicationContext(), mMapView);
+        mRotationGestureOverlay.setEnabled(true);
+        mMapView.setMultiTouchControls(true);
+        mMapView.getOverlays().add(mRotationGestureOverlay);
     }
 }

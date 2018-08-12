@@ -15,4 +15,7 @@
     <string name="card_view_detail_point_add_layer_text">Add to layer</string>
     <string name="map_settings_title">Layers :</string>
     <string name="add_layer_map_string">Add Layer to Map</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+    <string name="login_button">LOGIN</string>
 </resources>

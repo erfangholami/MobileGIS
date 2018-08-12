@@ -127,7 +127,6 @@
                     android:src="@mipmap/ic_zoom_in"
                     app:layout_constraintLeft_toRightOf="@+id/add_layer_map"
                     app:layout_constraintTop_toBottomOf="@+id/linear3"/>
-                    -->
 
             </android.support.constraint.ConstraintLayout>
         </ScrollView>
