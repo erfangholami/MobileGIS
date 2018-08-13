@@ -18,4 +18,5 @@
     <string name="username_hint">Username</string>
     <string name="password_hint">Password</string>
     <string name="login_button">LOGIN</string>
+    <string name="login_msg">Login Successful :)</string>
 </resources>

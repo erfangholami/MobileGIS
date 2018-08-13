@@ -10,4 +10,5 @@
     <dimen name="card_view_detail_point_padding">8dp</dimen>
     <dimen name="regular_margin">8dp</dimen>
     <dimen name="login_component_width">150dp</dimen>
+    <dimen name="regular_elevation">8dp</dimen>
 </resources>

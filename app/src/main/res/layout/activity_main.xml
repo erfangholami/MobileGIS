@@ -86,6 +86,7 @@
                             android:background="@android:color/transparent"
                             />
                         <ImageButton
+                            android:id="@+id/navigation_drawer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:src="@mipmap/ic_navigation"
@@ -107,6 +108,7 @@
                     android:layout_height="wrap_content"
                     android:src="@mipmap/ic_my_location"
                     style="@style/mainButtonStyle"
+                    android:onClick="@{() -> mapsViewModel.goMyLocation()}"
                     android:background="@drawable/round_button"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintRight_toRightOf="parent" />
@@ -116,6 +118,7 @@
                     android:layout_height="wrap_content"
                     android:src="@mipmap/ic_zoom_out"
                     style="@style/mainButtonStyle"
+                    android:onClick="@{(v) -> mapsViewModel.zoom(v)}"
                     android:layout_marginBottom="100dp"
                     android:background="@drawable/round_button"
                     app:layout_constraintBottom_toTopOf="@+id/my_location_button"
@@ -126,6 +129,7 @@
                     android:layout_height="wrap_content"
                     android:src="@mipmap/ic_zoom_in"
                     style="@style/mainButtonStyle"
+                    android:onClick="@{(v) -> mapsViewModel.zoom(v)}"
                     android:background="@drawable/round_button"
                     app:layout_constraintBottom_toTopOf="@+id/zoom_out_button"
                     app:layout_constraintRight_toRightOf="parent"/>

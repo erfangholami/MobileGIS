@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 28
@@ -19,6 +20,9 @@ android {
     //DataBinding
     dataBinding {
         enabled = true
+    }
+    realm {
+        syncEnabled = true
     }
 }
 
@@ -50,4 +54,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+
+    //realm
+    implementation 'io.realm:android-adapters:3.0.0'
 }

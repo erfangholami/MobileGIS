@@ -2,7 +2,7 @@ package com.kandaidea.mobilegis.DataModel.Models;
 
 import com.google.gson.annotations.SerializedName;
 
-public class LoginResponse
+public class LoginResponse<T>
 {
     @SerializedName("valid")
     private boolean valid;

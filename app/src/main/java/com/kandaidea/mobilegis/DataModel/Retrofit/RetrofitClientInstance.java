@@ -1,21 +1,31 @@
 package com.kandaidea.mobilegis.DataModel.Retrofit;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import com.kandaidea.mobilegis.DataModel.Constants;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClientInstance
 {
     private static Retrofit mRetrofit;
-    public static final String BASE_URL = "WWW.google.com";
     public static Retrofit getRetrofitInstance()
     {
         if (mRetrofit == null)
         {
+            OkHttpClient client = new OkHttpClient.Builder().build();
+
+            Gson gson = new GsonBuilder()
+                    .setLenient()
+                    .create();
+
             mRetrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .baseUrl(Constants.BASE_URL)
+                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .build();
         }
