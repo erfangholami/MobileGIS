@@ -20,4 +20,7 @@
     <string name="login_button">LOGIN</string>
     <string name="login_msg">Login Successful :)</string>
     <string name="search_hint">Search Here :)))</string>
+    <string name="send_server">Send to Server</string>
+    <string name="clear">Clear</string>
+    <string name="export">Export</string>
 </resources>

@@ -13,4 +13,5 @@
     <dimen name="regular_elevation">8dp</dimen>
     <dimen name="search_result_margin">12dp</dimen>
     <dimen name="search_result_elevation">8dp</dimen>
+    <dimen name="actionbar_corner_radius">10dp</dimen>
 </resources>

@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.kandaidea.mobilegis.DataModel.Models.LoginResponse;
 import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
+import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,5 +69,11 @@ public class RetrofitMethods
         Observable<List<SearchResult>> call = api.getSearchResult(searchText);
         searchResult = call;
         return call;
+    }
+
+    public void sendUserLocations(List<UserLocationModel> locations)
+    {
+        //should send to server
+        api.sendUserLocations(locations);
     }
 }

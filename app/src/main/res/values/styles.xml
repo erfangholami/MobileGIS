@@ -19,4 +19,10 @@
         <item name="android:layout_margin">@dimen/main_button_margins</item>
         <item name="android:elevation">@dimen/main_button_elevation</item>
     </style>
+    <style name="actionbar_style">
+        <item name="android:elevation">@dimen/action_bar_elevation</item>
+        <item name="android:background">@xml/actionbar_layer_list</item>
+        <item name="android:layout_margin">@dimen/action_bar_margin</item>
+
+    </style>
 </resources>

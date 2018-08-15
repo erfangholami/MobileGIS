@@ -2,6 +2,7 @@ package com.kandaidea.mobilegis;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
@@ -13,11 +14,14 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -27,7 +31,9 @@ import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.kandaidea.mobilegis.DataModel.Constants;
+import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
 import com.kandaidea.mobilegis.View.SearchActivity;
+import com.kandaidea.mobilegis.View.UserLocations;
 import com.kandaidea.mobilegis.ViewModel.MapsActivityViewModel;
 import com.kandaidea.mobilegis.databinding.ActivityMainBinding;
 
@@ -46,8 +52,11 @@ import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.gestures.RotationGestureDetector;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
+import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.util.Date;
 import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity
@@ -62,7 +71,7 @@ public class MainActivity extends AppCompatActivity
     private ImageButton navigationDrawer;
     private ImageButton mMapItem;
     private ImageButton mSearchItem;
-    private ImageButton mScreenShotItem;
+    private NavigationView mNavigationView;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -126,6 +135,29 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        mNavigationView= findViewById(R.id.nav_view);
+        mNavigationView.getMenu().getItem(Constants.EXIT_ITEM_NUMBER).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem)
+            {
+                Intent intent = new Intent(Intent.ACTION_MAIN);
+                intent.addCategory(Intent.CATEGORY_HOME);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                return false;
+            }
+        });
+        mNavigationView.getMenu().getItem(Constants.USER_LOCATIONS_ITEM_NUMBER).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem)
+            {
+                Intent intent = new Intent(getApplicationContext(), UserLocations.class);
+                startActivity(intent);
+                return false;
+            }
+        });
         //endregion
 
 
@@ -181,16 +213,21 @@ public class MainActivity extends AppCompatActivity
         mapController.setCenter(centerPoint);
         mMapView.setTileSource(TileSourceFactory.MAPNIK);
         mMapView.setBuiltInZoomControls(false);
+        mMapView.setMultiTouchControls(true);
         mMapView.setClickable(true);
         mMapView.setLongClickable(true);
 
 
-        myLocationNewOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
+        GpsMyLocationProvider x = new GpsMyLocationProvider(this);
+        myLocationNewOverlay = new MyLocationNewOverlay(x, mMapView);
         myLocationNewOverlay.enableMyLocation();
         Bitmap myLocationLogo = ((BitmapDrawable)getResources().getDrawable(R.mipmap.ic_my_location_point)).getBitmap();
-        myLocationNewOverlay.setPersonIcon(myLocationLogo);
         myLocationNewOverlay.setPersonHotspot(myLocationLogo.getWidth() / 2, myLocationLogo.getHeight() / 2);
-        mMapView.getOverlays().add(myLocationNewOverlay);
+        myLocationNewOverlay.setDirectionArrow(myLocationLogo, myLocationLogo);
+        myLocationNewOverlay.setDrawAccuracyEnabled(true);
+        mMapView.getOverlays().add(Constants.MY_LOCATION_OVERLAY_NUMBER, myLocationNewOverlay);
+
+
 
     }
 

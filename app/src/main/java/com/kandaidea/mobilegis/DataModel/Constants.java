@@ -29,4 +29,7 @@ public class Constants
     public static final int SEARCH_ACTIVITY_REQUEST_CODE = 1000;
     public static final String MAIN_FOLDER = "MobileGIS";
     public static final String SCREENSHOT_FOLDER = "Screenshots";
+    public static final int EXIT_ITEM_NUMBER = 6;
+    public static final int USER_LOCATIONS_ITEM_NUMBER = 4;
+    public static final String USER_LOCATIONS_FOLDER = "UserLocations";
 }

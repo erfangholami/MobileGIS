@@ -39,7 +39,7 @@
             android:title="@string/setting_item" />
     </group>
     <group android:checkableBehavior="single"
-        android:id="@+id/group7">
+        android:id="@+id/exit">
         <item
             android:icon="@mipmap/ic_exit"
             android:title="@string/exit_item" />

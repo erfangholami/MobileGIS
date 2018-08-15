@@ -23,7 +23,7 @@ public class ScreenShot
         android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
         try
         {
-            String mPath = Environment.getExternalStorageDirectory().toString() + "/" + Constants.MAIN_FOLDER + "/"+ Constants.SCREENSHOT_FOLDER + "/" + now + ".jpg";
+            String mPath = Environment.getExternalStorageDirectory().toString() + "/" + Constants.MAIN_FOLDER + "/"+ Constants.SCREENSHOT_FOLDER + "/" + now.toString() + ".jpg";
             Log.d(TAG, mPath);
             File imageFile = new File(mPath);
 

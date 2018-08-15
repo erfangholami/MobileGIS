@@ -1,4 +1,5 @@
-login()
+login(String username, String password)
 getUpdate()
-getSearchResult()
-getSearchItem();
+getSearchResult(String s) //return a list of places with these data : name, id, city, province, country, type(marker,polygon, polyline)
+getSearchItem(int i); //return hole data of a place with it's id (name , ... and it's point(s)) to show on the map
+sendUserLocations(List<userLocationModel>); // send a list of userlocations to server 
