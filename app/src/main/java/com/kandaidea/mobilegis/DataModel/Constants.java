@@ -26,4 +26,5 @@ public class Constants
 
     public static final int MY_LOCATION_OVERLAY_NUMBER = 0;
 
+    public static final int SEARCH_ACTIVITY_REQUEST_CODE = 1000;
 }

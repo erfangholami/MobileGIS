@@ -2,6 +2,7 @@ package com.kandaidea.mobilegis;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -25,6 +26,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.kandaidea.mobilegis.DataModel.Constants;
+import com.kandaidea.mobilegis.View.SearchActivity;
 import com.kandaidea.mobilegis.ViewModel.MapsActivityViewModel;
 import com.kandaidea.mobilegis.databinding.ActivityMainBinding;
 
@@ -55,6 +57,11 @@ public class MainActivity extends AppCompatActivity
     private Toolbar mToolbar;
     public MyLocationNewOverlay myLocationNewOverlay;
 
+    //Views
+    private ImageButton navigationDrawer;
+    private ImageButton mMapItem;
+    private ImageButton mSearchItem;
+    private ImageButton mScreenShotItem;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -75,8 +82,8 @@ public class MainActivity extends AppCompatActivity
 
         //region Toolbar
         mToolbar = findViewById(R.id.main_toolbar);
-        ImageButton navigationdrawer = mToolbar.findViewById(R.id.navigation_drawer);
-        navigationdrawer.setOnClickListener(new View.OnClickListener()
+        navigationDrawer = mToolbar.findViewById(R.id.navigation_drawer);
+        navigationDrawer.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
@@ -85,7 +92,7 @@ public class MainActivity extends AppCompatActivity
                 dl.openDrawer(findViewById(R.id.nav_view));
             }
         });
-        ImageButton mMapItem = mToolbar.findViewById(R.id.map_item);
+        mMapItem = mToolbar.findViewById(R.id.map_item);
         mMapItem.setOnClickListener(new View.OnClickListener()
         {
             @SuppressLint("ResourceType")
@@ -105,6 +112,16 @@ public class MainActivity extends AppCompatActivity
                 vieww.setAnimation(animation);
                 vieww.setVisibility(View.VISIBLE);
                 vieww.startAnimation(animation);
+            }
+        });
+        mSearchItem = mToolbar.findViewById(R.id.search_item);
+        mSearchItem.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                Intent intent = new Intent(getApplicationContext(), SearchActivity.class);
+                startActivityForResult(intent, Constants.SEARCH_ACTIVITY_REQUEST_CODE);
             }
         });
 
