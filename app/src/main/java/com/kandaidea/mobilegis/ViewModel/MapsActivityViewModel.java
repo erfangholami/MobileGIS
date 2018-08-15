@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.arch.lifecycle.ViewModel;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 
 import com.kandaidea.mobilegis.DataModel.Constants;
+import com.kandaidea.mobilegis.DataModel.ScreenShot;
 import com.kandaidea.mobilegis.MainActivity;
 import com.kandaidea.mobilegis.R;
 
@@ -15,6 +17,8 @@ import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+
+import java.io.File;
 
 public class MapsActivityViewModel extends ViewModel
 {
@@ -26,6 +30,16 @@ public class MapsActivityViewModel extends ViewModel
     {
         this.mActivity = mActivity;
         mMapView = (this.mActivity.getWindow().getDecorView().findViewById(android.R.id.content)).findViewById(R.id.map_view_main);
+
+        //make directory for screenshots
+        File f = new File(Environment.getExternalStorageDirectory(), Constants.MAIN_FOLDER);
+        if (!f.exists()) {
+            f.mkdirs();
+        }
+        File f1 = new File(Environment.getExternalStorageDirectory() + "/" + Constants.MAIN_FOLDER, Constants.SCREENSHOT_FOLDER);
+        if (!f1.exists()) {
+            f1.mkdirs();
+        }
 
     }
     public void zoom(View v)
@@ -50,5 +64,13 @@ public class MapsActivityViewModel extends ViewModel
         {
             mMapView.getController().animateTo(location, Constants.ANIMATE_ZOOM_LEVEL, Constants.ANIMATE_SPEED);
         }
+    }
+    public boolean takeScreenshot()
+    {
+        View v1 = mActivity.getWindow().getDecorView().getRootView();
+        v1.setDrawingCacheEnabled(true);
+        Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
+        v1.setDrawingCacheEnabled(false);
+        return new ScreenShot(bitmap).takeScreenshot();
     }
 }

@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.widget.DrawerLayout;
@@ -191,5 +192,16 @@ public class MainActivity extends AppCompatActivity
         myLocationNewOverlay.setPersonHotspot(myLocationLogo.getWidth() / 2, myLocationLogo.getHeight() / 2);
         mMapView.getOverlays().add(myLocationNewOverlay);
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        //set data to map view getting Bundle
+        if(requestCode == Constants.SEARCH_ACTIVITY_REQUEST_CODE)
+        {
+
+        }
     }
 }
