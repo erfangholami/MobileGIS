@@ -5,4 +5,5 @@
     <color name="colorAccent">#FF4081</color>
     <color name="action_bar_background">#F0FFFFFF</color>
     <color name="navigation_background">#E4E4E4</color>
+    <color name="polygon_fill_color">#802EC0C0</color>
 </resources>

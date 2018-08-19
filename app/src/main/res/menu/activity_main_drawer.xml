@@ -18,7 +18,8 @@
         android:id="@+id/group3">
         <item
             android:icon="@mipmap/ic_draw"
-            android:title="@string/draw_item" />
+            android:title="@string/draw_item">
+        </item>
     </group>
     <group android:checkableBehavior="single"
         android:id="@+id/group4">

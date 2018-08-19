@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationManager;
@@ -32,6 +33,7 @@ import android.widget.ImageButton;
 
 import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
+import com.kandaidea.mobilegis.View.Draw;
 import com.kandaidea.mobilegis.View.SearchActivity;
 import com.kandaidea.mobilegis.View.UserLocations;
 import com.kandaidea.mobilegis.ViewModel.MapsActivityViewModel;
@@ -47,6 +49,9 @@ import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polygon;
+import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.gestures.RotationGestureDetector;
@@ -56,7 +61,9 @@ import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity
@@ -72,6 +79,18 @@ public class MainActivity extends AppCompatActivity
     private ImageButton mMapItem;
     private ImageButton mSearchItem;
     private NavigationView mNavigationView;
+
+
+    //vars
+    private int mapMode = Constants.NONE;
+    private Polyline mapDrawPolyline = new Polyline();
+    private Polygon mapDrawPolygon = new Polygon();
+    private ArrayList<Marker> areaPolygonMarkers = new ArrayList<>();
+
+    private ArrayList<Marker> areaPolylineMarkers = new ArrayList<>();
+    private Draw polygonDraw;
+    private Draw polylineDraw;
+
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -158,6 +177,15 @@ public class MainActivity extends AppCompatActivity
                 return false;
             }
         });
+        mNavigationView.getMenu().getItem(Constants.DRAW_ITEM_NUMBER).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem)
+            {
+                mapMode = Constants.DRAW_POLYGON_MODE;
+                return false;
+            }
+        });
         //endregion
 
 
@@ -227,9 +255,58 @@ public class MainActivity extends AppCompatActivity
         myLocationNewOverlay.setDrawAccuracyEnabled(true);
         mMapView.getOverlays().add(Constants.MY_LOCATION_OVERLAY_NUMBER, myLocationNewOverlay);
 
-
+        initialMapClickListener();
 
     }
+    private void initialMapClickListener()
+    {
+        mMapView.setLongClickable(true);
+        MapEventsReceiver eventsReceiver = new MapEventsReceiver()
+        {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public boolean singleTapConfirmedHelper(GeoPoint p)
+            {
+                if(mapMode == Constants.DRAW_POLYGON_MODE)
+                {
+                    if(mapDrawPolygon.getPoints().size() > 0)
+                    {
+                        polygonDraw.drawForPolygon(p);
+                    }
+                }
+                return false;
+            }
+
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public boolean longPressHelper(GeoPoint p)
+            {
+                if(mapMode == Constants.DRAW_POLYGON_MODE)
+                {
+                    if(mapDrawPolygon.getPoints().size() == 0)
+                    {
+                        polygonDraw = new Draw(getApplicationContext(), mMapView, mapDrawPolygon, mapDrawPolyline, areaPolygonMarkers, areaPolylineMarkers, Constants.DRAW_POLYGON_MODE);
+                        polygonDraw.drawForPolygon(p);
+                    }
+                }
+                return false;
+            }
+        };
+        MapEventsOverlay OverlayEvents = new MapEventsOverlay(this, eventsReceiver);
+        mMapView.getOverlays().add(Constants.MAP_EVENT_RECEIVER_OVERLAY_NUMBER, OverlayEvents);
+        areaPolygonMarkers.add(new Marker(mMapView));
+        areaPolylineMarkers.add(new Marker(mMapView));
+        mMapView.getOverlays().add(Constants.DRAW_POLYGON_OVERLAY_NUMBER, mapDrawPolygon);
+        mMapView.getOverlays().addAll(Constants.DRAW_POLYGON_MARKER_OVERLAY_NUMBER, areaPolygonMarkers);
+        mMapView.getOverlays().add(Constants.DRAW_POLYLINE_OVERLAY_NUMBER, mapDrawPolyline);
+        mMapView.getOverlays().addAll(Constants.DRAW_POLYLINE_MARKER_OVERLAY_NUMBER, areaPolylineMarkers);
+        areaPolylineMarkers.clear();
+        areaPolygonMarkers.clear();
+        mMapView.getOverlays().remove(Constants.DRAW_POLYLINE_MARKER_OVERLAY_NUMBER);
+        mMapView.getOverlays().remove(Constants.DRAW_POLYGON_MARKER_OVERLAY_NUMBER);
+        mMapView.invalidate();
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)

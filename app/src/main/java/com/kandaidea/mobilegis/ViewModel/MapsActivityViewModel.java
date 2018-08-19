@@ -78,6 +78,7 @@ public class MapsActivityViewModel extends ViewModel
     }
     public void goMyLocation()
     {
+        Log.d(TAG, "onLocationClicked" + mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER).getClass().getSimpleName());
         IGeoPoint location = ((MyLocationNewOverlay)(mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER))).getMyLocation();
         if(location != null)
         {

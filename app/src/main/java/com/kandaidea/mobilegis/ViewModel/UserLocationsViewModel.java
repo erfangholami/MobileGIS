@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.kandaidea.mobilegis.DataModel.Constants;
+import com.kandaidea.mobilegis.DataModel.GPX;
 import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
 import com.kandaidea.mobilegis.DataModel.Retrofit.RetrofitMethods;
 import com.kandaidea.mobilegis.R;
@@ -72,25 +73,9 @@ public class UserLocationsViewModel extends ViewModel
     {
         Date now = new Date();
         android.text.format.DateFormat.format("yyyy_MM_dd_hh:mm:ss", now);
-        String mPath = Environment.getExternalStorageDirectory().toString() + "/" + Constants.MAIN_FOLDER + "/"+ Constants.USER_LOCATIONS_FOLDER + "/" + now.toString()+ ".txt";
+        String mPath = Environment.getExternalStorageDirectory().toString() + "/" + Constants.MAIN_FOLDER + "/"+ Constants.USER_LOCATIONS_FOLDER + "/" + now.toString()+ ".gpx";
 
         File file = new File(mPath);
-        try {
-            FileOutputStream f = new FileOutputStream(file);
-            PrintWriter pw = new PrintWriter(f);
-            for(UserLocationModel m: getLocations())
-            {
-                pw.println(m.getTime() + " , " + m.getLat() + " , " + m.getLng());
-            }
-            pw.flush();
-            pw.close();
-            f.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            Log.i(TAG, "******* File not found. Did you" +
-                    " add a WRITE_EXTERNAL_STORAGE permission to the   manifest?");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        new GPX().writePath(file, "gpsFile", getLocations());
     }
 }

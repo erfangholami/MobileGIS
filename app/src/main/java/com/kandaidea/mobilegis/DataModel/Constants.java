@@ -25,11 +25,29 @@ public class Constants
     public static final BoundingBox MAP_BOUND = new BoundingBox(85.05112877980659, 180.0d,-85.05112877980659,-180.0d);
 
     public static final int MY_LOCATION_OVERLAY_NUMBER = 0;
+    public static final int MAP_EVENT_RECEIVER_OVERLAY_NUMBER = 1;
+    public static final int DRAW_POLYGON_OVERLAY_NUMBER = 2;
+    public static final int DRAW_POLYGON_MARKER_OVERLAY_NUMBER = 3;
+    public static final int DRAW_POLYLINE_OVERLAY_NUMBER = 4;
+    public static final int DRAW_POLYLINE_MARKER_OVERLAY_NUMBER = 5;
+
 
     public static final int SEARCH_ACTIVITY_REQUEST_CODE = 1000;
+
+
     public static final String MAIN_FOLDER = "MobileGIS";
     public static final String SCREENSHOT_FOLDER = "Screenshots";
+    public static final String USER_LOCATIONS_FOLDER = "UserLocations";
+
+
+    //navigation item numbers
     public static final int EXIT_ITEM_NUMBER = 6;
     public static final int USER_LOCATIONS_ITEM_NUMBER = 4;
-    public static final String USER_LOCATIONS_FOLDER = "UserLocations";
+    public static final int DRAW_ITEM_NUMBER = 2;
+
+
+    //map modes
+    public static final int NONE = 0;
+    public static final int DRAW_POLYGON_MODE = 1;
+    public static final int DRAW_POLYLINE_MODE = 2;
 }
