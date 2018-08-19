@@ -23,4 +23,7 @@
     <string name="send_server">Send to Server</string>
     <string name="clear">Clear</string>
     <string name="export">Export</string>
+    <string name="polygon">POLYGON</string>
+    <string name="polyline">POLYLINE</string>
+    <string name="dialog_choise_draw_mode">Which one you want to draw ?</string>
 </resources>

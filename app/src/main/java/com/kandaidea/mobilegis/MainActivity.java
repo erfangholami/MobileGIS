@@ -20,6 +20,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -30,6 +31,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
@@ -50,6 +52,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.Polygon;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
@@ -79,6 +82,7 @@ public class MainActivity extends AppCompatActivity
     private ImageButton mMapItem;
     private ImageButton mSearchItem;
     private NavigationView mNavigationView;
+    private TextView drawInformation;
 
 
     //vars
@@ -108,6 +112,9 @@ public class MainActivity extends AppCompatActivity
 
         mapCashSet();
         initialMapSettings();
+
+        drawInformation = findViewById(R.id.draw_information);
+
 
         //region Toolbar
         mToolbar = findViewById(R.id.main_toolbar);
@@ -182,7 +189,30 @@ public class MainActivity extends AppCompatActivity
             @Override
             public boolean onMenuItemClick(MenuItem menuItem)
             {
-                mapMode = Constants.DRAW_POLYGON_MODE;
+                DrawerLayout dl = findViewById(R.id.drawer_layout);
+                dl.closeDrawer(findViewById(R.id.nav_view));
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Draw")
+                        .setMessage(R.string.dialog_choise_draw_mode)
+                        .setCancelable(false)
+                        .setNeutralButton("cancel", null)
+                        .setNegativeButton(R.string.polygon, new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i)
+                            {
+                                mapMode = Constants.DRAW_POLYGON_MODE;
+                            }
+                        })
+                        .setPositiveButton(R.string.polyline, new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i)
+                            {
+                                mapMode = Constants.DRAW_POLYLINE_MODE;
+                            }
+                        })
+                        .show();
                 return false;
             }
         });
@@ -274,6 +304,13 @@ public class MainActivity extends AppCompatActivity
                         polygonDraw.drawForPolygon(p);
                     }
                 }
+                if(mapMode == Constants.DRAW_POLYLINE_MODE)
+                {
+                    if(mapDrawPolyline.getPoints().size() > 0)
+                    {
+                        polylineDraw.drawForPolyline(p);
+                    }
+                }
                 return false;
             }
 
@@ -285,8 +322,19 @@ public class MainActivity extends AppCompatActivity
                 {
                     if(mapDrawPolygon.getPoints().size() == 0)
                     {
+                        areaPolygonMarkers.clear();
+                        mMapView.invalidate();
                         polygonDraw = new Draw(getApplicationContext(), mMapView, mapDrawPolygon, mapDrawPolyline, areaPolygonMarkers, areaPolylineMarkers, Constants.DRAW_POLYGON_MODE);
                         polygonDraw.drawForPolygon(p);
+                    }
+                }
+                if(mapMode == Constants.DRAW_POLYLINE_MODE)
+                {
+                    if(mapDrawPolyline.getPoints().size() == 0)
+                    {
+                        areaPolylineMarkers.clear();
+                        polylineDraw = new Draw(getApplicationContext(), mMapView, mapDrawPolygon, mapDrawPolyline, areaPolygonMarkers, areaPolylineMarkers, Constants.DRAW_POLYLINE_MODE);
+                        polylineDraw.drawForPolyline(p);
                     }
                 }
                 return false;
@@ -294,16 +342,21 @@ public class MainActivity extends AppCompatActivity
         };
         MapEventsOverlay OverlayEvents = new MapEventsOverlay(this, eventsReceiver);
         mMapView.getOverlays().add(Constants.MAP_EVENT_RECEIVER_OVERLAY_NUMBER, OverlayEvents);
-        areaPolygonMarkers.add(new Marker(mMapView));
-        areaPolylineMarkers.add(new Marker(mMapView));
+        Marker x = new Marker(mMapView);
+        x.setIcon(null);
+        x.setImage(null);
+        x.setVisible(false);
+        areaPolygonMarkers.add(x);
+        areaPolylineMarkers.add(x);
         mMapView.getOverlays().add(Constants.DRAW_POLYGON_OVERLAY_NUMBER, mapDrawPolygon);
         mMapView.getOverlays().addAll(Constants.DRAW_POLYGON_MARKER_OVERLAY_NUMBER, areaPolygonMarkers);
         mMapView.getOverlays().add(Constants.DRAW_POLYLINE_OVERLAY_NUMBER, mapDrawPolyline);
         mMapView.getOverlays().addAll(Constants.DRAW_POLYLINE_MARKER_OVERLAY_NUMBER, areaPolylineMarkers);
+
         areaPolylineMarkers.clear();
         areaPolygonMarkers.clear();
-        mMapView.getOverlays().remove(Constants.DRAW_POLYLINE_MARKER_OVERLAY_NUMBER);
-        mMapView.getOverlays().remove(Constants.DRAW_POLYGON_MARKER_OVERLAY_NUMBER);
+        //mMapView.getOverlays().remove(Constants.DRAW_POLYLINE_MARKER_OVERLAY_NUMBER);
+        //mMapView.getOverlays().remove(Constants.DRAW_POLYGON_MARKER_OVERLAY_NUMBER);
         mMapView.invalidate();
     }
 

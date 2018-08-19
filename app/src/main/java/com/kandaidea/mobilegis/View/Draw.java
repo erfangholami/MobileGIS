@@ -90,6 +90,56 @@ public class Draw
         mMapView.getOverlays().addAll(Constants.DRAW_POLYGON_MARKER_OVERLAY_NUMBER, mPolygonMarker);
         mMapView.invalidate();
     }
+    public void drawForPolyline(GeoPoint p)
+    {
+        mMapView.getOverlays().remove(Constants.DRAW_POLYLINE_OVERLAY_NUMBER);
+        Marker newMarker = new Marker(mMapView);
+        newMarker.setPosition(p);
+        newMarker.setDraggable(true);
+        newMarker.setIcon(mContext.getResources().getDrawable(R.mipmap.ic_draw_edge));
+        newMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+        newMarker.setOnMarkerDragListener(new Marker.OnMarkerDragListener()
+        {
+            @Override
+            public void onMarkerDrag(Marker marker)
+            {
+                Log.d(TAG, "onMarkerDrag");
+            }
+
+            @Override
+            public void onMarkerDragEnd(Marker marker)
+            {
+                Log.d(TAG, "onMarkerDragEnd");
+
+                int index = mPolylineMarker.indexOf(marker);
+                GeoPoint p = marker.getPosition();
+                List<GeoPoint> x = mPolyline.getPoints();
+                Log.d(TAG, "sizeOfPolyline is : " + x.size());
+                x.set(index, p);
+                Polyline poly = new Polyline();
+                poly.setPoints(x);
+                mPolyline = poly;
+                mMapView.getOverlays().add(Constants.DRAW_POLYLINE_OVERLAY_NUMBER, mPolyline);
+                mMapView.getOverlays().remove(Constants.DRAW_POLYLINE_MARKER_OVERLAY_NUMBER);
+                mMapView.getOverlays().addAll(Constants.DRAW_POLYLINE_MARKER_OVERLAY_NUMBER, mPolylineMarker);
+                mMapView.invalidate();
+            }
+
+            @Override
+            public void onMarkerDragStart(Marker marker)
+            {
+                Log.d(TAG, "onMarkerDragStart");
+                mMapView.getOverlays().remove(mPolyline);
+                mMapView.invalidate();
+            }
+        });
+        mMapView.getOverlays().remove(mPolylineMarker);
+        mPolylineMarker.add(newMarker);
+        mPolyline.addPoint(p);
+        mMapView.getOverlays().add(Constants.DRAW_POLYLINE_OVERLAY_NUMBER, mPolyline);
+        mMapView.getOverlays().addAll(Constants.DRAW_POLYLINE_MARKER_OVERLAY_NUMBER, mPolylineMarker);
+        mMapView.invalidate();
+    }
 
 
     // region getterSetter
