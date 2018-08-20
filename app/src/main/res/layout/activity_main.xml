@@ -143,13 +143,14 @@
                     app:layout_constraintRight_toRightOf="parent"/>
 
                 <include
-                    android:id="@+id/detail_point_card_view"
-                    layout="@layout/detail_point_view"/>
+                    android:id="@+id/detail_point_view_card"
+                    layout="@layout/detail_point_view" />
+
                 <include
                     android:id="@+id/detail_polygon_card_view"
-                    layout="@layout/polygon_layer_details"/>
+                    layout="@layout/polygon_layer_details" />
                 <include
-                    android:id="@+id/map_settings_card_view"
+                    android:id="@+id/map_settings_view_card"
                     layout="@layout/map_settings"/>
             </android.support.constraint.ConstraintLayout>
             <android.support.design.widget.NavigationView

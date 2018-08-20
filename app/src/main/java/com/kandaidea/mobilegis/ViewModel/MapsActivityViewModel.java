@@ -11,12 +11,16 @@ import android.view.View;
 
 import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
+import com.kandaidea.mobilegis.DataModel.Models.UserOverlayModel;
+import com.kandaidea.mobilegis.DataModel.Realm.RealmUserOverlays;
 import com.kandaidea.mobilegis.DataModel.ScreenShot;
 import com.kandaidea.mobilegis.MainActivity;
 import com.kandaidea.mobilegis.R;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.Polygon;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
@@ -34,11 +38,13 @@ public class MapsActivityViewModel extends ViewModel
     private Activity mActivity;
     private MapView mMapView;
     public Realm userLocationRealm;
+    public RealmUserOverlays realmUserOverlays;
 
     public void init(Activity mActivity)
     {
         this.mActivity = mActivity;
         Realm.init(this.mActivity.getApplicationContext());
+        //realmUserOverlays = new RealmUserOverlays();
         RealmConfiguration userLocationRealmConfig = new RealmConfiguration.Builder()
                 .name("user_locations.realm")
                 .schemaVersion(1)
@@ -110,5 +116,14 @@ public class MapsActivityViewModel extends ViewModel
         Log.d(TAG, "addedLocation" + now.toString());
         userLocationRealm.insert(new UserLocationModel(now.toString(), location.getLatitude(), location.getLongitude()));
         userLocationRealm.commitTransaction();
+    }
+
+    public void saveUserOverlay(Overlay overlay)
+    {
+        Date now = new Date();
+        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+        UserOverlayModel model = new UserOverlayModel(now.toString(),overlay instanceof Polygon ? Constants.POLYGON_TYPE : Constants.POLYLINE_TYPE, overlay);
+
+        realmUserOverlays.addOverlay(model);
     }
 }

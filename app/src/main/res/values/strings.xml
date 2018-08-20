@@ -26,4 +26,8 @@
     <string name="polygon">POLYGON</string>
     <string name="polyline">POLYLINE</string>
     <string name="dialog_choise_draw_mode">Which one you want to draw ?</string>
+    <string name="dialog_exit">Are you sure to exit?</string>
+    <string name="yes">YES</string>
+    <string name="no">NO</string>
+    <string name="tiles">Tiles</string>
 </resources>

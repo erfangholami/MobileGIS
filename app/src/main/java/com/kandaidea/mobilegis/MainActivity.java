@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -21,6 +22,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -33,10 +37,13 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.kandaidea.mobilegis.Adapers.MapSettingTileAdapter;
 import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
+import com.kandaidea.mobilegis.View.ColorFilter;
 import com.kandaidea.mobilegis.View.Draw;
 import com.kandaidea.mobilegis.View.SearchActivity;
+import com.kandaidea.mobilegis.View.SettingActivity;
 import com.kandaidea.mobilegis.View.UserLocations;
 import com.kandaidea.mobilegis.ViewModel.MapsActivityViewModel;
 import com.kandaidea.mobilegis.databinding.ActivityMainBinding;
@@ -45,8 +52,10 @@ import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.BuildConfig;
 import org.osmdroid.events.MapEventsReceiver;
+import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -55,6 +64,7 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.Polygon;
 import org.osmdroid.views.overlay.Polyline;
+import org.osmdroid.views.overlay.TilesOverlay;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.gestures.RotationGestureDetector;
@@ -83,6 +93,8 @@ public class MainActivity extends AppCompatActivity
     private ImageButton mSearchItem;
     private NavigationView mNavigationView;
     private TextView drawInformation;
+    private CardView pointDetailCardView;
+    private CardView mapSetting;
 
 
     //vars
@@ -90,10 +102,10 @@ public class MainActivity extends AppCompatActivity
     private Polyline mapDrawPolyline = new Polyline();
     private Polygon mapDrawPolygon = new Polygon();
     private ArrayList<Marker> areaPolygonMarkers = new ArrayList<>();
-
     private ArrayList<Marker> areaPolylineMarkers = new ArrayList<>();
     private Draw polygonDraw;
     private Draw polylineDraw;
+    private Marker customMarker;
 
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -115,6 +127,22 @@ public class MainActivity extends AppCompatActivity
 
         drawInformation = findViewById(R.id.draw_information);
 
+        pointDetailCardView = ((ConstraintLayout)findViewById(R.id.detail_point_view_card)).findViewById(R.id.detail_point_card_view);
+        pointDetailCardView.findViewById(R.id.share_location_point).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                shareLocation(customMarker.getPosition());
+            }
+        });
+
+        mapSetting = ((ConstraintLayout)findViewById(R.id.map_settings_view_card)).findViewById(R.id.map_setting_card_view);
+        RecyclerView cc = mapSetting.findViewById(R.id.tile_recycler_view);
+        cc.setHasFixedSize(true);
+        cc.setLayoutManager(new LinearLayoutManager(this));
+        cc.setAdapter(new MapSettingTileAdapter(this, mMapView));
+        cc.getAdapter().notifyDataSetChanged();
 
         //region Toolbar
         mToolbar = findViewById(R.id.main_toolbar);
@@ -136,18 +164,15 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view)
             {
                 Log.d(TAG, "mMapItemClicked");
-                if(findViewById(R.id.detail_point_card_view).getVisibility() == View.VISIBLE)
-                {
-                    Log.d(TAG, "hiding detail point");
-                    findViewById(R.id.detail_point_card_view).setVisibility(View.GONE);
-                }
                 showMainTools(false);
-
-                View vieww = findViewById(R.id.map_settings_card_view);
-                Animation animation = AnimationUtils.makeInAnimation(getApplicationContext(), false);
-                vieww.setAnimation(animation);
-                vieww.setVisibility(View.VISIBLE);
-                vieww.startAnimation(animation);
+                if(pointDetailCardView.getVisibility() == View.VISIBLE)
+                {
+                    customMarker.setVisible(false);
+                    pointDetailCardView.setVisibility(View.GONE);
+                    mMapView.invalidate();
+                }
+                mapSetting.setVisibility(View.VISIBLE);
+                ((RecyclerView)mapSetting.findViewById(R.id.tile_recycler_view)).getAdapter().notifyDataSetChanged();
             }
         });
         mSearchItem = mToolbar.findViewById(R.id.search_item);
@@ -167,10 +192,33 @@ public class MainActivity extends AppCompatActivity
             @Override
             public boolean onMenuItemClick(MenuItem menuItem)
             {
-                Intent intent = new Intent(Intent.ACTION_MAIN);
-                intent.addCategory(Intent.CATEGORY_HOME);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+                DrawerLayout dl = findViewById(R.id.drawer_layout);
+                dl.closeDrawer(findViewById(R.id.nav_view));
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle(R.string.exit_item)
+                        .setMessage(R.string.dialog_exit)
+                        .setCancelable(false)
+                        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i)
+                            {
+
+                            }
+                        })
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i)
+                            {
+                                finish();
+                                Intent intent = new Intent(Intent.ACTION_MAIN);
+                                intent.addCategory(Intent.CATEGORY_HOME);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                            }
+                        })
+                        .show();
                 return false;
             }
         });
@@ -213,6 +261,18 @@ public class MainActivity extends AppCompatActivity
                             }
                         })
                         .show();
+                return false;
+            }
+        });
+        mNavigationView.getMenu().getItem(Constants.SETTING_ITEM_NUMBER).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem)
+            {
+                DrawerLayout dl = findViewById(R.id.drawer_layout);
+                dl.closeDrawer(findViewById(R.id.nav_view));
+                Intent intent = new Intent(getApplicationContext(), SettingActivity.class);
+                startActivity(intent);
                 return false;
             }
         });
@@ -283,6 +343,7 @@ public class MainActivity extends AppCompatActivity
         myLocationNewOverlay.setPersonHotspot(myLocationLogo.getWidth() / 2, myLocationLogo.getHeight() / 2);
         myLocationNewOverlay.setDirectionArrow(myLocationLogo, myLocationLogo);
         myLocationNewOverlay.setDrawAccuracyEnabled(true);
+        addTileSources();
         mMapView.getOverlays().add(Constants.MY_LOCATION_OVERLAY_NUMBER, myLocationNewOverlay);
 
         initialMapClickListener();
@@ -297,6 +358,21 @@ public class MainActivity extends AppCompatActivity
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p)
             {
+                if(mapMode == Constants.NONE)
+                {
+                    if(pointDetailCardView.getVisibility() == View.VISIBLE)
+                    {
+                        pointDetailCardView.setVisibility(View.GONE);
+                        customMarker.setVisible(false);
+                        mMapView.invalidate();
+                        showMainTools(true);
+                    }
+                    else if(mapSetting.getVisibility() == View.VISIBLE)
+                    {
+                        mapSetting.setVisibility(View.GONE);
+                        showMainTools(true);
+                    }
+                }
                 if(mapMode == Constants.DRAW_POLYGON_MODE)
                 {
                     if(mapDrawPolygon.getPoints().size() > 0)
@@ -318,6 +394,15 @@ public class MainActivity extends AppCompatActivity
             @Override
             public boolean longPressHelper(GeoPoint p)
             {
+                if(mapMode == Constants.NONE)
+                {
+                    if(mapSetting.getVisibility() == View.VISIBLE)
+                    {
+                        mapSetting.setVisibility(View.GONE);
+                    }
+                    showMainTools(false);
+                    showPointPopup(p);
+                }
                 if(mapMode == Constants.DRAW_POLYGON_MODE)
                 {
                     if(mapDrawPolygon.getPoints().size() == 0)
@@ -348,18 +433,71 @@ public class MainActivity extends AppCompatActivity
         x.setVisible(false);
         areaPolygonMarkers.add(x);
         areaPolylineMarkers.add(x);
+        x.setIcon(getResources().getDrawable(R.mipmap.ic_custom_marker));
+        x.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        x.setInfoWindow(null);
+        customMarker = x;
+        mapDrawPolygon.setOnClickListener(new Polygon.OnClickListener()
+        {
+            @Override
+            public boolean onClick(Polygon polygon, MapView mapView, GeoPoint eventPos)
+            {
+                mapsViewModel.saveUserOverlay( polygon);
+                mapDrawPolygon = new Polygon();
+                mMapView.getOverlayManager().set(Constants.DRAW_POLYGON_OVERLAY_NUMBER, mapDrawPolygon);
+                areaPolygonMarkers.clear();
+                mMapView.invalidate();
+                return false;
+            }
+        });
         mMapView.getOverlays().add(Constants.DRAW_POLYGON_OVERLAY_NUMBER, mapDrawPolygon);
         mMapView.getOverlays().addAll(Constants.DRAW_POLYGON_MARKER_OVERLAY_NUMBER, areaPolygonMarkers);
         mMapView.getOverlays().add(Constants.DRAW_POLYLINE_OVERLAY_NUMBER, mapDrawPolyline);
         mMapView.getOverlays().addAll(Constants.DRAW_POLYLINE_MARKER_OVERLAY_NUMBER, areaPolylineMarkers);
-
+        mMapView.getOverlays().add(Constants.DRAW_CUSTOM_MARKER_OVERLAY_NUMBER, customMarker);
         areaPolylineMarkers.clear();
         areaPolygonMarkers.clear();
-        //mMapView.getOverlays().remove(Constants.DRAW_POLYLINE_MARKER_OVERLAY_NUMBER);
-        //mMapView.getOverlays().remove(Constants.DRAW_POLYGON_MARKER_OVERLAY_NUMBER);
+
         mMapView.invalidate();
     }
 
+    private void showPointPopup(GeoPoint p)
+    {
+        customMarker.setVisible(true);
+        customMarker.setPosition(p);
+        pointDetailCardView.setVisibility(View.VISIBLE);
+        TextView location = pointDetailCardView.findViewById(R.id.location_details);
+        location.setText(String.valueOf(p.getLatitude() + "," + String.valueOf(p.getLongitude())));
+        mMapView.getController().animateTo(customMarker.getPosition());
+        mMapView.invalidate();
+    }
+
+    private void shareLocation(GeoPoint chosenPoint)
+    {
+        String uri = "geo:" + chosenPoint.getLatitude() + ","
+                + chosenPoint.getLongitude() + "?q=" + chosenPoint.getLatitude()
+                + "," + chosenPoint.getLongitude();
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, uri);
+        startActivity(Intent.createChooser(sharingIntent, "Share via :"));
+    }
+
+
+    private void addTileSources()
+    {
+        for(int i = 0; i < Constants.TILE_OVERLAIES_NUMBER.length; i++)
+        {
+            final MapTileProviderBasic tileProvider = new MapTileProviderBasic(getApplicationContext());
+            final ITileSource tileSource = Constants.TILE_OVERLAIES[i];
+            tileProvider.setTileSource(tileSource);
+            final TilesOverlay tilesOverlay = new TilesOverlay(tileProvider, this.getBaseContext());
+            tilesOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
+            tilesOverlay.setColorFilter(new ColorFilter().getColorFilter());
+            tilesOverlay.setEnabled(false);
+            mMapView.getOverlays().add(Constants.TILE_OVERLAIES_NUMBER[i], tilesOverlay);
+        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
@@ -371,4 +509,28 @@ public class MainActivity extends AppCompatActivity
 
         }
     }
+
+
+    //region lifeCycle
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        mMapView.onPause();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        mMapView.onDetach();
+    }
+    //endregion
+
 }

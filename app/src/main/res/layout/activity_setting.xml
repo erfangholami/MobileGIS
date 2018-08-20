@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="com.kandaidea.mobilegis.ViewModel.SettingActivityViewModel"/>
+    </data>
+    
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/navigation_background"
+        tools:context=".View.SettingActivity">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/search_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            style="@style/actionbar_style"
+            app:layout_constraintTop_toTopOf="parent">
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:foregroundGravity="left">
+                <TextView
+                    android:id="@+id/setting_activity_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setting_item"
+                    android:textSize="24sp"
+                    android:textColor="@android:color/black"
+                    android:fontFamily="@android:font"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toRightOf="@+id/back_arrow_search_bar"/>
+                <ImageButton
+                    android:id="@+id/back_arrow_search_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/ic_back_arrow"
+                    android:scaleX=".8"
+                    android:scaleY=".8"
+                    android:scaleType="center"
+                    android:background="@android:color/transparent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"/>
+            </android.support.constraint.ConstraintLayout>
+        </android.support.v7.widget.Toolbar>
+
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

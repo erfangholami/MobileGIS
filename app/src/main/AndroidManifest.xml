@@ -26,7 +26,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".View.SearchActivity" />
-        <activity android:name=".View.UserLocations"></activity>
+        <activity android:name=".View.UserLocations" />
+        <activity android:name=".View.SettingActivity"></activity>
     </application>
 
 </manifest>
