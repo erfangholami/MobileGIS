@@ -9,17 +9,22 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 
+import com.google.gson.Gson;
 import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
+import com.kandaidea.mobilegis.DataModel.Models.UserOverlayItem;
 import com.kandaidea.mobilegis.DataModel.Models.UserOverlayModel;
+import com.kandaidea.mobilegis.DataModel.OverlayString;
 import com.kandaidea.mobilegis.DataModel.Realm.RealmUserOverlays;
 import com.kandaidea.mobilegis.DataModel.ScreenShot;
 import com.kandaidea.mobilegis.MainActivity;
 import com.kandaidea.mobilegis.R;
 
 import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.Polygon;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
@@ -27,7 +32,9 @@ import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -44,7 +51,7 @@ public class MapsActivityViewModel extends ViewModel
     {
         this.mActivity = mActivity;
         Realm.init(this.mActivity.getApplicationContext());
-        //realmUserOverlays = new RealmUserOverlays();
+        realmUserOverlays = new RealmUserOverlays();
         RealmConfiguration userLocationRealmConfig = new RealmConfiguration.Builder()
                 .name("user_locations.realm")
                 .schemaVersion(1)
@@ -118,12 +125,45 @@ public class MapsActivityViewModel extends ViewModel
         userLocationRealm.commitTransaction();
     }
 
-    public void saveUserOverlay(Overlay overlay)
+    public void saveUserOverlay(Polygon overlay)
     {
+        //TODO save overlay in DB
         Date now = new Date();
         android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
-        UserOverlayModel model = new UserOverlayModel(now.toString(),overlay instanceof Polygon ? Constants.POLYGON_TYPE : Constants.POLYLINE_TYPE, overlay);
-
+        UserOverlayModel model = new UserOverlayModel(now.toString(),overlay instanceof Polygon ? Constants.POLYGON_TYPE : Constants.POLYLINE_TYPE, new Gson().toJson(overlay));
         realmUserOverlays.addOverlay(model);
+    }
+    public List<UserOverlayItem> getUserPolygons(int type)
+    {
+        //TODO remove hardcode and return data from DB
+        //return realmUserOverlays.getUserOverlay(type);
+        List<GeoPoint> points = new ArrayList<>();
+        List<UserOverlayItem> xx = new ArrayList<>();
+        points.add(new GeoPoint(0, 0));
+        points.add(new GeoPoint(3, 70));
+        points.add(new GeoPoint(4, 20));
+        points.add(new GeoPoint(5, 9));
+        points.add(new GeoPoint(7, 82));
+        if(type == 0)
+        {
+            Polygon x = new Polygon();
+            x.setPoints(points);
+
+            UserOverlayItem xxx = new UserOverlayItem();
+            UserOverlayItem xxxx = new UserOverlayItem();
+            xxx.setmPolygon(x);
+            xxx.setName("aval");
+            xxx.setType(0);
+            xx.add(xxx);
+            xxxx.setmPolygon(x);
+            xxxx.setName("dovom");
+            xxxx.setType(0);
+            xx.add(xxxx);
+            return xx;
+        }
+        else
+        {
+            return xx;
+        }
     }
 }

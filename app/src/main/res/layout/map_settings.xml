@@ -65,21 +65,14 @@
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tile_recycler_view" />
 
-                <LinearLayout
-                    android:id="@+id/linear1"
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/polygon_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    app:layout_constraintStart_toEndOf="@id/polygon_image"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/polygon_image">
+                    app:layout_constraintTop_toBottomOf="@+id/polygon_image">
 
-                    <include layout="@layout/layer_item" />
-
-                    <include layout="@layout/layer_item" />
-
-                    <include layout="@layout/layer_item" />
-                </LinearLayout>
+                </android.support.v7.widget.RecyclerView>
 
                 <ImageView
                     android:id="@+id/polyline_image"
@@ -87,22 +80,15 @@
                     android:layout_height="wrap_content"
                     android:src="@mipmap/ic_polyline"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/linear1" />
-                <LinearLayout
-                    android:id="@+id/linear2"
+                    app:layout_constraintTop_toBottomOf="@+id/polygon_recycler_view" />
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/polyline_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    app:layout_constraintLeft_toLeftOf="@+id/polygon_image"
-                    app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/polyline_image">
 
-                    <include layout="@layout/layer_item" />
-
-                    <include layout="@layout/layer_item" />
-
-                    <include layout="@layout/layer_item" />
-                </LinearLayout>
+                </android.support.v7.widget.RecyclerView>
 
                 <ImageView
                     android:id="@+id/marker_image"
@@ -111,22 +97,16 @@
                     android:layout_margin="8dp"
                     android:src="@mipmap/ic_marker"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/linear2"/>
-                <LinearLayout
-                    android:id="@+id/linear3"
+                    app:layout_constraintTop_toBottomOf="@+id/polyline_recycler_view"/>
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/marker_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    app:layout_constraintLeft_toLeftOf="@+id/polygon_image"
-                    app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/marker_image">
 
-                    <include layout="@layout/layer_item" />
+                </android.support.v7.widget.RecyclerView>
 
-                    <include layout="@layout/layer_item" />
-
-                    <include layout="@layout/layer_item" />
-                </LinearLayout>
                 <TextView
                     android:id="@+id/add_layer_map"
                     android:layout_width="wrap_content"
@@ -143,7 +123,7 @@
                     android:background="@android:color/transparent"
                     android:src="@mipmap/ic_zoom_in"
                     app:layout_constraintLeft_toRightOf="@+id/add_layer_map"
-                    app:layout_constraintTop_toBottomOf="@+id/linear3"/>
+                    app:layout_constraintTop_toBottomOf="@+id/marker_recycler_view"/>
 
             </android.support.constraint.ConstraintLayout>
         </ScrollView>

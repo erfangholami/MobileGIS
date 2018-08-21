@@ -24,11 +24,12 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/layer_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="24sp"
+                android:text="layer Name"
                 android:textColor="@android:color/black"
-                android:text="layer Name" />
+                android:textSize="24sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -36,11 +37,13 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/transparency_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="trancparency" />
 
                 <SeekBar
+                    android:id="@+id/transparency"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </LinearLayout>
@@ -51,19 +54,22 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/stroke_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="trancparency" />
 
                 <SeekBar
+                    android:id="@+id/stroke"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
             <TextView
+                android:id="@+id/description"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Description"/>
+                android:hint="Description" />
 
         </LinearLayout>
         <LinearLayout
@@ -71,38 +77,47 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_weight="3">
+
             <Switch
+                android:id="@+id/layer_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="On/Off"/>
+                android:text="On/Off" />
+
             <Switch
+                android:id="@+id/simplify"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Simplify"/>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:text="StrokeColor"
-                />
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:text="FillColor"/>
+                android:text="Simplify" />
 
             <Button
+                android:id="@+id/stroke_color"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                android:text="EditPoints"/>
+                android:text="StrokeColor" />
+
+            <Button
+                android:id="@+id/fill_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:text="FillColor" />
+
+            <Button
+                android:id="@+id/edit_point"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:text="EditPoints" />
 
             <ImageButton
+                android:id="@+id/show_less"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="right|bottom"
                 android:background="@android:color/transparent"
-                android:src="@mipmap/ic_show_less"
-                android:layout_gravity="right|bottom"/>
+                android:src="@mipmap/ic_show_less" />
         </LinearLayout>
     </LinearLayout>
 

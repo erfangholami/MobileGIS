@@ -14,4 +14,7 @@
     <dimen name="search_result_margin">12dp</dimen>
     <dimen name="search_result_elevation">8dp</dimen>
     <dimen name="actionbar_corner_radius">10dp</dimen>
+    <dimen name="max_tile_transparency_value">100</dimen>
+    <dimen name="min_tile_transparency_value">0</dimen>
+    <dimen name="default_tile_transparency_value">0</dimen>
 </resources>

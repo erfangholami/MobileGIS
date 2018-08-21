@@ -1,17 +1,12 @@
 package com.kandaidea.mobilegis;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.location.Location;
-import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -21,7 +16,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,17 +23,13 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.kandaidea.mobilegis.Adapers.MapSettingTileAdapter;
+import com.kandaidea.mobilegis.Adapers.UserOverlayAdapter;
 import com.kandaidea.mobilegis.DataModel.Constants;
-import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
 import com.kandaidea.mobilegis.View.ColorFilter;
 import com.kandaidea.mobilegis.View.Draw;
 import com.kandaidea.mobilegis.View.SearchActivity;
@@ -55,39 +45,29 @@ import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.tileprovider.tilesource.XYTileSource;
-import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.Polygon;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.TilesOverlay;
-import org.osmdroid.views.overlay.compass.CompassOverlay;
-import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
-import org.osmdroid.views.overlay.gestures.RotationGestureDetector;
-import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
-import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
-import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.zip.Inflater;
+
 
 public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = MainActivity.class.getSimpleName();
+
     private MapsActivityViewModel mapsViewModel;
     private MapView mMapView;
-    private Toolbar mToolbar;
     public MyLocationNewOverlay myLocationNewOverlay;
 
     //Views
+    private Toolbar mToolbar;
     private ImageButton navigationDrawer;
     private ImageButton mMapItem;
     private ImageButton mSearchItem;
@@ -95,6 +75,11 @@ public class MainActivity extends AppCompatActivity
     private TextView drawInformation;
     private CardView pointDetailCardView;
     private CardView mapSetting;
+    private RecyclerView mapSettingTileRecycler;
+    private RecyclerView mapSettingPolygonRecycler;
+    private RecyclerView mapSettingPolylineRecycler;
+    private RecyclerView mapSettingMarkerRecycler;
+    private DrawerLayout drawerlayout;
 
 
     //vars
@@ -119,15 +104,30 @@ public class MainActivity extends AppCompatActivity
         mapsViewModel.init(this);
         binding.setMapsViewModel(mapsViewModel);
 
+        //region BindViews
+        drawInformation = findViewById(R.id.draw_information);
+        pointDetailCardView = ((ConstraintLayout)findViewById(R.id.detail_point_view_card)).findViewById(R.id.detail_point_card_view);
+        mapSetting = ((ConstraintLayout)findViewById(R.id.map_settings_view_card)).findViewById(R.id.map_setting_card_view);
+        mapSettingTileRecycler = mapSetting.findViewById(R.id.tile_recycler_view);
+        mapSettingPolygonRecycler = mapSetting.findViewById(R.id.polygon_recycler_view);
+        mapSettingPolylineRecycler = mapSetting.findViewById(R.id.polyline_recycler_view);
+        mapSettingMarkerRecycler = mapSetting.findViewById(R.id.marker_recycler_view);
+        mToolbar = findViewById(R.id.main_toolbar);
+        navigationDrawer = mToolbar.findViewById(R.id.navigation_drawer);
+        mNavigationView= findViewById(R.id.nav_view);
+        drawerlayout = findViewById(R.id.drawer_layout);
+
+        //endregion
+
         //set screen settings
         initialScreenSettings();
 
         mapCashSet();
         initialMapSettings();
 
-        drawInformation = findViewById(R.id.draw_information);
 
-        pointDetailCardView = ((ConstraintLayout)findViewById(R.id.detail_point_view_card)).findViewById(R.id.detail_point_card_view);
+
+
         pointDetailCardView.findViewById(R.id.share_location_point).setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -137,23 +137,17 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        mapSetting = ((ConstraintLayout)findViewById(R.id.map_settings_view_card)).findViewById(R.id.map_setting_card_view);
-        RecyclerView cc = mapSetting.findViewById(R.id.tile_recycler_view);
-        cc.setHasFixedSize(true);
-        cc.setLayoutManager(new LinearLayoutManager(this));
-        cc.setAdapter(new MapSettingTileAdapter(this, mMapView));
-        cc.getAdapter().notifyDataSetChanged();
+
+        setAdapters();
 
         //region Toolbar
-        mToolbar = findViewById(R.id.main_toolbar);
-        navigationDrawer = mToolbar.findViewById(R.id.navigation_drawer);
+
         navigationDrawer.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
-                DrawerLayout dl = findViewById(R.id.drawer_layout);
-                dl.openDrawer(findViewById(R.id.nav_view));
+                drawerlayout.openDrawer(findViewById(R.id.nav_view));
             }
         });
         mMapItem = mToolbar.findViewById(R.id.map_item);
@@ -186,14 +180,13 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        mNavigationView= findViewById(R.id.nav_view);
+
         mNavigationView.getMenu().getItem(Constants.EXIT_ITEM_NUMBER).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
         {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem)
             {
-                DrawerLayout dl = findViewById(R.id.drawer_layout);
-                dl.closeDrawer(findViewById(R.id.nav_view));
+                drawerlayout.closeDrawer(findViewById(R.id.nav_view));
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle(R.string.exit_item)
                         .setMessage(R.string.dialog_exit)
@@ -237,8 +230,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public boolean onMenuItemClick(MenuItem menuItem)
             {
-                DrawerLayout dl = findViewById(R.id.drawer_layout);
-                dl.closeDrawer(findViewById(R.id.nav_view));
+                drawerlayout.closeDrawer(findViewById(R.id.nav_view));
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle("Draw")
                         .setMessage(R.string.dialog_choise_draw_mode)
@@ -269,8 +261,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public boolean onMenuItemClick(MenuItem menuItem)
             {
-                DrawerLayout dl = findViewById(R.id.drawer_layout);
-                dl.closeDrawer(findViewById(R.id.nav_view));
+                drawerlayout.closeDrawer(findViewById(R.id.nav_view));
                 Intent intent = new Intent(getApplicationContext(), SettingActivity.class);
                 startActivity(intent);
                 return false;
@@ -418,6 +409,7 @@ public class MainActivity extends AppCompatActivity
                     if(mapDrawPolyline.getPoints().size() == 0)
                     {
                         areaPolylineMarkers.clear();
+                        mMapView.invalidate();
                         polylineDraw = new Draw(getApplicationContext(), mMapView, mapDrawPolygon, mapDrawPolyline, areaPolygonMarkers, areaPolylineMarkers, Constants.DRAW_POLYLINE_MODE);
                         polylineDraw.drawForPolyline(p);
                     }
@@ -442,10 +434,23 @@ public class MainActivity extends AppCompatActivity
             @Override
             public boolean onClick(Polygon polygon, MapView mapView, GeoPoint eventPos)
             {
-                mapsViewModel.saveUserOverlay( polygon);
-                mapDrawPolygon = new Polygon();
-                mMapView.getOverlayManager().set(Constants.DRAW_POLYGON_OVERLAY_NUMBER, mapDrawPolygon);
-                areaPolygonMarkers.clear();
+                mapsViewModel.saveUserOverlay(mapDrawPolygon);
+                Toast.makeText(getApplicationContext(), "Polygon saved !", Toast.LENGTH_SHORT).show();
+                mapMode = Constants.NONE;
+               polygonDraw.deleteForPolygon();
+                mMapView.invalidate();
+                return false;
+            }
+        });
+        mapDrawPolyline.setOnClickListener(new Polyline.OnClickListener()
+        {
+            @Override
+            public boolean onClick(Polyline polyline, MapView mapView, GeoPoint eventPos)
+            {
+                //mapsViewModel.saveUserOverlay(mapDrawPolyline);
+                Toast.makeText(getApplicationContext(), "Polyline saved !", Toast.LENGTH_SHORT).show();
+                mapMode = Constants.NONE;
+                polylineDraw.deleteForPolyline();
                 mMapView.invalidate();
                 return false;
             }
@@ -497,6 +502,29 @@ public class MainActivity extends AppCompatActivity
             tilesOverlay.setEnabled(false);
             mMapView.getOverlays().add(Constants.TILE_OVERLAIES_NUMBER[i], tilesOverlay);
         }
+    }
+
+    private void setAdapters()
+    {
+        mapSettingTileRecycler.setHasFixedSize(true);
+        mapSettingTileRecycler.setLayoutManager(new LinearLayoutManager(this));
+        mapSettingTileRecycler.setAdapter(new MapSettingTileAdapter(this, mMapView));
+        mapSettingTileRecycler.getAdapter().notifyDataSetChanged();
+
+        mapSettingPolygonRecycler.setHasFixedSize(true);
+        mapSettingPolygonRecycler.setLayoutManager(new LinearLayoutManager(this));
+        mapSettingPolygonRecycler.setAdapter(new UserOverlayAdapter(mapsViewModel.getUserPolygons(0)));
+        mapSettingPolygonRecycler.getAdapter().notifyDataSetChanged();
+
+        mapSettingPolylineRecycler.setHasFixedSize(true);
+        mapSettingPolylineRecycler.setLayoutManager(new LinearLayoutManager(this));
+        mapSettingPolylineRecycler.setAdapter(new UserOverlayAdapter(mapsViewModel.getUserPolygons(1)));
+        mapSettingPolylineRecycler.getAdapter().notifyDataSetChanged();
+
+        mapSettingMarkerRecycler.setHasFixedSize(true);
+        mapSettingMarkerRecycler.setLayoutManager(new LinearLayoutManager(this));
+        mapSettingMarkerRecycler.setAdapter(new UserOverlayAdapter(mapsViewModel.getUserPolygons(2)));
+        mapSettingMarkerRecycler.getAdapter().notifyDataSetChanged();
     }
 
     @Override

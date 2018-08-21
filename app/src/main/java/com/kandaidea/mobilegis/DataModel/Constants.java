@@ -72,7 +72,16 @@ public class Constants
     public static final int DRAW_POLYGON_MODE = 1;
     public static final int DRAW_POLYLINE_MODE = 2;
 
+
+    public static final float MAX_TRANSPARENCY = 1;
+
     //save user overlays
-    public static int POLYGON_TYPE = 0;
-    public static int POLYLINE_TYPE = 1;
+    public static final int POLYGON_TYPE = 0;
+    public static final int POLYLINE_TYPE = 1;
+    public static final int MARKER_TYPE = 2;
+
+
+    public static final int COMPATE_MODE = 0;
+    public static final int EXTEND_MODE = 1;
+
 }
