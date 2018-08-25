@@ -19,7 +19,7 @@ public class UserOverlayItem
     private boolean simplify;
     private float transparency;
     private int type;
-    private int showMode = Constants.COMPATE_MODE;
+    private int showMode = Constants.COMPACT_MODE;
     //endregion
 
     //region Constructor

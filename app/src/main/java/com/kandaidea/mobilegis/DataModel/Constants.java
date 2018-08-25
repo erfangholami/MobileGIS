@@ -81,7 +81,7 @@ public class Constants
     public static final int MARKER_TYPE = 2;
 
 
-    public static final int COMPATE_MODE = 0;
+    public static final int COMPACT_MODE = 0;
     public static final int EXTEND_MODE = 1;
 
 }

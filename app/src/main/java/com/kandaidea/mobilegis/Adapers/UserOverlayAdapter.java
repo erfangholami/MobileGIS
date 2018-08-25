@@ -26,6 +26,7 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 {
     private static final String TAG = UserOverlayItem.class.getSimpleName();
     private List<UserOverlayItem> items ;
+    private ViewGroup par;
     public UserOverlayAdapter(List<UserOverlayItem> items)
     {
         this.items = items;
@@ -35,8 +36,10 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
+        par = parent;
         View view;
-        if(viewType == Constants.COMPATE_MODE)
+        Log.v(TAG, "viewType is : " + viewType);
+        if(viewType == Constants.COMPACT_MODE)
         {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layer_item, parent, false);
             return new CompatViewHolder(view);
@@ -53,7 +56,7 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, final int position)
     {
         //TODO set component attribute
-        if(getItemViewType(position) == Constants.COMPATE_MODE)
+        if(holder.getItemViewType() == Constants.COMPACT_MODE)
         {
             ((CompatViewHolder)holder).layerName.setText(items.get(position).getName());
             ((CompatViewHolder)holder).extend.setOnClickListener(new View.OnClickListener()
@@ -62,14 +65,12 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 @Override
                 public void onClick(View view)
                 {
-                    Log.d(TAG, "CompatExtendClicked" + items.get(position).getShowMode());
                     items.get(position).setShowMode(Constants.EXTEND_MODE);
-                    notifyDataSetChanged();
-                    //TODO change view after click more
+                    notifyItemChanged(position);
                 }
             });
         }
-        if(getItemViewType(position) == Constants.EXTEND_MODE)
+        if(holder.getItemViewType() == Constants.EXTEND_MODE)
         {
             ((ExtendViewHolder)holder).layerName.setText(items.get(position).getName());
             ((ExtendViewHolder)holder).extend.setOnClickListener(new View.OnClickListener()
@@ -77,10 +78,8 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 @Override
                 public void onClick(View view)
                 {
-                    Log.d(TAG, "ExtendExtendClicked");
-                    items.get(position).setShowMode(Constants.COMPATE_MODE);
-                    notifyDataSetChanged();
-                    //TODO change view after click less
+                    items.get(position).setShowMode(Constants.COMPACT_MODE);
+                    notifyItemChanged(position);
                 }
             });
         }
@@ -92,6 +91,12 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return items.size();
     }
 
+    @Override
+    public int getItemViewType(int position)
+    {
+        super.getItemViewType(position);
+        return items.get(position).getShowMode();
+    }
 
     class CompatViewHolder extends RecyclerView.ViewHolder
     {
