@@ -5,3 +5,4 @@ getSearchItem(int i); //return hole data of a place with it's id (name , ... and
 sendUserLocations(List<userLocationModel>); // send a list of userlocations to server 
 getAddress(Geopoint p); //get address of a uniqe location (for long click map)
 getDirection(Geopoint p1, Geopoint p2); //make a road between 2 point 
+getUserOverlays(); //return all user overlays contain polygon, polyline and Markers 

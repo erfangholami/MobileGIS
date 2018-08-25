@@ -1,13 +1,16 @@
 package com.kandaidea.mobilegis.View;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
+import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.R;
 import com.kandaidea.mobilegis.ViewModel.SettingActivityViewModel;
 import com.kandaidea.mobilegis.databinding.ActivitySettingBinding;
@@ -19,25 +22,42 @@ public class SettingActivity extends AppCompatActivity
 
     //views
     private ImageButton backArrow;
+    private Switch myLocationSwitch;
+    private Switch scaleBarSwitch;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        //get input bundle
+        Bundle bundle = getIntent().getExtras();
+
+        //set view and viewModel
         ActivitySettingBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_setting);
         viewModel = new SettingActivityViewModel();
         binding.setViewModel(viewModel);
 
 
 
-        //onClick
+        //assign container views
         backArrow = findViewById(R.id.back_arrow_search_bar);
+        myLocationSwitch = findViewById(R.id.my_location_switch);
+        scaleBarSwitch = findViewById(R.id.scale_bar_switch);
+
+
+
+        myLocationSwitch.setChecked(bundle.getBoolean(Constants.MY_LOCATION_ENABLE_VALUE));
+        scaleBarSwitch.setChecked(bundle.getBoolean(Constants.SCALE_BAR_ENABLE_VALUE));
         backArrow.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
+                Intent intent = new Intent();
+                intent.putExtra(Constants.MY_LOCATION_ENABLE_VALUE, myLocationSwitch.isChecked());
+                intent.putExtra(Constants.SCALE_BAR_ENABLE_VALUE, scaleBarSwitch.isChecked());
+                setResult(RESULT_OK, intent);
                 finish();
             }
         });

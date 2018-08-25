@@ -56,7 +56,7 @@
                     android:id="@+id/stroke_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="trancparency" />
+                    android:text="stroke size" />
 
                 <SeekBar
                     android:id="@+id/stroke"

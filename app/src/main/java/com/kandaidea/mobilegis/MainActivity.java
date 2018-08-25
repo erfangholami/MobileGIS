@@ -1,12 +1,14 @@
 package com.kandaidea.mobilegis;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.LocationManager;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -20,6 +22,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +33,7 @@ import android.widget.Toast;
 import com.kandaidea.mobilegis.Adapers.MapSettingTileAdapter;
 import com.kandaidea.mobilegis.Adapers.UserOverlayAdapter;
 import com.kandaidea.mobilegis.DataModel.Constants;
+import com.kandaidea.mobilegis.DataModel.Models.UserOverlayItem;
 import com.kandaidea.mobilegis.View.ColorFilter;
 import com.kandaidea.mobilegis.View.Draw;
 import com.kandaidea.mobilegis.View.SearchActivity;
@@ -46,16 +50,19 @@ import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.util.NetworkLocationIgnorer;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polygon;
 import org.osmdroid.views.overlay.Polyline;
+import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.TilesOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity
@@ -65,6 +72,7 @@ public class MainActivity extends AppCompatActivity
     private MapsActivityViewModel mapsViewModel;
     private MapView mMapView;
     public MyLocationNewOverlay myLocationNewOverlay;
+    private ScaleBarOverlay mScaleBarOverlay;
 
     //Views
     private Toolbar mToolbar;
@@ -263,7 +271,9 @@ public class MainActivity extends AppCompatActivity
             {
                 drawerlayout.closeDrawer(findViewById(R.id.nav_view));
                 Intent intent = new Intent(getApplicationContext(), SettingActivity.class);
-                startActivity(intent);
+                intent.putExtra(Constants.MY_LOCATION_ENABLE_VALUE, mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER).isEnabled());
+                intent.putExtra(Constants.SCALE_BAR_ENABLE_VALUE, mMapView.getOverlays().get(Constants.SCALE_BAR_OVERLAY_NUMBER).isEnabled());
+                startActivityForResult(intent, Constants.SETTING_ACTIVITY_REQUEST_CODE);
                 return false;
             }
         });
@@ -309,6 +319,7 @@ public class MainActivity extends AppCompatActivity
         org.osmdroid.config.Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void initialMapSettings()
     {
@@ -327,15 +338,27 @@ public class MainActivity extends AppCompatActivity
         mMapView.setLongClickable(true);
 
 
-        GpsMyLocationProvider x = new GpsMyLocationProvider(this);
+        addTileSources();
+
+        //add my location
+        GpsMyLocationProvider x = new GpsMyLocationProvider(getBaseContext());
+        x.addLocationSource(LocationManager.GPS_PROVIDER);
         myLocationNewOverlay = new MyLocationNewOverlay(x, mMapView);
         myLocationNewOverlay.enableMyLocation();
-        Bitmap myLocationLogo = ((BitmapDrawable)getResources().getDrawable(R.mipmap.ic_my_location_point)).getBitmap();
+        Bitmap myLocationLogo = ((BitmapDrawable)getDrawable(R.mipmap.ic_my_location_point)).getBitmap();
         myLocationNewOverlay.setPersonHotspot(myLocationLogo.getWidth() / 2, myLocationLogo.getHeight() / 2);
         myLocationNewOverlay.setDirectionArrow(myLocationLogo, myLocationLogo);
         myLocationNewOverlay.setDrawAccuracyEnabled(true);
-        addTileSources();
-        mMapView.getOverlays().add(Constants.MY_LOCATION_OVERLAY_NUMBER, myLocationNewOverlay);
+        mMapView.getOverlayManager().add(Constants.MY_LOCATION_OVERLAY_NUMBER, myLocationNewOverlay);
+        mMapView.invalidate();
+
+        //add scale bar
+        final DisplayMetrics dm = getResources().getDisplayMetrics();
+        mScaleBarOverlay = new ScaleBarOverlay(mMapView);
+        mScaleBarOverlay.setCentred(true);
+        mScaleBarOverlay.setScaleBarOffset(300, dm.heightPixels - 150);
+        mMapView.getOverlays().add(Constants.SCALE_BAR_OVERLAY_NUMBER, mScaleBarOverlay);
+        mMapView.invalidate();
 
         initialMapClickListener();
 
@@ -464,6 +487,18 @@ public class MainActivity extends AppCompatActivity
         areaPolygonMarkers.clear();
 
         mMapView.invalidate();
+
+        //add userOverlays to map
+        List<Polygon> items = new ArrayList<>();
+        List<Polyline> itemss = new ArrayList<>();
+        Polygon xx = new Polygon();
+        Polyline xxx = new Polyline();
+        items.add(xx);
+        itemss.add(xxx);
+        mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYGON_OVERLAY_NUMBER, items);
+        mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYLINE_OVERLAY_NUMBER, itemss);
+        //TODO add marker list draw to the map
+        mMapView.invalidate();
     }
 
     private void showPointPopup(GeoPoint p)
@@ -513,17 +548,17 @@ public class MainActivity extends AppCompatActivity
 
         mapSettingPolygonRecycler.setHasFixedSize(true);
         mapSettingPolygonRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mapSettingPolygonRecycler.setAdapter(new UserOverlayAdapter(mapsViewModel.getUserPolygons(0)));
+        mapSettingPolygonRecycler.setAdapter(new UserOverlayAdapter(mMapView, mapsViewModel.getUserPolygons(0)));
         mapSettingPolygonRecycler.getAdapter().notifyDataSetChanged();
 
         mapSettingPolylineRecycler.setHasFixedSize(true);
         mapSettingPolylineRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mapSettingPolylineRecycler.setAdapter(new UserOverlayAdapter(mapsViewModel.getUserPolygons(1)));
+        mapSettingPolylineRecycler.setAdapter(new UserOverlayAdapter(mMapView, mapsViewModel.getUserPolygons(1)));
         mapSettingPolylineRecycler.getAdapter().notifyDataSetChanged();
 
         mapSettingMarkerRecycler.setHasFixedSize(true);
         mapSettingMarkerRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mapSettingMarkerRecycler.setAdapter(new UserOverlayAdapter(mapsViewModel.getUserPolygons(2)));
+        mapSettingMarkerRecycler.setAdapter(new UserOverlayAdapter(mMapView, mapsViewModel.getUserPolygons(2)));
         mapSettingMarkerRecycler.getAdapter().notifyDataSetChanged();
     }
 
@@ -532,9 +567,24 @@ public class MainActivity extends AppCompatActivity
     {
         super.onActivityResult(requestCode, resultCode, data);
         //set data to map view getting Bundle
-        if(requestCode == Constants.SEARCH_ACTIVITY_REQUEST_CODE)
+        switch (requestCode)
         {
+            case Constants.SEARCH_ACTIVITY_REQUEST_CODE:
+            {
 
+                break;
+            }
+            case Constants.SETTING_ACTIVITY_REQUEST_CODE:
+            {
+                if(resultCode == RESULT_OK)
+                {
+                    Bundle bundle = data.getExtras();
+                    mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER).setEnabled(bundle.getBoolean(Constants.MY_LOCATION_ENABLE_VALUE));
+                    mMapView.getOverlays().get(Constants.SCALE_BAR_OVERLAY_NUMBER).setEnabled(bundle.getBoolean(Constants.SCALE_BAR_ENABLE_VALUE));
+                    mMapView.invalidate();
+                }
+                break;
+            }
         }
     }
 
@@ -551,6 +601,7 @@ public class MainActivity extends AppCompatActivity
     protected void onResume()
     {
         super.onResume();
+        mMapView.onResume();
     }
 
     @Override

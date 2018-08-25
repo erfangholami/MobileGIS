@@ -3,6 +3,7 @@ package com.kandaidea.mobilegis.ViewModel;
 import android.app.Activity;
 import android.arch.lifecycle.ViewModel;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.os.Environment;
@@ -139,25 +140,36 @@ public class MapsActivityViewModel extends ViewModel
         //return realmUserOverlays.getUserOverlay(type);
         List<GeoPoint> points = new ArrayList<>();
         List<UserOverlayItem> xx = new ArrayList<>();
-        points.add(new GeoPoint(0, 0));
-        points.add(new GeoPoint(3, 70));
-        points.add(new GeoPoint(4, 20));
-        points.add(new GeoPoint(5, 9));
-        points.add(new GeoPoint(7, 82));
+        points.add(new GeoPoint(0d, 0d));
+        points.add(new GeoPoint(0d, 10d));
+        points.add(new GeoPoint(10d, 0d));
         if(type == 0)
         {
             Polygon x = new Polygon();
             x.setPoints(points);
+            x.setEnabled(true);
+            x.setFillColor(Color.BLACK);
+            x.setStrokeColor(Color.BLACK);
+
+            Polygon xp = new Polygon();
+            xp.setPoints(points);
+            xp.setEnabled(false);
+            xp.setFillColor(Color.WHITE);
+            xp.setStrokeColor(Color.BLACK);
 
             UserOverlayItem xxx = new UserOverlayItem();
+
             UserOverlayItem xxxx = new UserOverlayItem();
             xxx.setmPolygon(x);
             xxx.setName("aval");
-            xxx.setType(0);
-            xx.add(xxx);
-            xxxx.setmPolygon(x);
+            xxx.setType(Constants.POLYGON_TYPE);
+
+
+            xxxx.setmPolygon(xp);
             xxxx.setName("dovom");
-            xxxx.setType(0);
+            xxxx.setType(Constants.POLYGON_TYPE);
+
+            xx.add(xxx);
             xx.add(xxxx);
             return xx;
         }
@@ -166,4 +178,5 @@ public class MapsActivityViewModel extends ViewModel
             return xx;
         }
     }
+
 }
