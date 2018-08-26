@@ -27,6 +27,7 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.Polygon;
+import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
@@ -128,17 +129,28 @@ public class MapsActivityViewModel extends ViewModel
 
     public void saveUserOverlay(Polygon overlay)
     {
+        Date now = new Date();
+        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+        String x = new OverlayString().polygonToString(overlay);
+        UserOverlayModel model = new UserOverlayModel(now.toString(),Constants.POLYGON_TYPE , x);
+        mMapView.invalidate();
+        realmUserOverlays.addOverlay(model);
+    }
+    public void saveUserOverlay(Polyline overlay)
+    {
         //TODO save overlay in DB
         Date now = new Date();
         android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
-        UserOverlayModel model = new UserOverlayModel(now.toString(),overlay instanceof Polygon ? Constants.POLYGON_TYPE : Constants.POLYLINE_TYPE, new Gson().toJson(overlay));
+        String x = new OverlayString().polylineToString(overlay);
+        Log.d(TAG, x);
+        UserOverlayModel model = new UserOverlayModel(now.toString(), Constants.POLYLINE_TYPE, x);
         realmUserOverlays.addOverlay(model);
     }
-    public List<UserOverlayItem> getUserPolygons(int type)
+    public List<UserOverlayItem> getUserOverlays(int type)
     {
         //TODO remove hardcode and return data from DB
-        //return realmUserOverlays.getUserOverlay(type);
-        List<GeoPoint> points = new ArrayList<>();
+        return realmUserOverlays.getUserOverlay(type);
+        /*List<GeoPoint> points = new ArrayList<>();
         List<UserOverlayItem> xx = new ArrayList<>();
         points.add(new GeoPoint(0d, 0d));
         points.add(new GeoPoint(0d, 10d));
@@ -176,7 +188,7 @@ public class MapsActivityViewModel extends ViewModel
         else
         {
             return xx;
-        }
+        }*/
     }
 
 }

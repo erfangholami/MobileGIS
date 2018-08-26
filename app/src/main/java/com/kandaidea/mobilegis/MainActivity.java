@@ -2,6 +2,9 @@ package com.kandaidea.mobilegis;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -100,7 +103,8 @@ public class MainActivity extends AppCompatActivity
     private Draw polylineDraw;
     private Marker customMarker;
 
-
+    private Polygon.OnClickListener mapDrawPolygonListener;
+    private Polyline.OnClickListener mapDrawPolylineListener;
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -175,6 +179,10 @@ public class MainActivity extends AppCompatActivity
                 }
                 mapSetting.setVisibility(View.VISIBLE);
                 ((RecyclerView)mapSetting.findViewById(R.id.tile_recycler_view)).getAdapter().notifyDataSetChanged();
+                ((UserOverlayAdapter)mapSettingPolygonRecycler.getAdapter()).updateDataSet(mapsViewModel.getUserOverlays(0));
+                ((UserOverlayAdapter)mapSettingPolylineRecycler.getAdapter()).updateDataSet(mapsViewModel.getUserOverlays(1));
+                ((UserOverlayAdapter)mapSettingMarkerRecycler.getAdapter()).updateDataSet(mapsViewModel.getUserOverlays(2));
+
             }
         });
         mSearchItem = mToolbar.findViewById(R.id.search_item);
@@ -423,7 +431,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         areaPolygonMarkers.clear();
                         mMapView.invalidate();
-                        polygonDraw = new Draw(getApplicationContext(), mMapView, mapDrawPolygon, mapDrawPolyline, areaPolygonMarkers, areaPolylineMarkers, Constants.DRAW_POLYGON_MODE);
+                        polygonDraw = new Draw(getApplicationContext(), mMapView, mapDrawPolygon, mapDrawPolyline, areaPolygonMarkers, areaPolylineMarkers, Constants.DRAW_POLYGON_MODE, mapDrawPolygonListener, mapDrawPolylineListener);
                         polygonDraw.drawForPolygon(p);
                     }
                 }
@@ -433,7 +441,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         areaPolylineMarkers.clear();
                         mMapView.invalidate();
-                        polylineDraw = new Draw(getApplicationContext(), mMapView, mapDrawPolygon, mapDrawPolyline, areaPolygonMarkers, areaPolylineMarkers, Constants.DRAW_POLYLINE_MODE);
+                        polylineDraw = new Draw(getApplicationContext(), mMapView, mapDrawPolygon, mapDrawPolyline, areaPolygonMarkers, areaPolylineMarkers, Constants.DRAW_POLYLINE_MODE, mapDrawPolygonListener, mapDrawPolylineListener);
                         polylineDraw.drawForPolyline(p);
                     }
                 }
@@ -452,7 +460,7 @@ public class MainActivity extends AppCompatActivity
         x.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         x.setInfoWindow(null);
         customMarker = x;
-        mapDrawPolygon.setOnClickListener(new Polygon.OnClickListener()
+        mapDrawPolygonListener = new Polygon.OnClickListener()
         {
             @Override
             public boolean onClick(Polygon polygon, MapView mapView, GeoPoint eventPos)
@@ -464,20 +472,22 @@ public class MainActivity extends AppCompatActivity
                 mMapView.invalidate();
                 return false;
             }
-        });
-        mapDrawPolyline.setOnClickListener(new Polyline.OnClickListener()
+        };
+        mapDrawPolygon.setOnClickListener(mapDrawPolygonListener);
+        mapDrawPolylineListener = new Polyline.OnClickListener()
         {
             @Override
             public boolean onClick(Polyline polyline, MapView mapView, GeoPoint eventPos)
             {
-                //mapsViewModel.saveUserOverlay(mapDrawPolyline);
+                mapsViewModel.saveUserOverlay(mapDrawPolyline);
                 Toast.makeText(getApplicationContext(), "Polyline saved !", Toast.LENGTH_SHORT).show();
                 mapMode = Constants.NONE;
                 polylineDraw.deleteForPolyline();
                 mMapView.invalidate();
                 return false;
             }
-        });
+        };
+        mapDrawPolyline.setOnClickListener(mapDrawPolylineListener);
         mMapView.getOverlays().add(Constants.DRAW_POLYGON_OVERLAY_NUMBER, mapDrawPolygon);
         mMapView.getOverlays().addAll(Constants.DRAW_POLYGON_MARKER_OVERLAY_NUMBER, areaPolygonMarkers);
         mMapView.getOverlays().add(Constants.DRAW_POLYLINE_OVERLAY_NUMBER, mapDrawPolyline);
@@ -523,6 +533,17 @@ public class MainActivity extends AppCompatActivity
         startActivity(Intent.createChooser(sharingIntent, "Share via :"));
     }
 
+    //copy location to clipboard
+    private void copyLocation(GeoPoint point)
+    {
+        String text = "p=" + point.getLatitude() + "," + point.getLongitude();
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("locationPoint", text);
+        clipboard.setPrimaryClip(clip);
+        Log.v(TAG, getString(R.string.copy_clipboard_msg));
+        Toast.makeText(this, R.string.copy_clipboard_msg, Toast.LENGTH_SHORT).show();
+    }
+
 
     private void addTileSources()
     {
@@ -548,17 +569,17 @@ public class MainActivity extends AppCompatActivity
 
         mapSettingPolygonRecycler.setHasFixedSize(true);
         mapSettingPolygonRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mapSettingPolygonRecycler.setAdapter(new UserOverlayAdapter(mMapView, mapsViewModel.getUserPolygons(0)));
+        mapSettingPolygonRecycler.setAdapter(new UserOverlayAdapter(mMapView, mapsViewModel.getUserOverlays(0)));
         mapSettingPolygonRecycler.getAdapter().notifyDataSetChanged();
 
         mapSettingPolylineRecycler.setHasFixedSize(true);
         mapSettingPolylineRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mapSettingPolylineRecycler.setAdapter(new UserOverlayAdapter(mMapView, mapsViewModel.getUserPolygons(1)));
+        mapSettingPolylineRecycler.setAdapter(new UserOverlayAdapter(mMapView, mapsViewModel.getUserOverlays(1)));
         mapSettingPolylineRecycler.getAdapter().notifyDataSetChanged();
 
         mapSettingMarkerRecycler.setHasFixedSize(true);
         mapSettingMarkerRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mapSettingMarkerRecycler.setAdapter(new UserOverlayAdapter(mMapView, mapsViewModel.getUserPolygons(2)));
+        mapSettingMarkerRecycler.setAdapter(new UserOverlayAdapter(mMapView, mapsViewModel.getUserOverlays(2)));
         mapSettingMarkerRecycler.getAdapter().notifyDataSetChanged();
     }
 

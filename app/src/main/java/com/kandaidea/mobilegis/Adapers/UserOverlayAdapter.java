@@ -44,33 +44,7 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     {
         this.mMapView = mMapView;
         this.items = items;
-        if(items.size() != 0)
-        {
-            if(items.get(0).getType() == Constants.POLYGON_TYPE)
-            {
-                polygons.clear();
-                for(UserOverlayItem item: items)
-                {
-                    polygons.add(item.getmPolygon());
-                }
-                mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYGON_OVERLAY_NUMBER, polygons);
-                mMapView.invalidate();
-            }
-            else if(items.get(0).getType() == Constants.POLYLINE_TYPE)
-            {
-                polylines.clear();
-                for(UserOverlayItem item: items)
-                {
-                    polylines.add(item.getmPolyline());
-                }
-                mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYLINE_OVERLAY_NUMBER, polylines);
-                mMapView.invalidate();
-            }
-            else if (items.get(0).getType() == Constants.MARKER_TYPE)
-            {
-                //TODO add markers to map
-            }
-        }
+        addData();
     }
 
 
@@ -121,7 +95,6 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 public void onClick(View view)
                 {
                     items.get(position).setShowMode(Constants.EXTEND_MODE);
-                    notifyItemChanged(position);
                 }
             });
             mHolder.turnOnOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
@@ -234,6 +207,44 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         holder.strokeColor.setEnabled(b);
         holder.editPoints.setEnabled(b);
         holder.fillColor.setEnabled(b);
+    }
+    public void updateDataSet(List<UserOverlayItem> items)
+    {
+        this.items = items;
+        addData();
+        notifyDataSetChanged();
+    }
+    void addData()
+    {
+        if(items.size() != 0)
+        {
+            if(items.get(0).getType() == Constants.POLYGON_TYPE)
+            {
+                mMapView.getOverlays().removeAll(polygons);
+                polygons.clear();
+                for(UserOverlayItem item: items)
+                {
+                    polygons.add(item.getmPolygon());
+                }
+                mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYGON_OVERLAY_NUMBER, polygons);
+                mMapView.invalidate();
+            }
+            else if(items.get(0).getType() == Constants.POLYLINE_TYPE)
+            {
+                mMapView.getOverlays().removeAll(polylines);
+                polylines.clear();
+                for(UserOverlayItem item: items)
+                {
+                    polylines.add(item.getmPolyline());
+                }
+                mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYLINE_OVERLAY_NUMBER, polylines);
+                mMapView.invalidate();
+            }
+            else if (items.get(0).getType() == Constants.MARKER_TYPE)
+            {
+                //TODO add markers to map
+            }
+        }
     }
 
     @Override

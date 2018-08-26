@@ -93,4 +93,9 @@ public class Constants
 
     public static final String MY_LOCATION_ENABLE_VALUE = "my_location_value";
     public static final String SCALE_BAR_ENABLE_VALUE = "scale_bar_value";
+
+
+    public static final String STROKE_COLOR_STRING = "stroke_color";
+    public static final String STROKE_SIZE_STRING = "stroke_size";
+    public static final String FILL_COLOR_STRING = "fill_color";
 }

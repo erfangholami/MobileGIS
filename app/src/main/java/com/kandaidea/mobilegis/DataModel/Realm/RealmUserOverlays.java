@@ -39,8 +39,9 @@ public class RealmUserOverlays
         List<UserOverlayItem> returningList = new ArrayList<>();
         userOverlayRealm.beginTransaction();
         RealmResults<UserOverlayModel> results = userOverlayRealm.where(UserOverlayModel.class).equalTo("overlayType", type).findAll();
-        realmList = Arrays.asList((UserOverlayModel[]) results.toArray());
-        for(UserOverlayModel model: realmList)
+        userOverlayRealm.commitTransaction();
+        //realmList = Arrays.asList((UserOverlayModel[]) results.toArray());
+        for(UserOverlayModel model: results)
         {
             UserOverlayItem newItem = new UserOverlayItem();
             newItem.setName(model.getName());
@@ -51,13 +52,13 @@ public class RealmUserOverlays
             {
                 case Constants.POLYGON_TYPE:
                 {
-                    newItem.setmPolygon(new OverlayString().toPolygon(model.getOverlay()));
+                    newItem.setmPolygon(new OverlayString().stringToPolygon(model.getOverlay()));
                     newItem.setTransparency(Constants.MAX_TRANSPARENCY);
                     break;
                 }
                 case Constants.POLYLINE_TYPE:
                 {
-                    newItem.setmPolyline(new OverlayString().toPolyline(model.getOverlay()));
+                    newItem.setmPolyline(new OverlayString().stringToPolyline(model.getOverlay()));
                     newItem.setTransparency(Constants.MAX_TRANSPARENCY);
                     break;
                 }

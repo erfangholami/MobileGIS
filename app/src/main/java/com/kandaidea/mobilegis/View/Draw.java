@@ -27,8 +27,10 @@ public class Draw
     private ArrayList<Marker> mPolygonMarker;
     private ArrayList<Marker> mPolylineMarker;
     private int mMode;
+    private Polygon.OnClickListener polygonListener;
+    private Polyline.OnClickListener polylineListener;
 
-    public Draw(Context mContext,MapView mMapView, Polygon mPolygon, Polyline mPolyline, ArrayList<Marker> mPolygonMarker, ArrayList<Marker> mPolylineMarker, int mMode)
+    public Draw(Context mContext,MapView mMapView, Polygon mPolygon, Polyline mPolyline, ArrayList<Marker> mPolygonMarker, ArrayList<Marker> mPolylineMarker, int mMode, Polygon.OnClickListener listener, Polyline.OnClickListener listener2)
     {
         this.mContext = mContext;
         this.mMapView = mMapView;
@@ -37,6 +39,8 @@ public class Draw
         this.mPolygonMarker = mPolygonMarker;
         this.mPolylineMarker = mPolylineMarker;
         this.mMode = mMode;
+        this.polygonListener = listener;
+        this.polylineListener = listener2;
     }
 
     public void drawForPolygon(GeoPoint p)
@@ -69,6 +73,7 @@ public class Draw
                 poly.setPoints(x);
                 poly.setFillColor(mContext.getResources().getColor(R.color.polygon_fill_color));
                 mPolygon = poly;
+                mPolygon.setOnClickListener(polygonListener);
                 mMapView.getOverlays().add(Constants.DRAW_POLYGON_OVERLAY_NUMBER, mPolygon);
                 mMapView.getOverlays().remove(Constants.DRAW_POLYGON_MARKER_OVERLAY_NUMBER);
                 mMapView.getOverlays().addAll(Constants.DRAW_POLYGON_MARKER_OVERLAY_NUMBER, mPolygonMarker);
@@ -131,6 +136,7 @@ public class Draw
                 Polyline poly = new Polyline();
                 poly.setPoints(x);
                 mPolyline = poly;
+                mPolyline.setOnClickListener(polylineListener);
                 mMapView.getOverlays().add(Constants.DRAW_POLYLINE_OVERLAY_NUMBER, mPolyline);
                 mMapView.getOverlays().remove(Constants.DRAW_POLYLINE_MARKER_OVERLAY_NUMBER);
                 mMapView.getOverlays().addAll(Constants.DRAW_POLYLINE_MARKER_OVERLAY_NUMBER, mPolylineMarker);
@@ -141,7 +147,7 @@ public class Draw
             public void onMarkerDragStart(Marker marker)
             {
                 Log.d(TAG, "onMarkerDragStart");
-                mMapView.getOverlays().remove(mPolyline);
+                mMapView.getOverlays().remove(Constants.DRAW_POLYLINE_OVERLAY_NUMBER);
                 mMapView.invalidate();
             }
         });

@@ -30,4 +30,5 @@
     <string name="yes">YES</string>
     <string name="no">NO</string>
     <string name="tiles">Tiles</string>
+    <string name="copy_clipboard_msg">location copied to clipboard :D</string>
 </resources>

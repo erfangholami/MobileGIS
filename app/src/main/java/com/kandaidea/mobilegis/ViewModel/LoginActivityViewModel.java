@@ -36,11 +36,12 @@ public class LoginActivityViewModel extends ViewModel
         String password = passwordField.getText().toString();
         Log.d(TAG, "Login information is : " + username + " " + password);
         boolean response = new RetrofitMethods().login(username , password);
-        progressBar.setVisibility(View.GONE);
+
         if(response)
         {
             //valid to
             Toast.makeText(mActivity.getApplicationContext(), R.string.login_msg, Toast.LENGTH_LONG).show();
+            progressBar.setVisibility(View.GONE);
             Log.d(TAG, "LoginSuccessful");
             Intent intent = new Intent(mActivity.getApplicationContext(), MainActivity.class );
             mActivity.startActivity(intent);
@@ -48,6 +49,7 @@ public class LoginActivityViewModel extends ViewModel
         else
         {
             //invalid username or password
+            progressBar.setVisibility(View.GONE);
             Log.d(TAG, "LoginFailed");
         }
     }

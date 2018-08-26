@@ -57,4 +57,5 @@ dependencies {
 
     //realm
     implementation 'io.realm:android-adapters:3.0.0'
+
 }

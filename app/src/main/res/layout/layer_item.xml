@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="@dimen/card_view_detail_point_padding"
+    android:elevation="@dimen/regular_elevation"
     android:layout_margin="@dimen/card_view_detail_point_margin">
 
     <TextView
