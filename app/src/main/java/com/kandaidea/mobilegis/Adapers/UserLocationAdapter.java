@@ -46,6 +46,12 @@ public class UserLocationAdapter extends RecyclerView.Adapter<UserLocationAdapte
         return locations.size();
     }
 
+    public void updateDataSet(List<UserLocationModel> locations)
+    {
+        this.locations = locations;
+        notifyDataSetChanged();
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder
     {
         public TextView time, location;

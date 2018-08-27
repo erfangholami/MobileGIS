@@ -36,7 +36,7 @@ public class RetrofitMethods
     //decler methods and their response here
     public boolean login(String username, String password)
     {
-        final boolean[] valid = {false};
+        final LoginResponse[] responseLogin = new LoginResponse[1];
         Observable<LoginResponse> response = api.login(username, password);
         response.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -45,7 +45,11 @@ public class RetrofitMethods
                     @Override
                     public void onNext(LoginResponse loginResponse)
                     {
-                        valid[0] = loginResponse.isValid();
+                        responseLogin[0] = loginResponse;
+                        Log.d(TAG,"responseIs" + responseLogin[0].getErrorInternalServer());
+                        Log.d(TAG, "responseIs" + responseLogin[0].getUserData().getUsername());
+                        Log.d(TAG, "responseIs" +responseLogin[0].getUserData().getEmailAddress());
+                        Log.d(TAG, "responseIs" +responseLogin[0].getUserData().getPassword());
                     }
 
                     @Override

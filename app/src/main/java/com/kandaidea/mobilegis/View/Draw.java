@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
+import com.kandaidea.mobilegis.DataModel.CalculateOverlay;
 import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.R;
 
@@ -92,6 +93,7 @@ public class Draw
         mPolygonMarker.add(newMarker);
         mPolygon.addPoint(p);
         mPolygon.setFillColor(mContext.getResources().getColor(R.color.polygon_fill_color));
+        mPolygon.setOnClickListener(polygonListener);
         mMapView.getOverlays().add(Constants.DRAW_POLYGON_OVERLAY_NUMBER, mPolygon);
         mMapView.getOverlays().addAll(Constants.DRAW_POLYGON_MARKER_OVERLAY_NUMBER, mPolygonMarker);
         mMapView.invalidate();
@@ -106,6 +108,7 @@ public class Draw
         x.setVisible(false);
         mPolygonMarker.add(x);
         mMapView.getOverlays().addAll(Constants.DRAW_POLYGON_MARKER_OVERLAY_NUMBER, mPolygonMarker);
+        mMapView.invalidate();
     }
     public void drawForPolyline(GeoPoint p)
     {

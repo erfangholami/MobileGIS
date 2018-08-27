@@ -19,14 +19,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/send_server"
-            android:onClick="@{() -> locationViewModel.sendToServer()}"
             app:layout_constraintLeft_toRightOf="@+id/clear"/>
         <Button
             android:id="@+id/clear"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/clear"
-            android:onClick="@{() -> locationViewModel.clearData()}"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
@@ -35,7 +33,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/export"
-            android:onClick="@{() -> locationViewModel.exportToSD()}"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/clear"/>
         <android.support.v7.widget.RecyclerView

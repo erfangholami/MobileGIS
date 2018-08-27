@@ -2,22 +2,62 @@ package com.kandaidea.mobilegis.DataModel.Models;
 
 import com.google.gson.annotations.SerializedName;
 
-public class LoginResponse<T>
+public class LoginResponse
 {
-    @SerializedName("valid")
-    private boolean valid;
-    LoginResponse(boolean valid)
+    @SerializedName("ErrorUsername")
+    private String ErrorUsername;
+    @SerializedName("ErrorPassword")
+    private String ErrorPassword;
+    @SerializedName("ErrorInternalServer")
+    private String ErrorInternalServer;
+    @SerializedName("UserData")
+    private Userdata userData;
+
+    public LoginResponse(String errorUsername, String errorPassword, String errorInternalServer, Userdata userData)
     {
-        this.valid = valid;
+        ErrorUsername = errorUsername;
+        ErrorPassword = errorPassword;
+        ErrorInternalServer = errorInternalServer;
+        this.userData = userData;
     }
 
-    public boolean isValid()
+    public String getErrorUsername()
     {
-        return valid;
+        return ErrorUsername;
     }
 
-    public void setValid(boolean valid)
+    public void setErrorUsername(String errorUsername)
     {
-        this.valid = valid;
+        ErrorUsername = errorUsername;
+    }
+
+    public String getErrorPassword()
+    {
+        return ErrorPassword;
+    }
+
+    public void setErrorPassword(String errorPassword)
+    {
+        ErrorPassword = errorPassword;
+    }
+
+    public String getErrorInternalServer()
+    {
+        return ErrorInternalServer;
+    }
+
+    public void setErrorInternalServer(String errorInternalServer)
+    {
+        ErrorInternalServer = errorInternalServer;
+    }
+
+    public Userdata getUserData()
+    {
+        return userData;
+    }
+
+    public void setUserData(Userdata userData)
+    {
+        this.userData = userData;
     }
 }

@@ -12,7 +12,7 @@ import org.osmdroid.views.overlay.Overlay;
 
 public class Constants
 {
-    public static final String BASE_URL = "http://google.com";
+    public static final String BASE_URL = "http://192.168.0.25/AppServer/AppService.asmx/";
     public static final String[] permissions = {Manifest.permission.CAMERA,
                                                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                                 Manifest.permission.ACCESS_FINE_LOCATION};
@@ -20,14 +20,13 @@ public class Constants
 
     public static final Long ANIMATE_SPEED = 500l;
     public static final Double ANIMATE_ZOOM_LEVEL = 19.0d;
-    public static final long MIN_TIME_LOCATION_MANAGER = 4000;
-    public static final float MIN_DISTANCE_LOCATION_MANAGER = 100f;
     public static final double MIN_MAP_ZOOM_LEVEL = 3d;
     public static final Double MAX_MAP_ZOOM_LEVEL = 22d;
     public static final GeoPoint MIDDLE_IRAN = new GeoPoint(33.33, 50);
     public static final BoundingBox MAP_BOUND = new BoundingBox(85.05112877980659, 180.0d,-85.05112877980659,-180.0d);
 
 
+    //map all overlay numbers
     public static final int[] TILE_OVERLAIES_NUMBER = new int[]{0, 1, 2, 3, 4};
     public static final XYTileSource x1 =  new XYTileSource("x1", 4, 12, 256, ".png?type=google",
             new String[]{"http://wms.chartbundle.com/tms/v1.0/enrl/"});
@@ -58,10 +57,12 @@ public class Constants
     public static final int DRAW_USER_MARKER_OVERLAY_NUMBER = 15;
 
 
+    //main activity start intent for result request code
     public static final int SEARCH_ACTIVITY_REQUEST_CODE = 1000;
     public static final int SETTING_ACTIVITY_REQUEST_CODE = 1001;
 
 
+    //save data in storage folder names
     public static final String MAIN_FOLDER = "MobileGIS";
     public static final String SCREENSHOT_FOLDER = "Screenshots";
     public static final String USER_LOCATIONS_FOLDER = "UserLocations";
@@ -87,14 +88,15 @@ public class Constants
     public static final int POLYLINE_TYPE = 1;
     public static final int MARKER_TYPE = 2;
 
-
+    //user overlay items in map setting show mode
     public static final int COMPACT_MODE = 0;
     public static final int EXTEND_MODE = 1;
 
+    //SettingActivity returning value key
     public static final String MY_LOCATION_ENABLE_VALUE = "my_location_value";
     public static final String SCALE_BAR_ENABLE_VALUE = "scale_bar_value";
 
-
+    //key for save overlay features in DB
     public static final String STROKE_COLOR_STRING = "stroke_color";
     public static final String STROKE_SIZE_STRING = "stroke_size";
     public static final String FILL_COLOR_STRING = "fill_color";

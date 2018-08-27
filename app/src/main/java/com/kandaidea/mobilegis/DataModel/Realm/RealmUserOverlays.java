@@ -6,6 +6,7 @@ import com.kandaidea.mobilegis.DataModel.Models.UserOverlayModel;
 import com.kandaidea.mobilegis.DataModel.OverlayString;
 
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.Polygon;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +53,9 @@ public class RealmUserOverlays
             {
                 case Constants.POLYGON_TYPE:
                 {
-                    newItem.setmPolygon(new OverlayString().stringToPolygon(model.getOverlay()));
+                    Polygon x = new OverlayString().stringToPolygon(model.getOverlay());
+                    x.setOnClickListener(null);
+                    newItem.setmPolygon(x);
                     newItem.setTransparency(Constants.MAX_TRANSPARENCY);
                     break;
                 }

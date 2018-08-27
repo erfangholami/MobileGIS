@@ -51,15 +51,16 @@ public class UserLocationsViewModel extends ViewModel
         for(UserLocationModel a : query.findAll())
         {
            locationModels.add(a);
-           Log.d(TAG, "locations" + a.getTime());
         }
         return locationModels;
     }
-    public void sendToServer()
+    public boolean sendToServer()
     {
         Log.d(TAG, "sendingToServer");
         retrofitMethods.sendUserLocations(getLocations());
-        //clearData();
+        clearData();
+        return true;
+
     }
     public void clearData()
     {
@@ -69,7 +70,7 @@ public class UserLocationsViewModel extends ViewModel
         realm.commitTransaction();
         Log.d(TAG, "allUserLocationsDeleted");
     }
-    public void exportToSD()
+    public boolean exportToSD()
     {
         Date now = new Date();
         android.text.format.DateFormat.format("yyyy_MM_dd_hh:mm:ss", now);
@@ -77,5 +78,7 @@ public class UserLocationsViewModel extends ViewModel
 
         File file = new File(mPath);
         new GPX().writePath(file, "gpsFile", getLocations());
+        clearData();
+        return true;
     }
 }

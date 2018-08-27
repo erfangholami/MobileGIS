@@ -466,9 +466,10 @@ public class MainActivity extends AppCompatActivity
             public boolean onClick(Polygon polygon, MapView mapView, GeoPoint eventPos)
             {
                 mapsViewModel.saveUserOverlay(mapDrawPolygon);
+                mapDrawPolygon.getPoints().clear();
                 Toast.makeText(getApplicationContext(), "Polygon saved !", Toast.LENGTH_SHORT).show();
                 mapMode = Constants.NONE;
-               polygonDraw.deleteForPolygon();
+                polygonDraw.deleteForPolygon();
                 mMapView.invalidate();
                 return false;
             }

@@ -17,7 +17,7 @@ public interface API
 {
     //API should decler here
     @GET("/login")
-    Observable<LoginResponse> login(@Query("username")String username, @Query("pass")String password);
+    Observable<LoginResponse> login(@Query("username")String username, @Query("password")String password);
 
     @GET("/search")
     Observable<List<SearchResult>> getSearchResult(@Query("search") String searchString);

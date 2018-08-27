@@ -19,12 +19,12 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="50dp"
             style="@style/actionbar_style"
             app:layout_constraintTop_toTopOf="parent">
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
+                android:layout_height="50dp"
                 android:foregroundGravity="left">
                 <TextView
                     android:id="@+id/setting_activity_title"

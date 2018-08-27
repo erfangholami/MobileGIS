@@ -95,6 +95,7 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 public void onClick(View view)
                 {
                     items.get(position).setShowMode(Constants.EXTEND_MODE);
+                    notifyItemChanged(position, items.get(position));
                 }
             });
             mHolder.turnOnOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()

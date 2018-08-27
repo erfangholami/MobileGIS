@@ -35,12 +35,12 @@
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/main_toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
+                    android:layout_height="50dp"
                     style="@style/actionbar_style"
                     app:layout_constraintTop_toTopOf="parent">
                     <android.support.constraint.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="?attr/actionBarSize"
+                        android:layout_height="50dp"
                         android:gravity="right">
                         <ImageButton
                             android:id="@+id/search_item"
@@ -84,6 +84,18 @@
                             app:layout_constraintTop_toTopOf="parent"
                             android:background="@android:color/transparent"
                             />
+                        <ImageView
+                            android:id="@+id/company_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@mipmap/ic_company"
+                            android:scaleType="center"
+                            android:scaleY="1.5"
+                            android:scaleX="1.5"
+                            android:background="@android:color/transparent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintLeft_toRightOf="@id/navigation_drawer"/>
                         <ImageButton
                             android:id="@+id/navigation_drawer"
                             android:layout_width="wrap_content"
