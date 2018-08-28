@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.LocationManager;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
@@ -28,6 +29,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -176,6 +178,7 @@ public class MainActivity extends AppCompatActivity
                 Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
                 if(new ScreenShot(bitmap).takeScreenshot())
                 {
+                    Toast.makeText(getApplicationContext(), R.string.screenshot_ok_msg, Toast.LENGTH_SHORT).show();
                     //TODO show screenshot for moments
                 }
             }

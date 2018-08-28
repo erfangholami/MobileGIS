@@ -12,7 +12,7 @@ import org.osmdroid.views.overlay.Overlay;
 
 public class Constants
 {
-    public static final String BASE_URL = "http://192.168.0.25/AppServer/AppService.asmx/";
+    public static final String BASE_URL = "http://192.168.0.25/AppServer/KService.svc/";
     public static final String[] permissions = {Manifest.permission.CAMERA,
                                                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                                 Manifest.permission.ACCESS_FINE_LOCATION};
@@ -100,4 +100,9 @@ public class Constants
     public static final String STROKE_COLOR_STRING = "stroke_color";
     public static final String STROKE_SIZE_STRING = "stroke_size";
     public static final String FILL_COLOR_STRING = "fill_color";
+
+    //login response code
+    public static final int LOGIN_SUCCESS = 1;
+    public static final int LOGIN_FAILED = 0;
+    public static final int CONNECTION_ERROR = -1;
 }

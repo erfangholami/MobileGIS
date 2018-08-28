@@ -20,7 +20,7 @@
     <string name="login_button">LOGIN</string>
     <string name="login_msg">Login Successful :)</string>
     <string name="search_hint">Search Here :)))</string>
-    <string name="send_server">Send to Server</string>
+    <string name="send_server">Server</string>
     <string name="clear">Clear</string>
     <string name="export">Export</string>
     <string name="polygon">POLYGON</string>
@@ -32,4 +32,8 @@
     <string name="tiles">Tiles</string>
     <string name="copy_clipboard_msg">location copied to clipboard :D</string>
     <string name="clear_location_data_msg">History Cleared!</string>
+    <string name="screenshot_ok_msg">Screenshot Captured</string>
+    <string name="incorrect_login_msg">Incorrect Username or Password</string>
+    <string name="connection_error">Connection Failed!</string>
+    <string name="empty_username_password">Empty Username or Password</string>
 </resources>

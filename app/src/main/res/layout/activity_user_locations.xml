@@ -13,34 +13,48 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/navigation_background"
         tools:context=".View.UserLocations">
-        <Button
-            android:id="@+id/send_server"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/user_location_tools"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/send_server"
-            app:layout_constraintLeft_toRightOf="@+id/clear"/>
-        <Button
-            android:id="@+id/clear"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/clear"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
-        <Button
-            android:id="@+id/export"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/export"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/clear"/>
+            android:layout_margin="@dimen/regular_margin"
+            android:background="@xml/actionbar_layer_list"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/send_server"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/send_server"
+                app:layout_constraintLeft_toRightOf="@+id/clear"
+                android:layout_weight="1"/>
+            <Button
+                android:id="@+id/clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/clear"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_weight="1"/>
+            <Button
+                android:id="@+id/export"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/export"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/clear"
+                android:layout_weight="1"/>
+        </LinearLayout>
         <android.support.v7.widget.RecyclerView
             android:id="@+id/user_location_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/regular_margin"
-            app:layout_constraintTop_toBottomOf="@id/clear">
+            android:elevation="@dimen/regular_elevation"
+            android:background="@xml/actionbar_layer_list"
+            app:layout_constraintTop_toBottomOf="@id/user_location_tools">
 
         </android.support.v7.widget.RecyclerView>
 

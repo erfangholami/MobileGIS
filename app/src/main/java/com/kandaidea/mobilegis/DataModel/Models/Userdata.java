@@ -1,12 +1,24 @@
 package com.kandaidea.mobilegis.DataModel.Models;
 
+import android.service.autofill.UserData;
+
+import com.google.gson.annotations.SerializedName;
+
 public class Userdata
 {
+    @SerializedName("Username")
     private String Username;
+    @SerializedName("Password")
     private String Password;
+    @SerializedName("EmailAddress")
     private String EmailAddress;
+    @SerializedName("Salt")
     private String Salt;
 
+    public Userdata()
+    {
+
+    }
     public Userdata(String username, String password, String emailAddress, String salt)
     {
         Username = username;
