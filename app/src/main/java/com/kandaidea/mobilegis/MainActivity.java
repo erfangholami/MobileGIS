@@ -30,6 +30,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +38,8 @@ import com.kandaidea.mobilegis.Adapers.MapSettingTileAdapter;
 import com.kandaidea.mobilegis.Adapers.UserOverlayAdapter;
 import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.DataModel.Models.UserOverlayItem;
+import com.kandaidea.mobilegis.DataModel.MovingDetails;
+import com.kandaidea.mobilegis.DataModel.ScreenShot;
 import com.kandaidea.mobilegis.View.ColorFilter;
 import com.kandaidea.mobilegis.View.Draw;
 import com.kandaidea.mobilegis.View.SearchActivity;
@@ -82,6 +85,7 @@ public class MainActivity extends AppCompatActivity
     private ImageButton navigationDrawer;
     private ImageButton mMapItem;
     private ImageButton mSearchItem;
+    private ImageView mScreenShot;
     private NavigationView mNavigationView;
     private TextView drawInformation;
     private CardView pointDetailCardView;
@@ -91,7 +95,6 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView mapSettingPolylineRecycler;
     private RecyclerView mapSettingMarkerRecycler;
     private DrawerLayout drawerlayout;
-
 
     //vars
     private int mapMode = Constants.NONE;
@@ -126,6 +129,7 @@ public class MainActivity extends AppCompatActivity
         mapSettingMarkerRecycler = mapSetting.findViewById(R.id.marker_recycler_view);
         mToolbar = findViewById(R.id.main_toolbar);
         navigationDrawer = mToolbar.findViewById(R.id.navigation_drawer);
+        mScreenShot = mToolbar.findViewById(R.id.screenshot_item);
         mNavigationView= findViewById(R.id.nav_view);
         drawerlayout = findViewById(R.id.drawer_layout);
 
@@ -160,6 +164,20 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view)
             {
                 drawerlayout.openDrawer(findViewById(R.id.nav_view));
+            }
+        });
+        mScreenShot.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                View v1 = getWindow().getDecorView().getRootView();
+                v1.setDrawingCacheEnabled(true);
+                Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
+                if(new ScreenShot(bitmap).takeScreenshot())
+                {
+                    //TODO show screenshot for moments
+                }
             }
         });
         mMapItem = mToolbar.findViewById(R.id.map_item);
@@ -359,7 +377,6 @@ public class MainActivity extends AppCompatActivity
         myLocationNewOverlay.setDrawAccuracyEnabled(true);
         mMapView.getOverlayManager().add(Constants.MY_LOCATION_OVERLAY_NUMBER, myLocationNewOverlay);
         mMapView.invalidate();
-
         //add scale bar
         final DisplayMetrics dm = getResources().getDisplayMetrics();
         mScaleBarOverlay = new ScaleBarOverlay(mMapView);
