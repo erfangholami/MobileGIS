@@ -3,6 +3,7 @@ package com.kandaidea.mobilegis.View;
 import android.app.Activity;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,15 +12,20 @@ import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 
 import com.kandaidea.mobilegis.Adapers.OnItemClickListener;
 import com.kandaidea.mobilegis.Adapers.SearchAdapter;
+import com.kandaidea.mobilegis.DataModel.Models.SearchItem;
+import com.kandaidea.mobilegis.DataModel.Models.SearchModel;
 import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
+import com.kandaidea.mobilegis.DataModel.Models.SearchitemItem;
 import com.kandaidea.mobilegis.DataModel.Retrofit.RetrofitMethods;
 import com.kandaidea.mobilegis.R;
 import com.kandaidea.mobilegis.ViewModel.SearchActivityViewModel;
 import com.kandaidea.mobilegis.databinding.ActivitySearchBinding;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.ObservableSource;
@@ -28,20 +34,28 @@ import io.reactivex.functions.Function;
 public class SearchActivity extends AppCompatActivity
 {
     public static final String TAG = SearchActivity.class.getSimpleName();
+
     private SearchActivityViewModel viewModel;
+
     private SearchView mSearchView;
     private ImageButton mBackArrow;
     private RecyclerView mRecyclerView;
+    private ProgressBar mProgressbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         ActivitySearchBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_search);
         viewModel = new SearchActivityViewModel();
+        viewModel.init(this);
         binding.setSearchViewModel(viewModel);
 
         mBackArrow = findViewById(R.id.back_arrow_search_bar);
         mSearchView = findViewById(R.id.search_field_Search_bar);
+        mProgressbar = findViewById(R.id.search_progressbar);
+        mSearchView.setIconified(false);
+
         mRecyclerView = findViewById(R.id.search_recycler_view);
         mBackArrow.setOnClickListener(new View.OnClickListener()
         {
@@ -55,10 +69,10 @@ public class SearchActivity extends AppCompatActivity
         });
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setAdapter(new SearchAdapter(this, viewModel.getSearchResult(), new OnItemClickListener()
+        mRecyclerView.setAdapter(new SearchAdapter(this, new ArrayList<SearchModel>(), new OnItemClickListener()
         {
             @Override
-            public void onItemClick(SearchResult item)
+            public void onItemClick(SearchModel item)
             {
                 Bundle bundle = new Bundle();
                 finishActivity(bundle);
@@ -72,14 +86,15 @@ public class SearchActivity extends AppCompatActivity
             public boolean onQueryTextSubmit(String s)
             {
                 Log.d(TAG, "searchClicked");
-                viewModel.retrofitMethods.search(s);
-                mRecyclerView.setAdapter(new SearchAdapter(getApplicationContext(), viewModel.getSearchResult(), new OnItemClickListener()
+                viewModel.getSearchResult(s);
+                mRecyclerView.setAdapter(new SearchAdapter(getApplicationContext(), new ArrayList<SearchModel>(), new OnItemClickListener()
                 {
                     @Override
-                    public void onItemClick(SearchResult item)
+                    public void onItemClick(SearchModel item)
                     {
-                        Bundle bundle = new Bundle();
-                        finishActivity(bundle);
+                        mProgressbar.setVisibility(View.VISIBLE);
+                        viewModel.getSearchItem(item.getId());
+
                     }
                 }));
                 mRecyclerView.getAdapter().notifyDataSetChanged();
@@ -102,5 +117,17 @@ public class SearchActivity extends AppCompatActivity
         intent.putExtra("result", bundle);
         setResult(Activity.RESULT_OK, intent);
         finish();
+    }
+
+    public void updateAdapterDataSet(List<SearchModel> items, int status)
+    {
+        ((SearchAdapter)mRecyclerView.getAdapter()).updateDataSet(items);
+    }
+    public void finishActivity(SearchitemItem item)
+    {
+        mProgressbar.setVisibility(View.GONE);
+        Bundle bundle = new Bundle();
+        //TODO (SEND BUNDLE) put item into bundle
+        finishActivity(bundle);
     }
 }

@@ -39,6 +39,7 @@ import android.widget.Toast;
 import com.kandaidea.mobilegis.Adapers.MapSettingTileAdapter;
 import com.kandaidea.mobilegis.Adapers.UserOverlayAdapter;
 import com.kandaidea.mobilegis.DataModel.Constants;
+import com.kandaidea.mobilegis.DataModel.Models.SearchitemItem;
 import com.kandaidea.mobilegis.DataModel.Models.UserOverlayItem;
 import com.kandaidea.mobilegis.DataModel.MovingDetails;
 import com.kandaidea.mobilegis.DataModel.ScreenShot;
@@ -613,7 +614,10 @@ public class MainActivity extends AppCompatActivity
         {
             case Constants.SEARCH_ACTIVITY_REQUEST_CODE:
             {
-
+                if(resultCode == RESULT_OK)
+                {
+                    //TODO (GET BUNDLE) get bundle and convert it to SearchitemItem type
+                }
                 break;
             }
             case Constants.SETTING_ACTIVITY_REQUEST_CODE:

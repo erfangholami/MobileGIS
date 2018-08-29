@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.kandaidea.mobilegis.DataModel.Models.SearchModel;
 import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
 import com.kandaidea.mobilegis.R;
 import com.kandaidea.mobilegis.View.SearchActivity;
@@ -26,49 +27,16 @@ import io.reactivex.schedulers.Schedulers;
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder>
 {
     public static final String TAG = SearchAdapter.class.getSimpleName();
-    public Observable<List<SearchResult>> result;
-
-    public void setResult(Observable<List<SearchResult>> result)
-    {
-        this.result = result;
-    }
 
     private Context mContext;
     private OnItemClickListener listener;
-    public List<SearchResult> ss = new ArrayList<>();
-    public SearchAdapter(Context context, Observable<List<SearchResult>> result, OnItemClickListener listener)
+    public List<SearchModel> items;
+
+    public SearchAdapter(Context context, List<SearchModel> items, OnItemClickListener listener)
     {
-        this.result = result;
+        this.items = items;
         this.mContext = context;
         this.listener = listener;
-        if(result != null)
-        {
-            this.result.subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(new DisposableObserver<List<SearchResult>>()
-                    {
-                        @Override
-                        public void onNext(List<SearchResult> r)
-                        {
-                            for (SearchResult s: r)
-                            {
-                                ss.add(s);
-                                Log.d(TAG, "constructor" + s.getCity());
-                            }
-                        }
-
-                        @Override
-                        public void onError(Throwable e)
-                        {
-
-                        }
-
-                        @Override
-                        public void onComplete()
-                        {
-                        }
-                    });
-        }
     }
     @NonNull
     @Override
@@ -82,28 +50,38 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position)
     {
+        //TODO set vars
         Log.v(TAG, "onBindViewHolder");
-        holder.textView.setText(ss.get(position).getCity());
-        holder.bind(ss.get(position), listener);
+        holder.textView.setText(items.get(position).getName());
+        holder.id.setText(String.valueOf(items.get(position).getId()));
+        holder.bind(items.get(position), listener);
     }
 
     @Override
     public int getItemCount()
     {
-        return ss == null ? 0 : ss.size();
+        return items == null ? 0 : items.size();
     }
 
+
+    public void updateDataSet(List<SearchModel> items)
+    {
+        this.items = items;
+        notifyDataSetChanged();
+    }
 
     //holder class
     public static class ViewHolder extends RecyclerView.ViewHolder
     {
         public TextView textView;
+        public TextView id;
         public ViewHolder(View itemView)
         {
             super(itemView);
-            textView = itemView.findViewById(R.id.city);
+            textView = itemView.findViewById(R.id.name);
+            id = itemView.findViewById(R.id.id);
         }
-        public void bind(final SearchResult item, final OnItemClickListener listener) {
+        public void bind(final SearchModel item, final OnItemClickListener listener) {
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View v) {

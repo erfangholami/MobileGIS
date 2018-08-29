@@ -2,49 +2,27 @@ package com.kandaidea.mobilegis.DataModel.Models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class SearchResult
 {
-    @SerializedName("name")
-    private String name;
-    @SerializedName("city")
-    private String city;
-    @SerializedName("province")
-    private String province;
+    @SerializedName("GetPrimaryResultResult")
+    private List<SearchModel> resultList;
 
-    public SearchResult(String name, String city, String province)
+    public SearchResult(List<SearchModel> resultList)
     {
-        this.name = name;
-        this.city = city;
-        this.province = province;
+        this.resultList = resultList;
     }
 
-    public String getName()
+    public List<SearchModel> getResultList()
     {
-        return name;
+        return resultList;
     }
 
-    public void setName(String name)
+    public void setResultList(List<SearchModel> resultList)
     {
-        this.name = name;
+        this.resultList = resultList;
     }
 
-    public String getCity()
-    {
-        return city;
-    }
 
-    public void setCity(String city)
-    {
-        this.city = city;
-    }
-
-    public String getProvince()
-    {
-        return province;
-    }
-
-    public void setProvince(String province)
-    {
-        this.province = province;
-    }
 }

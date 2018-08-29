@@ -1,6 +1,7 @@
 package com.kandaidea.mobilegis.DataModel.Retrofit;
 
 import com.kandaidea.mobilegis.DataModel.Models.LoginResponse;
+import com.kandaidea.mobilegis.DataModel.Models.SearchItem;
 import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
 import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
 
@@ -26,8 +27,19 @@ public interface API
             @Field("password") String password
     );
 
-    @GET("/search")
-    Observable<List<SearchResult>> getSearchResult(@Query("search") String searchString);
+    @POST("GetPrimaryResult")
+    @FormUrlEncoded
+    Observable<SearchResult> getSearchResult
+    (
+            @Field("searchTerm") String searchString
+    );
+
+    @POST("GetFinalResult")
+    @FormUrlEncoded
+    Observable<SearchItem> getSearchItem
+    (
+            @Field("id") int id
+    );
 
     @POST("/sendUserLocations")
     Call<ResponseBody> sendUserLocations(@Field("locationList[]")List<UserLocationModel> locations);

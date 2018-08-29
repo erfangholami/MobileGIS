@@ -1,5 +1,6 @@
 package com.kandaidea.mobilegis.View;
 
+import android.arch.lifecycle.ViewModel;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.support.design.widget.TextInputEditText;
@@ -12,11 +13,15 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.kandaidea.mobilegis.DataModel.Constants;
+import com.kandaidea.mobilegis.DataModel.Models.LoginResponse;
 import com.kandaidea.mobilegis.DataModel.RequestPermissions;
 import com.kandaidea.mobilegis.MainActivity;
 import com.kandaidea.mobilegis.R;
 import com.kandaidea.mobilegis.ViewModel.LoginActivityViewModel;
 import com.kandaidea.mobilegis.databinding.ActivityLoginBinding;
+
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
 public class LoginActivity extends AppCompatActivity
 {
@@ -30,13 +35,15 @@ public class LoginActivity extends AppCompatActivity
     private Button loginButton;
     private ProgressBar progressBar;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         ActivityLoginBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
         loginViewModel = new LoginActivityViewModel();
-        loginViewModel.init();
+        loginViewModel.init(this);
         binding.setLoginViewModel(loginViewModel);
 
         //initial views
@@ -61,31 +68,36 @@ public class LoginActivity extends AppCompatActivity
                 }
                 else
                 {
-                    progressBar.setVisibility(View.GONE);
-                    int response = loginViewModel.login(username, password);
-                    if(response == Constants.LOGIN_SUCCESS)
-                    {
-                        Toast.makeText(getApplicationContext(), R.string.login_msg, Toast.LENGTH_LONG).show();
-                        progressBar.setVisibility(View.GONE);
-                        Log.d(TAG, "LoginSuccessful");
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class );
-                        startActivity(intent);
-                    }
-                    else if(response == Constants.LOGIN_FAILED)
-                    {
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(getApplicationContext(), R.string.incorrect_login_msg, Toast.LENGTH_LONG).show();
-                        Log.d(TAG, "LoginFailed");
-                    }
-                    else if(response == Constants.CONNECTION_ERROR)
-                    {
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(getApplicationContext(), R.string.connection_error, Toast.LENGTH_LONG).show();
-                        Log.d(TAG, "connectionError");
-                    }
+                    progressBar.setVisibility(View.VISIBLE);
+                    loginViewModel.login(username, password);
+
                 }
             }
         });
 
+
+    }
+    public void login(int response)
+    {
+        if(response == Constants.LOGIN_SUCCESS)
+        {
+            Toast.makeText(getApplicationContext(), R.string.login_msg, Toast.LENGTH_LONG).show();
+            progressBar.setVisibility(View.GONE);
+            Log.d(TAG, "LoginSuccessful");
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class );
+            startActivity(intent);
+        }
+        else if(response == Constants.LOGIN_FAILED)
+        {
+            progressBar.setVisibility(View.GONE);
+            Toast.makeText(getApplicationContext(), R.string.incorrect_login_msg, Toast.LENGTH_LONG).show();
+            Log.d(TAG, "LoginFailed");
+        }
+        else if(response == Constants.CONNECTION_ERROR)
+        {
+            progressBar.setVisibility(View.GONE);
+            Toast.makeText(getApplicationContext(), R.string.connection_error, Toast.LENGTH_LONG).show();
+            Log.d(TAG, "connectionError");
+        }
     }
 }

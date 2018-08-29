@@ -57,10 +57,20 @@
             android:layout_margin="@dimen/search_result_margin"
             android:elevation="@dimen/search_result_elevation"
             android:scrollbars="vertical"
+            android:orientation="vertical"
             android:background="@color/action_bar_background"
             app:layout_constraintTop_toBottomOf="@+id/search_toolbar">
 
         </android.support.v7.widget.RecyclerView>
+        <ProgressBar
+            android:id="@+id/search_progressbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"/>
 
     </android.support.constraint.ConstraintLayout>
 </layout>

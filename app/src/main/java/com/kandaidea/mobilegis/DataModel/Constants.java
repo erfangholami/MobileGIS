@@ -105,4 +105,9 @@ public class Constants
     public static final int LOGIN_SUCCESS = 1;
     public static final int LOGIN_FAILED = 0;
     public static final int CONNECTION_ERROR = -1;
+
+
+    //
+    public static final int SUCCESS = 1;
+    public static final int ERROR = 0;
 }

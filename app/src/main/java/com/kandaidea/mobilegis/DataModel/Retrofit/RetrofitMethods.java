@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.util.Log;
 
 import com.kandaidea.mobilegis.DataModel.Models.LoginResponse;
+import com.kandaidea.mobilegis.DataModel.Models.SearchItem;
 import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
 import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
 
@@ -12,18 +13,12 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
+import retrofit2.Call;
 
 public class RetrofitMethods
 {
     private static final String TAG = RetrofitMethods.class.getSimpleName();
-    public Observable<List<SearchResult>> searchResult = new Observable<List<SearchResult>>()
-    {
-        @Override
-        protected void subscribeActual(Observer<? super List<SearchResult>> observer)
-        {
 
-        }
-    };
     //api instance
     API api = RetrofitClientInstance.getRetrofitInstance().create(API.class);
 
@@ -31,43 +26,21 @@ public class RetrofitMethods
     @SuppressLint("CheckResult")
     public Observable<LoginResponse> login(String username, String password)
     {
-        final LoginResponse[] responseLogin = new LoginResponse[1];
         Observable<LoginResponse> response = api.login(username, password);
         return response;
-        /*response.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableObserver<LoginResponse>()
-                {
-                    @Override
-                    public void onNext(LoginResponse loginResponse)
-                    {
-                        responseLogin[0] = loginResponse;
-                        Log.d(TAG, "responseIs" + responseLogin[0].getUserData().getUsername());
-                        Log.d(TAG, "responseIs" +responseLogin[0].getUserData().getEmailAddress());
-                        Log.d(TAG, "responseIs" +responseLogin[0].getUserData().getPassword());
-                    }
-
-                    @Override
-                    public void onError(Throwable e)
-                    {
-                        Log.d(TAG, "responseIs" +" error" + e.getMessage());
-                        valid[0] = false;
-                    }
-
-                    @Override
-                    public void onComplete()
-                    {
-                        Log.d(TAG, "responseIs" + " complete");
-                        valid[0] = true;
-                    }
-                });*/
     }
 
-    public Observable<List<SearchResult>> search(String searchText)
+    public Observable<SearchResult> search(String searchText)
     {
         Log.d(TAG, "OnSearchMethod");
-        Observable<List<SearchResult>> call = api.getSearchResult(searchText);
-        searchResult = call;
+        Observable<SearchResult> call = api.getSearchResult(searchText);
+        return call;
+    }
+
+    public Observable<SearchItem> searchBuId(int id)
+    {
+        Log.d(TAG, "OnSearchMethod");
+        Observable<SearchItem> call = api.getSearchItem(id);
         return call;
     }
 
