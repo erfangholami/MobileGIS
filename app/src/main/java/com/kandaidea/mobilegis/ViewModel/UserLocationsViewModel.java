@@ -50,7 +50,7 @@ public class UserLocationsViewModel extends ViewModel
         realm.commitTransaction();
         for(UserLocationModel a : query.findAll())
         {
-           locationModels.add(a);
+            locationModels.add(realm.copyFromRealm(a));
         }
         return locationModels;
     }
@@ -58,7 +58,7 @@ public class UserLocationsViewModel extends ViewModel
     {
         Log.d(TAG, "sendingToServer");
         retrofitMethods.sendUserLocations(getLocations());
-        clearData();
+        //clearData();
         return true;
 
     }

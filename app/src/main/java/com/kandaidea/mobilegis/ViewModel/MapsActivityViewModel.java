@@ -49,6 +49,8 @@ public class MapsActivityViewModel extends ViewModel
     public Realm userLocationRealm;
     public RealmUserOverlays realmUserOverlays;
 
+    private boolean followEnable = true;
+
     public void init(Activity mActivity)
     {
         this.mActivity = mActivity;
@@ -104,7 +106,10 @@ public class MapsActivityViewModel extends ViewModel
             @Override
             public void onLocationChanged(Location location, IMyLocationProvider source)
             {
-                saveUserLocation(location);
+                if(followEnable)
+                {
+                    saveUserLocation(location);
+                }
             }
         });
     }
@@ -191,4 +196,14 @@ public class MapsActivityViewModel extends ViewModel
         }*/
     }
 
+
+    public boolean isFollowEnable()
+    {
+        return followEnable;
+    }
+
+    public void setFollowEnable(boolean followEnable)
+    {
+        this.followEnable = followEnable;
+    }
 }

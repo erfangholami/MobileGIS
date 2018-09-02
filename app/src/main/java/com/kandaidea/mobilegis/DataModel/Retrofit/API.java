@@ -1,20 +1,19 @@
 package com.kandaidea.mobilegis.DataModel.Retrofit;
 
+
 import com.kandaidea.mobilegis.DataModel.Models.LoginResponse;
 import com.kandaidea.mobilegis.DataModel.Models.SearchItem;
 import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
-import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
+
 
 import java.util.List;
 
 import io.reactivex.Observable;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
-import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
-import retrofit2.http.Query;
 
 public interface API
 {
@@ -29,7 +28,7 @@ public interface API
 
     @POST("GetPrimaryResult")
     @FormUrlEncoded
-    Observable<SearchResult> getSearchResult
+    Observable<List<SearchResult>> getSearchResult
     (
             @Field("searchTerm") String searchString
     );
@@ -41,6 +40,13 @@ public interface API
             @Field("id") int id
     );
 
-    @POST("/sendUserLocations")
-    Call<ResponseBody> sendUserLocations(@Field("locationList[]")List<UserLocationModel> locations);
+
+    @POST("SendUserLocations")
+    //@FormUrlEncoded
+    Observable<String> sendUserLocations
+    (
+            @Header("Content-Type") String type,
+            @Header("Token") String token,
+            @Body String jsonObject
+    );
 }

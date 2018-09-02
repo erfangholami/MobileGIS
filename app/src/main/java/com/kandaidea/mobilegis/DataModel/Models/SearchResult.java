@@ -6,23 +6,51 @@ import java.util.List;
 
 public class SearchResult
 {
-    @SerializedName("GetPrimaryResultResult")
-    private List<SearchModel> resultList;
+    @SerializedName("Name")
+    private String name;
+    @SerializedName("ID")
+    private int id;
+    @SerializedName("GeometryType")
+    private String type;
 
-    public SearchResult(List<SearchModel> resultList)
+    public SearchResult()
     {
-        this.resultList = resultList;
+
+    }
+    public SearchResult(String name, int id, String type)
+    {
+        this.name = name;
+        this.id = id;
+        this.type = type;
     }
 
-    public List<SearchModel> getResultList()
+    public String getName()
     {
-        return resultList;
+        return name;
     }
 
-    public void setResultList(List<SearchModel> resultList)
+    public void setName(String name)
     {
-        this.resultList = resultList;
+        this.name = name;
     }
 
+    public int getId()
+    {
+        return id;
+    }
 
+    public void setId(int id)
+    {
+        this.id = id;
+    }
+
+    public String getType()
+    {
+        return type;
+    }
+
+    public void setType(String type)
+    {
+        this.type = type;
+    }
 }

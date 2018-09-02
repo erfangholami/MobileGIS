@@ -39,7 +39,6 @@ import android.widget.Toast;
 import com.kandaidea.mobilegis.Adapers.MapSettingTileAdapter;
 import com.kandaidea.mobilegis.Adapers.UserOverlayAdapter;
 import com.kandaidea.mobilegis.DataModel.Constants;
-import com.kandaidea.mobilegis.DataModel.Models.SearchitemItem;
 import com.kandaidea.mobilegis.DataModel.Models.UserOverlayItem;
 import com.kandaidea.mobilegis.DataModel.MovingDetails;
 import com.kandaidea.mobilegis.DataModel.ScreenShot;
@@ -63,6 +62,7 @@ import org.osmdroid.util.NetworkLocationIgnorer;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.Polygon;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
@@ -98,6 +98,9 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView mapSettingPolylineRecycler;
     private RecyclerView mapSettingMarkerRecycler;
     private DrawerLayout drawerlayout;
+    private ImageButton myLocation;
+    private ImageButton zoomIn;
+    private ImageButton zoomOut;
 
     //vars
     private int mapMode = Constants.NONE;
@@ -108,6 +111,7 @@ public class MainActivity extends AppCompatActivity
     private Draw polygonDraw;
     private Draw polylineDraw;
     private Marker customMarker;
+    private List<Overlay> searchOverlays = new ArrayList<>();
 
     private Polygon.OnClickListener mapDrawPolygonListener;
     private Polyline.OnClickListener mapDrawPolylineListener;
@@ -135,6 +139,11 @@ public class MainActivity extends AppCompatActivity
         mScreenShot = mToolbar.findViewById(R.id.screenshot_item);
         mNavigationView= findViewById(R.id.nav_view);
         drawerlayout = findViewById(R.id.drawer_layout);
+
+        //mainTools
+        zoomIn = findViewById(R.id.zoom_in_button);
+        zoomOut = findViewById(R.id.zoom_out_button);
+        myLocation = findViewById(R.id.my_location_button);
 
         //endregion
 
@@ -303,6 +312,7 @@ public class MainActivity extends AppCompatActivity
                 Intent intent = new Intent(getApplicationContext(), SettingActivity.class);
                 intent.putExtra(Constants.MY_LOCATION_ENABLE_VALUE, mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER).isEnabled());
                 intent.putExtra(Constants.SCALE_BAR_ENABLE_VALUE, mMapView.getOverlays().get(Constants.SCALE_BAR_OVERLAY_NUMBER).isEnabled());
+                intent.putExtra(Constants.FOLLOW_LOCATION_ENABLE_VALUE, mapsViewModel.isFollowEnable());
                 startActivityForResult(intent, Constants.SETTING_ACTIVITY_REQUEST_CODE);
                 return false;
             }
@@ -314,34 +324,16 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    private void showMainTools(boolean  show)
-    {
-        if(show)
-        {
-            findViewById(R.id.zoom_in_button).setVisibility(View.VISIBLE);
-            findViewById(R.id.zoom_out_button).setVisibility(View.VISIBLE);
-            findViewById(R.id.my_location_button).setVisibility(View.VISIBLE);
-        }
-        else
-        {
-            findViewById(R.id.zoom_in_button).setVisibility(View.GONE);
-            findViewById(R.id.zoom_out_button).setVisibility(View.GONE);
-            findViewById(R.id.my_location_button).setVisibility(View.GONE);
-        }
-    }
+
 
     private void initialScreenSettings()
     {
         View decorView = getWindow().getDecorView();
-        //hide navigation & fullscreen
         int uiOptions = View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR ;
         decorView.setSystemUiVisibility(uiOptions);
         Toolbar toolbar = findViewById(R.id.main_toolbar);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-        {
-            setSupportActionBar(toolbar);
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-        }
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
     private void mapCashSet()
@@ -349,11 +341,13 @@ public class MainActivity extends AppCompatActivity
         org.osmdroid.config.Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+
+    //find mapView, add default setting, add tile sources, add myLocation and scaleBar & initial mapClickListener
     private void initialMapSettings()
     {
         mMapView = findViewById(R.id.map_view_main);
+
+        //region default settings and tileSources
         mMapView.setScrollableAreaLimitDouble(Constants.MAP_BOUND);
         final IMapController mapController = mMapView.getController();
         mapController.setZoom(Constants.MIN_MAP_ZOOM_LEVEL);
@@ -367,20 +361,22 @@ public class MainActivity extends AppCompatActivity
         mMapView.setClickable(true);
         mMapView.setLongClickable(true);
 
-
         addTileSources();
 
-        //add my location
+        //endregion
+
+        //region MyLocation & ScaleBar
         GpsMyLocationProvider x = new GpsMyLocationProvider(getBaseContext());
         x.addLocationSource(LocationManager.GPS_PROVIDER);
         myLocationNewOverlay = new MyLocationNewOverlay(x, mMapView);
         myLocationNewOverlay.enableMyLocation();
-        Bitmap myLocationLogo = ((BitmapDrawable)getDrawable(R.mipmap.ic_my_location_point)).getBitmap();
+        Bitmap myLocationLogo = ((BitmapDrawable) getResources().getDrawable(R.mipmap.ic_my_location_point)).getBitmap();
         myLocationNewOverlay.setPersonHotspot(myLocationLogo.getWidth() / 2, myLocationLogo.getHeight() / 2);
         myLocationNewOverlay.setDirectionArrow(myLocationLogo, myLocationLogo);
         myLocationNewOverlay.setDrawAccuracyEnabled(true);
         mMapView.getOverlayManager().add(Constants.MY_LOCATION_OVERLAY_NUMBER, myLocationNewOverlay);
         mMapView.invalidate();
+
         //add scale bar
         final DisplayMetrics dm = getResources().getDisplayMetrics();
         mScaleBarOverlay = new ScaleBarOverlay(mMapView);
@@ -389,9 +385,12 @@ public class MainActivity extends AppCompatActivity
         mMapView.getOverlays().add(Constants.SCALE_BAR_OVERLAY_NUMBER, mScaleBarOverlay);
         mMapView.invalidate();
 
-        initialMapClickListener();
+        //endregion
 
+        initialMapClickListener();
     }
+
+    //behave when user interact with mapView
     private void initialMapClickListener()
     {
         mMapView.setLongClickable(true);
@@ -527,8 +526,10 @@ public class MainActivity extends AppCompatActivity
         Polyline xxx = new Polyline();
         items.add(xx);
         itemss.add(xxx);
+        searchOverlays.add(xx);
         mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYGON_OVERLAY_NUMBER, items);
         mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYLINE_OVERLAY_NUMBER, itemss);
+        mMapView.getOverlays().addAll(Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER, searchOverlays);
         //TODO add marker list draw to the map
         mMapView.invalidate();
     }
@@ -552,7 +553,7 @@ public class MainActivity extends AppCompatActivity
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
         sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, uri);
-        startActivity(Intent.createChooser(sharingIntent, "Share via :"));
+        startActivity(Intent.createChooser(sharingIntent, getString(R.string.share_location_msg)));
     }
 
     //copy location to clipboard
@@ -567,9 +568,10 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    //region add default tile sources to mapOverlays
     private void addTileSources()
     {
-        for(int i = 0; i < Constants.TILE_OVERLAIES_NUMBER.length; i++)
+        for(int i = Constants.TILE_OVERLAIES_NUMBER.length - 1; i >= 0 ; i--)
         {
             final MapTileProviderBasic tileProvider = new MapTileProviderBasic(getApplicationContext());
             final ITileSource tileSource = Constants.TILE_OVERLAIES[i];
@@ -581,7 +583,9 @@ public class MainActivity extends AppCompatActivity
             mMapView.getOverlays().add(Constants.TILE_OVERLAIES_NUMBER[i], tilesOverlay);
         }
     }
+    //endregion
 
+    //region setMainPageRecyclerAdapter
     private void setAdapters()
     {
         mapSettingTileRecycler.setHasFixedSize(true);
@@ -591,19 +595,38 @@ public class MainActivity extends AppCompatActivity
 
         mapSettingPolygonRecycler.setHasFixedSize(true);
         mapSettingPolygonRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mapSettingPolygonRecycler.setAdapter(new UserOverlayAdapter(mMapView, mapsViewModel.getUserOverlays(0)));
+        mapSettingPolygonRecycler.setAdapter(new UserOverlayAdapter(mMapView, mapsViewModel.getUserOverlays(Constants.POLYGON_TYPE)));
         mapSettingPolygonRecycler.getAdapter().notifyDataSetChanged();
 
         mapSettingPolylineRecycler.setHasFixedSize(true);
         mapSettingPolylineRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mapSettingPolylineRecycler.setAdapter(new UserOverlayAdapter(mMapView, mapsViewModel.getUserOverlays(1)));
+        mapSettingPolylineRecycler.setAdapter(new UserOverlayAdapter(mMapView, mapsViewModel.getUserOverlays(Constants.POLYLINE_TYPE)));
         mapSettingPolylineRecycler.getAdapter().notifyDataSetChanged();
 
         mapSettingMarkerRecycler.setHasFixedSize(true);
         mapSettingMarkerRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mapSettingMarkerRecycler.setAdapter(new UserOverlayAdapter(mMapView, mapsViewModel.getUserOverlays(2)));
+        mapSettingMarkerRecycler.setAdapter(new UserOverlayAdapter(mMapView, mapsViewModel.getUserOverlays(Constants.MARKER_TYPE)));
         mapSettingMarkerRecycler.getAdapter().notifyDataSetChanged();
     }
+    //endregion
+
+    // region Show or Hide three main tools
+    private void showMainTools(boolean  show)
+    {
+        if(show)
+        {
+            zoomIn.setVisibility(View.VISIBLE);
+            zoomOut.setVisibility(View.VISIBLE);
+            myLocation.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            zoomIn.setVisibility(View.GONE);
+            zoomOut.setVisibility(View.GONE);
+            myLocation.setVisibility(View.GONE);
+        }
+    }
+    //endregion
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
@@ -617,6 +640,22 @@ public class MainActivity extends AppCompatActivity
                 if(resultCode == RESULT_OK)
                 {
                     //TODO (GET BUNDLE) get bundle and convert it to SearchitemItem type
+                    Bundle bundle = data.getExtras();
+                    String cord = bundle.getString(Constants.SEARCH_COORDINATES_KEY);
+                    String type = bundle.getString(Constants.SEARCH_TYPE_KEY);
+                    String name = bundle.getString(Constants.SEARCH_NAME_KEY);
+                    int id = bundle.getInt(Constants.SEARCH_ID_KEY);
+                    searchOverlays.clear();
+                    //add overlay to array
+                    Marker x = new Marker(mMapView);
+                    x.setPosition(new GeoPoint(15d, 15d));
+                    searchOverlays.add(x);
+                    mapMode = Constants.SHOW_SEARCH_MODE;
+                    mMapView.getOverlays().remove(Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER);
+                    mMapView.getOverlays().addAll(Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER, searchOverlays);
+                    mMapView.getController().animateTo(x.getPosition(), Constants.ANIMATE_ZOOM_LEVEL, Constants.ANIMATE_SPEED);
+                    mMapView.invalidate();
+
                 }
                 break;
             }
@@ -627,6 +666,7 @@ public class MainActivity extends AppCompatActivity
                     Bundle bundle = data.getExtras();
                     mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER).setEnabled(bundle.getBoolean(Constants.MY_LOCATION_ENABLE_VALUE));
                     mMapView.getOverlays().get(Constants.SCALE_BAR_OVERLAY_NUMBER).setEnabled(bundle.getBoolean(Constants.SCALE_BAR_ENABLE_VALUE));
+                    mapsViewModel.setFollowEnable(bundle.getBoolean(Constants.FOLLOW_LOCATION_ENABLE_VALUE));
                     mMapView.invalidate();
                 }
                 break;
@@ -634,6 +674,20 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onBackPressed()
+    {
+        if(mapMode == Constants.SHOW_SEARCH_MODE)
+        {
+            mMapView.getOverlays().get(Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER).setEnabled(false);
+            mMapView.invalidate();
+            mapMode = Constants.NONE;
+        }
+        else
+        {
+            super.onBackPressed();
+        }
+    }
 
     //region lifeCycle
     @Override

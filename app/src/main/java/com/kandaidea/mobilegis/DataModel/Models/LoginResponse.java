@@ -4,21 +4,64 @@ import com.google.gson.annotations.SerializedName;
 
 public class LoginResponse
 {
-    @SerializedName("LoginResult")
-    private Userdata userData;
+    @SerializedName("Username")
+    private String Username;
+    @SerializedName("Password")
+    private String Password;
+    @SerializedName("EmailAddress")
+    private String EmailAddress;
+    @SerializedName("Salt")
+    private String Salt;
 
-    public LoginResponse(Userdata userData)
+    public LoginResponse()
     {
-        this.userData = userData;
+
+    }
+    public LoginResponse(String username, String password, String emailAddress, String salt)
+    {
+        Username = username;
+        Password = password;
+        EmailAddress = emailAddress;
+        Salt = salt;
     }
 
-    public Userdata getUserData()
+    public String getUsername()
     {
-        return userData;
+        return Username;
     }
 
-    public void setUserData(Userdata userData)
+    public void setUsername(String username)
     {
-        this.userData = userData;
+        Username = username;
+    }
+
+    public String getPassword()
+    {
+        return Password;
+    }
+
+    public void setPassword(String password)
+    {
+        Password = password;
+    }
+
+    public String getEmailAddress()
+    {
+        return EmailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress)
+    {
+        EmailAddress = emailAddress;
+    }
+
+    public String getSalt()
+    {
+        return Salt;
+    }
+
+    public void setSalt(String salt)
+    {
+        Salt = salt;
     }
 }

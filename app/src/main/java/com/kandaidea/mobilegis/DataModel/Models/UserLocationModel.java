@@ -1,5 +1,7 @@
 package com.kandaidea.mobilegis.DataModel.Models;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import com.kandaidea.mobilegis.View.UserLocations;
 
@@ -7,11 +9,11 @@ import io.realm.RealmObject;
 
 public class UserLocationModel extends RealmObject
 {
-    @SerializedName("time")
+    @SerializedName("Time")
     private String time;
-    @SerializedName("latitude")
+    @SerializedName("Lat")
     private double lat;
-    @SerializedName("longitude")
+    @SerializedName("Lng")
     private double lng;
 
     public UserLocationModel()
@@ -23,6 +25,16 @@ public class UserLocationModel extends RealmObject
         this.time = time;
         this.lat = lat;
         this.lng = lng;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "UserLocationModel{" +
+                "time='" + time + '\'' +
+                ", lat=" + lat +
+                ", lng=" + lng +
+                '}';
     }
 
     public String getTime()

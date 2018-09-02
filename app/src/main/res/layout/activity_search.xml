@@ -55,10 +55,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/search_result_margin"
-            android:elevation="@dimen/search_result_elevation"
             android:scrollbars="vertical"
             android:orientation="vertical"
-            android:background="@color/action_bar_background"
+            android:background="@color/navigation_background"
             app:layout_constraintTop_toBottomOf="@+id/search_toolbar">
 
         </android.support.v7.widget.RecyclerView>

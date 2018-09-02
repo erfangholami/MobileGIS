@@ -2,7 +2,8 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="false">
 
     <data>
         <variable
@@ -47,13 +48,21 @@
                 app:layout_constraintRight_toLeftOf="@+id/clear"
                 android:layout_weight="1"/>
         </LinearLayout>
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/user_location_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/regular_margin"
-            android:elevation="@dimen/regular_elevation"
-            android:background="@xml/actionbar_layer_list"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:background="@color/navigation_background"
+            android:scrollbars="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/user_location_tools">
 
         </android.support.v7.widget.RecyclerView>

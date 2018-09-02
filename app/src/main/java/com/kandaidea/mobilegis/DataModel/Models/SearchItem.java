@@ -4,22 +4,75 @@ import com.google.gson.annotations.SerializedName;
 
 public class SearchItem
 {
-    //TODO set var and functions for searched item
-    @SerializedName("GetFinalResultResult")
-    private SearchitemItem item;
+    @SerializedName("Coordinates")
+    private String coordinates;
+    @SerializedName("GeometryType")
+    private String type;
+    @SerializedName("ID")
+    private int id;
+    @SerializedName("Name")
+    private String name;
 
-    public SearchItem(SearchitemItem item)
+    public SearchItem()
     {
-        this.item = item;
+
+    }
+    public SearchItem(String coordinates, String type, int id, String name)
+    {
+        this.coordinates = coordinates;
+        this.type = type;
+        this.id = id;
+        this.name = name;
     }
 
-    public SearchitemItem getItem()
+    @Override
+    public String toString()
     {
-        return item;
+        return "SearchItem{" +
+                "coordinates='" + coordinates + '\'' +
+                ", type='" + type + '\'' +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 
-    public void setItem(SearchitemItem item)
+    public String getCoordinates()
     {
-        this.item = item;
+        return coordinates;
+    }
+
+    public void setCoordinates(String coordinates)
+    {
+        this.coordinates = coordinates;
+    }
+
+    public String getType()
+    {
+        return type;
+    }
+
+    public void setType(String type)
+    {
+        this.type = type;
+    }
+
+    public int getId()
+    {
+        return id;
+    }
+
+    public void setId(int id)
+    {
+        this.id = id;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 }

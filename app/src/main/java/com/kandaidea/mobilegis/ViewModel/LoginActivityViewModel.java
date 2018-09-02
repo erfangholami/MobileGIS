@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.DataModel.Models.LoginResponse;
+import com.kandaidea.mobilegis.DataModel.Models.Token;
 import com.kandaidea.mobilegis.DataModel.Retrofit.RetrofitMethods;
 import com.kandaidea.mobilegis.View.LoginActivity;
 
@@ -22,9 +23,11 @@ public class LoginActivityViewModel extends ViewModel
     private static final String TAG = LoginActivityViewModel.class.getSimpleName();
 
     private LoginActivity mActivity;
+    private Token token;
     public void init(LoginActivity mActivity)
     {
         this.mActivity = mActivity;
+        token = new Token(this.mActivity.getApplicationContext());
     }
     public void login(final String username, String password)
     {
@@ -38,18 +41,19 @@ public class LoginActivityViewModel extends ViewModel
                     @Override
                     public void onNext(LoginResponse loginResponse)
                     {
-                        Log.d(TAG, "responseIs" + loginResponse.getUserData().getUsername());
-                        Log.d(TAG, "responseIs" +loginResponse.getUserData().getEmailAddress());
-                        Log.d(TAG, "responseIs" +loginResponse.getUserData().getPassword());
-                        if((String)loginResponse.getUserData().getUsername() == null )
+                        Log.d(TAG, "responseIs" + loginResponse.getUsername());
+                        Log.d(TAG, "responseIs" +loginResponse.getEmailAddress());
+                        Log.d(TAG, "responseIs" +loginResponse.getPassword());
+                        if(loginResponse.getUsername() == null )
                         {
                             i = Constants.LOGIN_FAILED;
                         }
                         else
                         {
                             i = Constants.LOGIN_SUCCESS;
+                            token.writeToken(loginResponse.getUsername());
                         }
-                        Log.d(TAG, "i is : " + loginResponse.getUserData().getUsername() + " " + username +" " + i);
+                        Log.d(TAG, "i is : " + loginResponse.getUsername() + " " + username +" " + i);
                     }
 
                     @Override

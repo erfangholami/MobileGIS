@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.DataModel.Models.SearchItem;
-import com.kandaidea.mobilegis.DataModel.Models.SearchModel;
 import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
 import com.kandaidea.mobilegis.DataModel.Retrofit.RetrofitMethods;
 import com.kandaidea.mobilegis.View.SearchActivity;
@@ -39,14 +38,14 @@ public class SearchActivityViewModel extends ViewModel
         retrofitMethods.search(search)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableObserver<SearchResult>()
+                .subscribeWith(new DisposableObserver<List<SearchResult>>()
                 {
-                    List<SearchModel> results = new ArrayList<>();
+                    List<SearchResult> results = new ArrayList<>();
                     @Override
-                    public void onNext(SearchResult searchResults)
+                    public void onNext(List<SearchResult> searchResults)
                     {
-                        mActivity.updateAdapterDataSet(searchResults.getResultList(), Constants.SUCCESS);
-                        for (SearchModel res: searchResults.getResultList())
+                        mActivity.updateAdapterDataSet(searchResults, Constants.SUCCESS);
+                        for (SearchResult res: searchResults)
                         {
                             Log.d(TAG, "res is : " + res.getName() + " " + res.getId());
                         }
@@ -67,7 +66,7 @@ public class SearchActivityViewModel extends ViewModel
     }
     public void getSearchItem(int id)
     {
-        retrofitMethods.searchBuId(id)
+        retrofitMethods.searchById(id)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(new DisposableObserver<SearchItem>()
@@ -75,8 +74,8 @@ public class SearchActivityViewModel extends ViewModel
                 @Override
                 public void onNext(SearchItem searchItem)
                 {
-                    Log.d(TAG, "final search is : " + searchItem.getItem().toString());
-                    mActivity.finishActivity(searchItem.getItem());
+                    Log.d(TAG, "final search is : " + searchItem.toString());
+                    mActivity.finishActivity(searchItem);
                 }
 
                 @Override

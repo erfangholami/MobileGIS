@@ -16,10 +16,9 @@ import android.widget.ProgressBar;
 
 import com.kandaidea.mobilegis.Adapers.OnItemClickListener;
 import com.kandaidea.mobilegis.Adapers.SearchAdapter;
+import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.DataModel.Models.SearchItem;
-import com.kandaidea.mobilegis.DataModel.Models.SearchModel;
 import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
-import com.kandaidea.mobilegis.DataModel.Models.SearchitemItem;
 import com.kandaidea.mobilegis.DataModel.Retrofit.RetrofitMethods;
 import com.kandaidea.mobilegis.R;
 import com.kandaidea.mobilegis.ViewModel.SearchActivityViewModel;
@@ -69,10 +68,10 @@ public class SearchActivity extends AppCompatActivity
         });
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setAdapter(new SearchAdapter(this, new ArrayList<SearchModel>(), new OnItemClickListener()
+        mRecyclerView.setAdapter(new SearchAdapter(this, new ArrayList<SearchResult>(), new OnItemClickListener()
         {
             @Override
-            public void onItemClick(SearchModel item)
+            public void onItemClick(SearchResult item)
             {
                 Bundle bundle = new Bundle();
                 finishActivity(bundle);
@@ -87,10 +86,10 @@ public class SearchActivity extends AppCompatActivity
             {
                 Log.d(TAG, "searchClicked");
                 viewModel.getSearchResult(s);
-                mRecyclerView.setAdapter(new SearchAdapter(getApplicationContext(), new ArrayList<SearchModel>(), new OnItemClickListener()
+                mRecyclerView.setAdapter(new SearchAdapter(getApplicationContext(), new ArrayList<SearchResult>(), new OnItemClickListener()
                 {
                     @Override
-                    public void onItemClick(SearchModel item)
+                    public void onItemClick(SearchResult item)
                     {
                         mProgressbar.setVisibility(View.VISIBLE);
                         viewModel.getSearchItem(item.getId());
@@ -119,14 +118,18 @@ public class SearchActivity extends AppCompatActivity
         finish();
     }
 
-    public void updateAdapterDataSet(List<SearchModel> items, int status)
+    public void updateAdapterDataSet(List<SearchResult> items, int status)
     {
         ((SearchAdapter)mRecyclerView.getAdapter()).updateDataSet(items);
     }
-    public void finishActivity(SearchitemItem item)
+    public void finishActivity(SearchItem item)
     {
         mProgressbar.setVisibility(View.GONE);
         Bundle bundle = new Bundle();
+        bundle.putString(Constants.SEARCH_COORDINATES_KEY, item.getCoordinates());
+        bundle.putString(Constants.SEARCH_TYPE_KEY, item.getType());
+        bundle.putString(Constants.SEARCH_NAME_KEY, item.getName());
+        bundle.putInt(Constants.SEARCH_ID_KEY, item.getId());
         //TODO (SEND BUNDLE) put item into bundle
         finishActivity(bundle);
     }

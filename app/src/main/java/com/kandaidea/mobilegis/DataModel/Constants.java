@@ -27,7 +27,7 @@ public class Constants
 
 
     //map all overlay numbers
-    public static final int[] TILE_OVERLAIES_NUMBER = new int[]{0, 1, 2, 3, 4};
+    public static final int[] TILE_OVERLAIES_NUMBER = new int[]{4, 3, 2, 1, 0};
     public static final XYTileSource x1 =  new XYTileSource("x1", 4, 12, 256, ".png?type=google",
             new String[]{"http://wms.chartbundle.com/tms/v1.0/enrl/"});
     public static final XYTileSource x2 = new XYTileSource("x2",
@@ -54,7 +54,7 @@ public class Constants
     public static final int DRAW_CUSTOM_MARKER_OVERLAY_NUMBER = 12;
     public static final int DRAW_USER_POLYGON_OVERLAY_NUMBER = 13;
     public static final int DRAW_USER_POLYLINE_OVERLAY_NUMBER = 14;
-    public static final int DRAW_USER_MARKER_OVERLAY_NUMBER = 15;
+    public static final int DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER = 15;
 
 
     //main activity start intent for result request code
@@ -79,6 +79,9 @@ public class Constants
     public static final int NONE = 0;
     public static final int DRAW_POLYGON_MODE = 1;
     public static final int DRAW_POLYLINE_MODE = 2;
+    public static final int SHOW_SEARCH_MODE = 3;
+    public static final int SHOW_MAPSETTING_MODE = 4;
+    public static final int SHOW_MARKER_MODE = 5;
 
 
     public static final float MAX_TRANSPARENCY = 1;
@@ -95,6 +98,7 @@ public class Constants
     //SettingActivity returning value key
     public static final String MY_LOCATION_ENABLE_VALUE = "my_location_value";
     public static final String SCALE_BAR_ENABLE_VALUE = "scale_bar_value";
+    public static final String FOLLOW_LOCATION_ENABLE_VALUE = "follow_location_value";
 
     //key for save overlay features in DB
     public static final String STROKE_COLOR_STRING = "stroke_color";
@@ -110,4 +114,12 @@ public class Constants
     //
     public static final int SUCCESS = 1;
     public static final int ERROR = 0;
+
+
+    public static final String SEARCH_COORDINATES_KEY = "coordinates";
+    public static final String SEARCH_TYPE_KEY = "geometry_type";
+    public static final String SEARCH_ID_KEY = "id";
+    public static final String SEARCH_NAME_KEY = "name";
+
+    public static final String RETROFIT_CONTENT_TYPE = "application/x-www-form-urlencoded";
 }

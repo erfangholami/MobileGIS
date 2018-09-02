@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.kandaidea.mobilegis.DataModel.Models.SearchModel;
 import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
 import com.kandaidea.mobilegis.R;
 import com.kandaidea.mobilegis.View.SearchActivity;
@@ -30,9 +29,9 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
 
     private Context mContext;
     private OnItemClickListener listener;
-    public List<SearchModel> items;
+    public List<SearchResult> items;
 
-    public SearchAdapter(Context context, List<SearchModel> items, OnItemClickListener listener)
+    public SearchAdapter(Context context, List<SearchResult> items, OnItemClickListener listener)
     {
         this.items = items;
         this.mContext = context;
@@ -64,7 +63,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     }
 
 
-    public void updateDataSet(List<SearchModel> items)
+    public void updateDataSet(List<SearchResult> items)
     {
         this.items = items;
         notifyDataSetChanged();
@@ -81,7 +80,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
             textView = itemView.findViewById(R.id.name);
             id = itemView.findViewById(R.id.id);
         }
-        public void bind(final SearchModel item, final OnItemClickListener listener) {
+        public void bind(final SearchResult item, final OnItemClickListener listener) {
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View v) {
