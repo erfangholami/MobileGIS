@@ -2,8 +2,7 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:fitsSystemWindows="false">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
         <variable
@@ -14,58 +13,59 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/navigation_background"
-        tools:context=".View.UserLocations">
-        <LinearLayout
+        android:background="@color/navigation_background">
+        <android.support.constraint.ConstraintLayout
             android:id="@+id/user_location_tools"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/regular_margin"
-            android:background="@xml/actionbar_layer_list"
-            android:orientation="horizontal">
-            <Button
-                android:id="@+id/send_server"
-                android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <LinearLayout
+
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/send_server"
-                app:layout_constraintLeft_toRightOf="@+id/clear"
-                android:layout_weight="1"/>
-            <Button
-                android:id="@+id/clear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/clear"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_weight="1"/>
-            <Button
-                android:id="@+id/export"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/export"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintRight_toLeftOf="@+id/clear"
-                android:layout_weight="1"/>
-        </LinearLayout>
+                android:layout_margin="@dimen/regular_margin"
+                android:background="@xml/actionbar_layer_list"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/send_server"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/send_server"
+                    app:layout_constraintLeft_toRightOf="@+id/clear"
+                    android:layout_weight="1"/>
+                <Button
+                    android:id="@+id/clear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/clear"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_weight="1"/>
+                <Button
+                    android:id="@+id/export"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/export"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintRight_toLeftOf="@+id/clear"
+                    android:layout_weight="1"/>
+            </LinearLayout>
+
+        </android.support.constraint.ConstraintLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/user_location_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/regular_margin"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
             android:background="@color/navigation_background"
+            android:orientation="vertical"
             android:scrollbars="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/user_location_tools">
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/user_location_tools"
+            android:paddingBottom="60dp"/>
 
-        </android.support.v7.widget.RecyclerView>
 
     </android.support.constraint.ConstraintLayout>
 </layout>

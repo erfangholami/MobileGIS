@@ -69,7 +69,7 @@ public class MapSettingTileAdapter extends RecyclerView.Adapter<MapSettingTileAd
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b)
             {
-                mMapView.getOverlays().get(position).setEnabled(b);
+                mMapView.getOverlays().get(Constants.TILE_OVERLAIES_NUMBER[position]).setEnabled(b);
                 holder.seekBar.setEnabled(b);
             }
         });

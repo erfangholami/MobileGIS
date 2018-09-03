@@ -29,6 +29,7 @@ public class UserLocations extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
         ActivityUserLocationsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_user_locations);
         viewModel = new UserLocationsViewModel();
         viewModel.init();
@@ -39,7 +40,7 @@ public class UserLocations extends AppCompatActivity
         clear = findViewById(R.id.clear);
         sendServer = findViewById(R.id.send_server);
 
-        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setHasFixedSize(false);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(new UserLocationAdapter(viewModel.getLocations()));
 

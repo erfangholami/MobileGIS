@@ -2,7 +2,9 @@ package com.kandaidea.mobilegis.View;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
 import com.kandaidea.mobilegis.DataModel.CalculateOverlay;
 import com.kandaidea.mobilegis.DataModel.Constants;
@@ -30,8 +32,9 @@ public class Draw
     private int mMode;
     private Polygon.OnClickListener polygonListener;
     private Polyline.OnClickListener polylineListener;
+    private TextView textView;
 
-    public Draw(Context mContext,MapView mMapView, Polygon mPolygon, Polyline mPolyline, ArrayList<Marker> mPolygonMarker, ArrayList<Marker> mPolylineMarker, int mMode, Polygon.OnClickListener listener, Polyline.OnClickListener listener2)
+    public Draw(Context mContext,MapView mMapView, Polygon mPolygon, Polyline mPolyline, ArrayList<Marker> mPolygonMarker, ArrayList<Marker> mPolylineMarker, int mMode, Polygon.OnClickListener listener, Polyline.OnClickListener listener2, TextView textView)
     {
         this.mContext = mContext;
         this.mMapView = mMapView;
@@ -42,10 +45,12 @@ public class Draw
         this.mMode = mMode;
         this.polygonListener = listener;
         this.polylineListener = listener2;
+        this.textView = textView;
     }
 
     public void drawForPolygon(GeoPoint p)
     {
+        final CalculateOverlay calculator = new CalculateOverlay();
         mMapView.getOverlays().remove(Constants.DRAW_POLYGON_OVERLAY_NUMBER);
         Marker newMarker = new Marker(mMapView);
         newMarker.setPosition(p);
@@ -75,6 +80,10 @@ public class Draw
                 poly.setFillColor(mContext.getResources().getColor(R.color.polygon_fill_color));
                 mPolygon = poly;
                 mPolygon.setOnClickListener(polygonListener);
+                double area = calculator.polygonArea(mPolygon);
+                double length = calculator.polygonLength(mPolygon);
+                textView.setVisibility(View.VISIBLE);
+                textView.setText("Area:" + String.valueOf(area) + "\nLength :" + length);
                 mMapView.getOverlays().add(Constants.DRAW_POLYGON_OVERLAY_NUMBER, mPolygon);
                 mMapView.getOverlays().remove(Constants.DRAW_POLYGON_MARKER_OVERLAY_NUMBER);
                 mMapView.getOverlays().addAll(Constants.DRAW_POLYGON_MARKER_OVERLAY_NUMBER, mPolygonMarker);
@@ -85,11 +94,11 @@ public class Draw
             public void onMarkerDragStart(Marker marker)
             {
                 Log.d(TAG, "onMarkerDragStart");
-                mMapView.getOverlays().remove(mPolygon);
+                mMapView.getOverlays().remove(Constants.DRAW_POLYGON_OVERLAY_NUMBER);
                 mMapView.invalidate();
             }
         });
-        mMapView.getOverlays().remove(mPolygonMarker);
+        mMapView.getOverlays().remove(Constants.DRAW_POLYGON_MARKER_OVERLAY_NUMBER);
         mPolygonMarker.add(newMarker);
         mPolygon.addPoint(p);
         mPolygon.setFillColor(mContext.getResources().getColor(R.color.polygon_fill_color));
@@ -97,6 +106,13 @@ public class Draw
         mMapView.getOverlays().add(Constants.DRAW_POLYGON_OVERLAY_NUMBER, mPolygon);
         mMapView.getOverlays().addAll(Constants.DRAW_POLYGON_MARKER_OVERLAY_NUMBER, mPolygonMarker);
         mMapView.invalidate();
+
+
+        double area = calculator.polygonArea((Polygon)mMapView.getOverlays().get(Constants.DRAW_POLYGON_OVERLAY_NUMBER));
+        double length = calculator.polygonLength((Polygon)mMapView.getOverlays().get(Constants.DRAW_POLYGON_OVERLAY_NUMBER));
+        textView.setVisibility(View.VISIBLE);
+        textView.setText("Area:" + String.valueOf(area) + "\nLength :" + length);
+
     }
     public void deleteForPolygon()
     {
@@ -112,6 +128,7 @@ public class Draw
     }
     public void drawForPolyline(GeoPoint p)
     {
+        final CalculateOverlay calculator = new CalculateOverlay();
         mMapView.getOverlays().remove(Constants.DRAW_POLYLINE_OVERLAY_NUMBER);
         Marker newMarker = new Marker(mMapView);
         newMarker.setPosition(p);
@@ -140,6 +157,9 @@ public class Draw
                 poly.setPoints(x);
                 mPolyline = poly;
                 mPolyline.setOnClickListener(polylineListener);
+                double length = calculator.polylineLength(mPolyline);
+                textView.setVisibility(View.VISIBLE);
+                textView.setText("Length:" + String.valueOf(length) );
                 mMapView.getOverlays().add(Constants.DRAW_POLYLINE_OVERLAY_NUMBER, mPolyline);
                 mMapView.getOverlays().remove(Constants.DRAW_POLYLINE_MARKER_OVERLAY_NUMBER);
                 mMapView.getOverlays().addAll(Constants.DRAW_POLYLINE_MARKER_OVERLAY_NUMBER, mPolylineMarker);
@@ -154,12 +174,15 @@ public class Draw
                 mMapView.invalidate();
             }
         });
-        mMapView.getOverlays().remove(mPolylineMarker);
+        mMapView.getOverlays().remove(Constants.DRAW_POLYLINE_MARKER_OVERLAY_NUMBER);
         mPolylineMarker.add(newMarker);
         mPolyline.addPoint(p);
         mMapView.getOverlays().add(Constants.DRAW_POLYLINE_OVERLAY_NUMBER, mPolyline);
         mMapView.getOverlays().addAll(Constants.DRAW_POLYLINE_MARKER_OVERLAY_NUMBER, mPolylineMarker);
         mMapView.invalidate();
+        double length = calculator.polylineLength((Polyline) mMapView.getOverlays().get(Constants.DRAW_POLYLINE_OVERLAY_NUMBER));
+        textView.setVisibility(View.VISIBLE);
+        textView.setText("Length:" + String.valueOf(length) );
     }
     public void deleteForPolyline()
     {

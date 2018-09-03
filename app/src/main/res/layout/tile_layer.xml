@@ -9,15 +9,17 @@
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="layer_name"
+        android:layout_margin="@dimen/regular_margin"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="layer_name"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <Switch
         android:id="@+id/on_off_switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="On/Off"
+        android:layout_margin="@dimen/regular_margin"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
 
@@ -28,9 +30,10 @@
         android:max="100"
         android:min="0"
         android:progress="0"
+        android:layout_margin="@dimen/regular_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/name"/>
+        app:layout_constraintTop_toBottomOf="@id/on_off_switch"/>
 
 </android.support.constraint.ConstraintLayout>

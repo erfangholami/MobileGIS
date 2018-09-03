@@ -46,6 +46,7 @@ public class LoginActivity extends AppCompatActivity
         loginViewModel.init(this);
         binding.setLoginViewModel(loginViewModel);
 
+
         //initial views
         usernameField = findViewById(R.id.login_username_edit_text);
         passwordField = findViewById(R.id.login_password_edit_text);
@@ -62,7 +63,7 @@ public class LoginActivity extends AppCompatActivity
             {
                 String username = usernameField.getText().toString();
                 String password = passwordField.getText().toString();
-                if(username == null || password == null)
+                if(username.length() == 0 || password.length() == 0)
                 {
                     Toast.makeText(getApplicationContext(), R.string.empty_username_password, Toast.LENGTH_SHORT).show();
                 }

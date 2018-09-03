@@ -14,9 +14,15 @@ import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
 import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
 
 
+import java.io.File;
+import java.net.URI;
 import java.util.List;
 
 import io.reactivex.Observable;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Response;
 
 
 public class RetrofitMethods
@@ -53,5 +59,9 @@ public class RetrofitMethods
         Gson gson = new Gson();
         String listString = gson.toJson(locations, new TypeToken<List<UserLocationModel>>() {}.getType()).toString();
         return  api.sendUserLocations(Constants.RETROFIT_CONTENT_TYPE,"dsdv", Uri.encode(listString));
+    }
+    public Observable<Response<Void>> uploadFile(MultipartBody.Part body)
+    {
+        return api.uploadFile(Constants.RETROFIT_CONTENT_TYPE,"dsjknkl", body);
     }
 }

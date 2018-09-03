@@ -9,11 +9,15 @@ import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
 import java.util.List;
 
 import io.reactivex.Observable;
+import okhttp3.MultipartBody;
+import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.Header;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 
 public interface API
 {
@@ -40,13 +44,21 @@ public interface API
             @Field("id") int id
     );
 
-
     @POST("SendUserLocations")
-    //@FormUrlEncoded
     Observable<String> sendUserLocations
     (
             @Header("Content-Type") String type,
             @Header("Token") String token,
             @Body String jsonObject
     );
+
+    @Multipart
+    @POST("SendFile")
+    Observable<Response<Void>> uploadFile
+    (
+            @Header("Content-Type") String type,
+            @Header("Token") String token,
+            @Part MultipartBody.Part file
+    );
+
 }

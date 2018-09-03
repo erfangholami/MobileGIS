@@ -23,10 +23,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 import io.realm.RealmQuery;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Response;
 
 public class UserLocationsViewModel extends ViewModel
 {
@@ -78,7 +85,40 @@ public class UserLocationsViewModel extends ViewModel
 
         File file = new File(mPath);
         new GPX().writePath(file, "gpsFile", getLocations());
-        clearData();
+
+
+        // create RequestBody instance from file
+        RequestBody requestFile = RequestBody.create(MediaType.parse("GPX"), file);
+
+        // MultipartBody.Part is used to send also the actual file name
+        MultipartBody.Part body =
+                MultipartBody.Part.createFormData("Locations", file.getName(), requestFile);
+
+        retrofitMethods.uploadFile(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableObserver<Response<Void>>()
+                {
+
+                    @Override
+                    public void onNext(Response<Void> aVoid)
+                    {
+                        Log.d(TAG, "sendGpxFileString OnNext" + aVoid);
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.d(TAG, "sendGpxFileString Error "+ e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete()
+                    {
+                        Log.d(TAG, "sendGpxFileString Complete");
+                    }
+                });
+        //clearData();
         return true;
     }
 }

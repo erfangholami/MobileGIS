@@ -31,6 +31,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.RenderProcessGoneDetail;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -38,6 +39,7 @@ import android.widget.Toast;
 
 import com.kandaidea.mobilegis.Adapers.MapSettingTileAdapter;
 import com.kandaidea.mobilegis.Adapers.UserOverlayAdapter;
+import com.kandaidea.mobilegis.DataModel.CalculateOverlay;
 import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.DataModel.Models.UserOverlayItem;
 import com.kandaidea.mobilegis.DataModel.MovingDetails;
@@ -139,6 +141,7 @@ public class MainActivity extends AppCompatActivity
         mScreenShot = mToolbar.findViewById(R.id.screenshot_item);
         mNavigationView= findViewById(R.id.nav_view);
         drawerlayout = findViewById(R.id.drawer_layout);
+
 
         //mainTools
         zoomIn = findViewById(R.id.zoom_in_button);
@@ -289,6 +292,7 @@ public class MainActivity extends AppCompatActivity
                             public void onClick(DialogInterface dialogInterface, int i)
                             {
                                 mapMode = Constants.DRAW_POLYGON_MODE;
+                                mapDrawPolygon.setPoints(new ArrayList<GeoPoint>());
                             }
                         })
                         .setPositiveButton(R.string.polyline, new DialogInterface.OnClickListener()
@@ -297,6 +301,7 @@ public class MainActivity extends AppCompatActivity
                             public void onClick(DialogInterface dialogInterface, int i)
                             {
                                 mapMode = Constants.DRAW_POLYLINE_MODE;
+                                mapDrawPolyline.setPoints(new ArrayList<GeoPoint>());
                             }
                         })
                         .show();
@@ -451,7 +456,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         areaPolygonMarkers.clear();
                         mMapView.invalidate();
-                        polygonDraw = new Draw(getApplicationContext(), mMapView, mapDrawPolygon, mapDrawPolyline, areaPolygonMarkers, areaPolylineMarkers, Constants.DRAW_POLYGON_MODE, mapDrawPolygonListener, mapDrawPolylineListener);
+                        polygonDraw = new Draw(getApplicationContext(), mMapView, mapDrawPolygon, mapDrawPolyline, areaPolygonMarkers, areaPolylineMarkers, Constants.DRAW_POLYGON_MODE, mapDrawPolygonListener, mapDrawPolylineListener, drawInformation);
                         polygonDraw.drawForPolygon(p);
                     }
                 }
@@ -461,7 +466,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         areaPolylineMarkers.clear();
                         mMapView.invalidate();
-                        polylineDraw = new Draw(getApplicationContext(), mMapView, mapDrawPolygon, mapDrawPolyline, areaPolygonMarkers, areaPolylineMarkers, Constants.DRAW_POLYLINE_MODE, mapDrawPolygonListener, mapDrawPolylineListener);
+                        polylineDraw = new Draw(getApplicationContext(), mMapView, mapDrawPolygon, mapDrawPolyline, areaPolygonMarkers, areaPolylineMarkers, Constants.DRAW_POLYLINE_MODE, mapDrawPolygonListener, mapDrawPolylineListener, drawInformation);
                         polylineDraw.drawForPolyline(p);
                     }
                 }
@@ -485,10 +490,11 @@ public class MainActivity extends AppCompatActivity
             @Override
             public boolean onClick(Polygon polygon, MapView mapView, GeoPoint eventPos)
             {
-                mapsViewModel.saveUserOverlay(mapDrawPolygon);
+                mapsViewModel.saveUserOverlay(polygon);
                 mapDrawPolygon.getPoints().clear();
                 Toast.makeText(getApplicationContext(), "Polygon saved !", Toast.LENGTH_SHORT).show();
                 mapMode = Constants.NONE;
+                drawInformation.setVisibility(View.GONE);
                 polygonDraw.deleteForPolygon();
                 mMapView.invalidate();
                 return false;
@@ -500,9 +506,10 @@ public class MainActivity extends AppCompatActivity
             @Override
             public boolean onClick(Polyline polyline, MapView mapView, GeoPoint eventPos)
             {
-                mapsViewModel.saveUserOverlay(mapDrawPolyline);
+                mapsViewModel.saveUserOverlay(polyline);
                 Toast.makeText(getApplicationContext(), "Polyline saved !", Toast.LENGTH_SHORT).show();
                 mapMode = Constants.NONE;
+                drawInformation.setVisibility(View.GONE);
                 polylineDraw.deleteForPolyline();
                 mMapView.invalidate();
                 return false;

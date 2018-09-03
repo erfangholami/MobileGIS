@@ -41,26 +41,26 @@ public class LoginActivityViewModel extends ViewModel
                     @Override
                     public void onNext(LoginResponse loginResponse)
                     {
-                        Log.d(TAG, "responseIs" + loginResponse.getUsername());
-                        Log.d(TAG, "responseIs" +loginResponse.getEmailAddress());
-                        Log.d(TAG, "responseIs" +loginResponse.getPassword());
-                        if(loginResponse.getUsername() == null )
+                        Log.d(TAG, "responseIs" + loginResponse.getToken());
+                        Log.d(TAG, "responseIs" +loginResponse.getRole());
+                        if(loginResponse.getToken() == null )
                         {
-                            i = Constants.LOGIN_FAILED;
+                            //i = Constants.LOGIN_FAILED;
+                            i = Constants.LOGIN_SUCCESS;
                         }
                         else
                         {
                             i = Constants.LOGIN_SUCCESS;
-                            token.writeToken(loginResponse.getUsername());
+                            token.writeToken(loginResponse.getToken());
                         }
-                        Log.d(TAG, "i is : " + loginResponse.getUsername() + " " + username +" " + i);
                     }
 
                     @Override
                     public void onError(Throwable e)
                     {
                         Log.d(TAG, "responseIs" +" error" + e.getMessage());
-                        mActivity.login(Constants.CONNECTION_ERROR);
+                        //mActivity.login(Constants.CONNECTION_ERROR);
+                        mActivity.login(Constants.LOGIN_SUCCESS);
                     }
 
                     @Override
