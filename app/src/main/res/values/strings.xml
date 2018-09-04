@@ -38,8 +38,9 @@
     <string name="empty_username_password">Empty Username or Password</string>
     <string name="token_shareprefrence_name">token_pref</string>
     <string name="token_shareprefrence_key">token</string>
-    <string name="setting_follow_location_text">Follow User Location</string>
+    <string name="setting_follow_location_text">Record User Location</string>
     <string name="setting_scale_bar_text">Show scale bar</string>
     <string name="setting_my_location_text">Show my location</string>
     <string name="share_location_msg">Share via :</string>
+    <string name="setting_speed_text">Show Speed and follow location</string>
 </resources>

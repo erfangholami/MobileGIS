@@ -99,6 +99,7 @@ public class Constants
     public static final String MY_LOCATION_ENABLE_VALUE = "my_location_value";
     public static final String SCALE_BAR_ENABLE_VALUE = "scale_bar_value";
     public static final String FOLLOW_LOCATION_ENABLE_VALUE = "follow_location_value";
+    public static final String SPEED_ENABLE_VALUE = "speed_value";
 
     //key for save overlay features in DB
     public static final String STROKE_COLOR_STRING = "stroke_color";

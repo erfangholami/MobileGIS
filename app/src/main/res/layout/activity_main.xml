@@ -158,6 +158,17 @@
                     app:layout_constraintBottom_toTopOf="@+id/zoom_out_button"
                     app:layout_constraintRight_toRightOf="parent"/>
 
+                <TextView
+                    android:id="@+id/speed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/round_button"
+                    android:textColor="@android:color/black"
+                    android:layout_margin="@dimen/regular_margin"
+                    android:gravity="center"
+                    android:text="0.0"
+                    app:layout_constraintBottom_toTopOf="@+id/zoom_in_button"
+                    app:layout_constraintRight_toRightOf="parent"/>
                 <include
                     android:id="@+id/detail_point_view_card"
                     layout="@layout/detail_point_view" />

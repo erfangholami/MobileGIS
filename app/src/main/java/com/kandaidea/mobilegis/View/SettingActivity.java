@@ -25,6 +25,7 @@ public class SettingActivity extends AppCompatActivity
     private Switch myLocationSwitch;
     private Switch scaleBarSwitch;
     private Switch followLocationSwitch;
+    private Switch speedSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -45,23 +46,36 @@ public class SettingActivity extends AppCompatActivity
         myLocationSwitch = findViewById(R.id.my_location_switch);
         scaleBarSwitch = findViewById(R.id.scale_bar_switch);
         followLocationSwitch = findViewById(R.id.follow_location_switch);
+        speedSwitch = findViewById(R.id.speed_switch);
 
 
         myLocationSwitch.setChecked(bundle.getBoolean(Constants.MY_LOCATION_ENABLE_VALUE));
         scaleBarSwitch.setChecked(bundle.getBoolean(Constants.SCALE_BAR_ENABLE_VALUE));
         followLocationSwitch.setChecked(bundle.getBoolean(Constants.FOLLOW_LOCATION_ENABLE_VALUE));
+        speedSwitch.setChecked(bundle.getBoolean(Constants.SPEED_ENABLE_VALUE));
         backArrow.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
-                Intent intent = new Intent();
-                intent.putExtra(Constants.MY_LOCATION_ENABLE_VALUE, myLocationSwitch.isChecked());
-                intent.putExtra(Constants.SCALE_BAR_ENABLE_VALUE, scaleBarSwitch.isChecked());
-                intent.putExtra(Constants.FOLLOW_LOCATION_ENABLE_VALUE, followLocationSwitch.isChecked());
-                setResult(RESULT_OK, intent);
-                finish();
+                finishActivity();
             }
         });
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        finishActivity();
+    }
+    private void finishActivity()
+    {
+        Intent intent = new Intent();
+        intent.putExtra(Constants.MY_LOCATION_ENABLE_VALUE, myLocationSwitch.isChecked());
+        intent.putExtra(Constants.SCALE_BAR_ENABLE_VALUE, scaleBarSwitch.isChecked());
+        intent.putExtra(Constants.FOLLOW_LOCATION_ENABLE_VALUE, followLocationSwitch.isChecked());
+        intent.putExtra(Constants.SPEED_ENABLE_VALUE, speedSwitch.isChecked());
+        setResult(RESULT_OK, intent);
+        finish();
     }
 }

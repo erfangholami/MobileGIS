@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity
     private ImageButton myLocation;
     private ImageButton zoomIn;
     private ImageButton zoomOut;
+    private TextView speed;
 
     //vars
     private int mapMode = Constants.NONE;
@@ -141,7 +142,7 @@ public class MainActivity extends AppCompatActivity
         mScreenShot = mToolbar.findViewById(R.id.screenshot_item);
         mNavigationView= findViewById(R.id.nav_view);
         drawerlayout = findViewById(R.id.drawer_layout);
-
+        speed = findViewById(R.id.speed);
 
         //mainTools
         zoomIn = findViewById(R.id.zoom_in_button);
@@ -317,7 +318,8 @@ public class MainActivity extends AppCompatActivity
                 Intent intent = new Intent(getApplicationContext(), SettingActivity.class);
                 intent.putExtra(Constants.MY_LOCATION_ENABLE_VALUE, mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER).isEnabled());
                 intent.putExtra(Constants.SCALE_BAR_ENABLE_VALUE, mMapView.getOverlays().get(Constants.SCALE_BAR_OVERLAY_NUMBER).isEnabled());
-                intent.putExtra(Constants.FOLLOW_LOCATION_ENABLE_VALUE, mapsViewModel.isFollowEnable());
+                intent.putExtra(Constants.FOLLOW_LOCATION_ENABLE_VALUE, mapsViewModel.isRecordEnable());
+                intent.putExtra(Constants.SPEED_ENABLE_VALUE, mapsViewModel.isSpeedEnable());
                 startActivityForResult(intent, Constants.SETTING_ACTIVITY_REQUEST_CODE);
                 return false;
             }
@@ -673,7 +675,16 @@ public class MainActivity extends AppCompatActivity
                     Bundle bundle = data.getExtras();
                     mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER).setEnabled(bundle.getBoolean(Constants.MY_LOCATION_ENABLE_VALUE));
                     mMapView.getOverlays().get(Constants.SCALE_BAR_OVERLAY_NUMBER).setEnabled(bundle.getBoolean(Constants.SCALE_BAR_ENABLE_VALUE));
-                    mapsViewModel.setFollowEnable(bundle.getBoolean(Constants.FOLLOW_LOCATION_ENABLE_VALUE));
+                    mapsViewModel.setRecordEnable(bundle.getBoolean(Constants.FOLLOW_LOCATION_ENABLE_VALUE));
+                    mapsViewModel.setSpeedEnable(bundle.getBoolean(Constants.SPEED_ENABLE_VALUE));
+                    if(bundle.getBoolean(Constants.SPEED_ENABLE_VALUE))
+                    {
+                        speed.setVisibility(View.VISIBLE);
+                    }
+                    else
+                    {
+                        speed.setVisibility(View.GONE);
+                    }
                     mMapView.invalidate();
                 }
                 break;
@@ -693,6 +704,20 @@ public class MainActivity extends AppCompatActivity
         else
         {
             super.onBackPressed();
+        }
+    }
+
+    public void updateSpeed(double sp)
+    {
+        sp *= 3.6;
+        speed.setText(String.format("%.1f", sp ));
+        if(sp > 50)
+        {
+            speed.setTextColor(Color.RED);
+        }
+        else
+        {
+            speed.setTextColor(Color.BLACK);
         }
     }
 

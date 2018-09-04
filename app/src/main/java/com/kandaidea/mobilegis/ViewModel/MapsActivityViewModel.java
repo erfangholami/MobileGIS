@@ -11,10 +11,12 @@ import android.util.Log;
 import android.view.View;
 
 import com.google.gson.Gson;
+import com.kandaidea.mobilegis.DataModel.CalculateOverlay;
 import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
 import com.kandaidea.mobilegis.DataModel.Models.UserOverlayItem;
 import com.kandaidea.mobilegis.DataModel.Models.UserOverlayModel;
+import com.kandaidea.mobilegis.DataModel.MovingDetails;
 import com.kandaidea.mobilegis.DataModel.OverlayString;
 import com.kandaidea.mobilegis.DataModel.Realm.RealmUserOverlays;
 import com.kandaidea.mobilegis.DataModel.ScreenShot;
@@ -35,6 +37,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -48,8 +51,10 @@ public class MapsActivityViewModel extends ViewModel
     private MapView mMapView;
     public Realm userLocationRealm;
     public RealmUserOverlays realmUserOverlays;
+    private MovingDetails moving;
 
-    private boolean followEnable = true;
+    private boolean recordEnable = true;
+    private boolean speedEnable = true;
 
     public void init(Activity mActivity)
     {
@@ -76,7 +81,7 @@ public class MapsActivityViewModel extends ViewModel
         if (!f1l.exists()) {
             f1l.mkdirs();
         }
-
+        moving = new MovingDetails();
     }
     public void zoom(View v)
     {
@@ -106,9 +111,27 @@ public class MapsActivityViewModel extends ViewModel
             @Override
             public void onLocationChanged(Location location, IMyLocationProvider source)
             {
-                if(followEnable)
+                if(location != null)
                 {
-                    saveUserLocation(location);
+                    if(speedEnable)
+                    {
+                        if(moving.start)
+                        {
+                            calculateAndUpdateSpeed(location);
+                            mMapView.getController().animateTo(new GeoPoint(location.getLatitude(), location.getLongitude()), Constants.ANIMATE_ZOOM_LEVEL, Constants.ANIMATE_SPEED);
+                        }
+                        else
+                        {
+                            moving.firstPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                            moving.firstTime = System.currentTimeMillis();
+                            moving.start = true;
+                        }
+                    }
+                    if(recordEnable)
+                    {
+                        saveUserLocation(location);
+                        ((MyLocationNewOverlay) (mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER))).onLocationChanged(location, source);
+                    }
                 }
             }
         });
@@ -153,57 +176,45 @@ public class MapsActivityViewModel extends ViewModel
     }
     public List<UserOverlayItem> getUserOverlays(int type)
     {
-        //TODO remove hardcode and return data from DB
         return realmUserOverlays.getUserOverlay(type);
-        /*List<GeoPoint> points = new ArrayList<>();
-        List<UserOverlayItem> xx = new ArrayList<>();
-        points.add(new GeoPoint(0d, 0d));
-        points.add(new GeoPoint(0d, 10d));
-        points.add(new GeoPoint(10d, 0d));
-        if(type == 0)
-        {
-            Polygon x = new Polygon();
-            x.setPoints(points);
-            x.setEnabled(true);
-            x.setFillColor(Color.BLACK);
-            x.setStrokeColor(Color.BLACK);
-
-            Polygon xp = new Polygon();
-            xp.setPoints(points);
-            xp.setEnabled(false);
-            xp.setFillColor(Color.WHITE);
-            xp.setStrokeColor(Color.BLACK);
-
-            UserOverlayItem xxx = new UserOverlayItem();
-
-            UserOverlayItem xxxx = new UserOverlayItem();
-            xxx.setmPolygon(x);
-            xxx.setName("aval");
-            xxx.setType(Constants.POLYGON_TYPE);
-
-
-            xxxx.setmPolygon(xp);
-            xxxx.setName("dovom");
-            xxxx.setType(Constants.POLYGON_TYPE);
-
-            xx.add(xxx);
-            xx.add(xxxx);
-            return xx;
-        }
-        else
-        {
-            return xx;
-        }*/
     }
 
-
-    public boolean isFollowEnable()
+    private void calculateAndUpdateSpeed(Location location)
     {
-        return followEnable;
+        long secondTime = System.currentTimeMillis();
+        moving.speed = moving.calculateSpeed(moving.firstPoint, location, moving.firstTime, secondTime);
+        moving.acc = moving.calculateAcc(moving.firstPoint, location, moving.firstTime, secondTime);
+        Log.d(TAG, "movingDetails is speed : " + new CalculateOverlay().distanceTwoPoint(moving.firstPoint, new GeoPoint(location.getLatitude(), location.getLongitude())) + "," + String.valueOf(secondTime) +","+ String.valueOf(moving.firstTime));
+        moving.time += secondTime - moving.firstTime;
+        moving.distance += new CalculateOverlay().distanceTwoPoint(moving.firstPoint, new GeoPoint(location.getLatitude(), location.getLongitude()));
+
+        moving.AvSpeed = moving.calculateAvSpeed();
+        moving.AvAcc = moving.calculateAvAcc();
+        Log.d(TAG, "movingDetails is : " + moving.speed + " " + moving.AvSpeed + " " + moving.acc + " " + moving.AvAcc);
+        moving.firstTime = secondTime;
+        moving.firstPoint.setCoords(location.getLatitude(), location.getLongitude());
+        ((MainActivity)mActivity).updateSpeed(moving.speed);
     }
 
-    public void setFollowEnable(boolean followEnable)
+    //region GetterSetter
+    public boolean isRecordEnable()
     {
-        this.followEnable = followEnable;
+        return recordEnable;
     }
+
+    public void setRecordEnable(boolean recordEnable)
+    {
+        this.recordEnable = recordEnable;
+    }
+
+    public boolean isSpeedEnable()
+    {
+        return speedEnable;
+    }
+
+    public void setSpeedEnable(boolean speedEnable)
+    {
+        this.speedEnable = speedEnable;
+    }
+    //endregion
 }
