@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.kandaidea.mobilegis.Adapers.UserLocationAdapter;
+import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.R;
 import com.kandaidea.mobilegis.ViewModel.UserLocationsViewModel;
 import com.kandaidea.mobilegis.databinding.ActivityUserLocationsBinding;
@@ -17,6 +18,7 @@ import com.kandaidea.mobilegis.databinding.ActivityUserLocationsBinding;
 public class UserLocations extends AppCompatActivity
 {
     private static final String TAG = UserLocations.class.getSimpleName();
+    private String token;
 
     private UserLocationsViewModel viewModel;
 
@@ -34,6 +36,9 @@ public class UserLocations extends AppCompatActivity
         viewModel = new UserLocationsViewModel();
         viewModel.init();
         binding.setLocationViewModel(viewModel);
+
+        Bundle bundle = getIntent().getExtras();
+        token = bundle.getString(Constants.TOKEN_KEY);
 
         mRecyclerView = findViewById(R.id.user_location_recycler_view);
         export = findViewById(R.id.export);
@@ -59,7 +64,7 @@ public class UserLocations extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
-                if(viewModel.sendToServer())
+                if(viewModel.sendToServer(token))
                 {
                     ((UserLocationAdapter)mRecyclerView.getAdapter()).updateDataSet(viewModel.getLocations());
                     Toast.makeText(getApplicationContext(), R.string.clear_location_data_msg, Toast.LENGTH_SHORT).show();

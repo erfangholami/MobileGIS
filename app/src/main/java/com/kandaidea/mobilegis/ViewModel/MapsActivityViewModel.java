@@ -13,6 +13,7 @@ import android.view.View;
 import com.google.gson.Gson;
 import com.kandaidea.mobilegis.DataModel.CalculateOverlay;
 import com.kandaidea.mobilegis.DataModel.Constants;
+import com.kandaidea.mobilegis.DataModel.Models.Token;
 import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
 import com.kandaidea.mobilegis.DataModel.Models.UserOverlayItem;
 import com.kandaidea.mobilegis.DataModel.Models.UserOverlayModel;
@@ -52,6 +53,7 @@ public class MapsActivityViewModel extends ViewModel
     public Realm userLocationRealm;
     public RealmUserOverlays realmUserOverlays;
     private MovingDetails moving;
+    public String token;
 
     private boolean recordEnable = true;
     private boolean speedEnable = true;
@@ -82,6 +84,7 @@ public class MapsActivityViewModel extends ViewModel
             f1l.mkdirs();
         }
         moving = new MovingDetails();
+        token = new Token(mActivity.getApplicationContext()).readToken();
     }
     public void zoom(View v)
     {

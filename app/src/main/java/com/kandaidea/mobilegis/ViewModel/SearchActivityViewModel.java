@@ -32,10 +32,10 @@ public class SearchActivityViewModel extends ViewModel
     }
 
     @SuppressLint("CheckResult")
-    public void getSearchResult(String search)
+    public void getSearchResult(String search, String token)
     {
 
-        retrofitMethods.search(search)
+        retrofitMethods.search(search, token)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableObserver<List<SearchResult>>()
@@ -64,9 +64,9 @@ public class SearchActivityViewModel extends ViewModel
                     }
                 });
     }
-    public void getSearchItem(int id)
+    public void getSearchItem(int id,String token)
     {
-        retrofitMethods.searchById(id)
+        retrofitMethods.searchById(id, token)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(new DisposableObserver<SearchItem>()

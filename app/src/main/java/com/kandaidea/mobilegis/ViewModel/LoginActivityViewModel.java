@@ -45,8 +45,7 @@ public class LoginActivityViewModel extends ViewModel
                         Log.d(TAG, "responseIs" +loginResponse.getRole());
                         if(loginResponse.getToken() == null )
                         {
-                            //i = Constants.LOGIN_FAILED;
-                            i = Constants.LOGIN_SUCCESS;
+                            i = Constants.LOGIN_FAILED;
                         }
                         else
                         {
@@ -59,8 +58,7 @@ public class LoginActivityViewModel extends ViewModel
                     public void onError(Throwable e)
                     {
                         Log.d(TAG, "responseIs" +" error" + e.getMessage());
-                        //mActivity.login(Constants.CONNECTION_ERROR);
-                        mActivity.login(Constants.LOGIN_SUCCESS);
+                        mActivity.login(Constants.CONNECTION_ERROR);
                     }
 
                     @Override

@@ -61,10 +61,10 @@ public class UserLocationsViewModel extends ViewModel
         }
         return locationModels;
     }
-    public boolean sendToServer()
+    public boolean sendToServer(String token)
     {
         Log.d(TAG, "sendingToServer");
-        retrofitMethods.sendUserLocations(getLocations());
+        retrofitMethods.sendUserLocations(token, getLocations());
         //clearData();
         return true;
 
@@ -88,7 +88,7 @@ public class UserLocationsViewModel extends ViewModel
 
 
         // create RequestBody instance from file
-        RequestBody requestFile = RequestBody.create(MediaType.parse("GPX"), file);
+        /*RequestBody requestFile = RequestBody.create(MediaType.parse("GPX"), file);
 
         // MultipartBody.Part is used to send also the actual file name
         MultipartBody.Part body =
@@ -117,7 +117,7 @@ public class UserLocationsViewModel extends ViewModel
                     {
                         Log.d(TAG, "sendGpxFileString Complete");
                     }
-                });
+                });*/
         //clearData();
         return true;
     }

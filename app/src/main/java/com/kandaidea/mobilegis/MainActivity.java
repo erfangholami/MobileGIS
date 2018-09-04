@@ -227,6 +227,7 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view)
             {
                 Intent intent = new Intent(getApplicationContext(), SearchActivity.class);
+                intent.putExtra(Constants.TOKEN_KEY, mapsViewModel.token);
                 startActivityForResult(intent, Constants.SEARCH_ACTIVITY_REQUEST_CODE);
             }
         });
@@ -272,6 +273,7 @@ public class MainActivity extends AppCompatActivity
             public boolean onMenuItemClick(MenuItem menuItem)
             {
                 Intent intent = new Intent(getApplicationContext(), UserLocations.class);
+                intent.putExtra(Constants.TOKEN_KEY, mapsViewModel.token);
                 startActivity(intent);
                 return false;
             }

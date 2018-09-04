@@ -33,6 +33,7 @@ import io.reactivex.functions.Function;
 public class SearchActivity extends AppCompatActivity
 {
     public static final String TAG = SearchActivity.class.getSimpleName();
+    private String token;
 
     private SearchActivityViewModel viewModel;
 
@@ -49,6 +50,9 @@ public class SearchActivity extends AppCompatActivity
         viewModel = new SearchActivityViewModel();
         viewModel.init(this);
         binding.setSearchViewModel(viewModel);
+
+        Bundle bundle = getIntent().getExtras();
+        token = bundle.getString(Constants.TOKEN_KEY);
 
         mBackArrow = findViewById(R.id.back_arrow_search_bar);
         mSearchView = findViewById(R.id.search_field_Search_bar);
@@ -85,14 +89,14 @@ public class SearchActivity extends AppCompatActivity
             public boolean onQueryTextSubmit(String s)
             {
                 Log.d(TAG, "searchClicked");
-                viewModel.getSearchResult(s);
+                viewModel.getSearchResult(s, token);
                 mRecyclerView.setAdapter(new SearchAdapter(getApplicationContext(), new ArrayList<SearchResult>(), new OnItemClickListener()
                 {
                     @Override
                     public void onItemClick(SearchResult item)
                     {
                         mProgressbar.setVisibility(View.VISIBLE);
-                        viewModel.getSearchItem(item.getId());
+                        viewModel.getSearchItem(item.getId(), token);
 
                     }
                 }));

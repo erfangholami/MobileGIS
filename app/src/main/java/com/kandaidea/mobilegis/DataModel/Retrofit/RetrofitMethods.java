@@ -40,25 +40,25 @@ public class RetrofitMethods
         return response;
     }
 
-    public Observable<List<SearchResult>> search(String searchText)
+    public Observable<List<SearchResult>> search(String searchText, String token)
     {
         Log.d(TAG, "OnSearchMethod");
-        Observable<List<SearchResult>> call = api.getSearchResult(searchText);
+        Observable<List<SearchResult>> call = api.getSearchResult(token, searchText);
         return call;
     }
 
-    public Observable<SearchItem> searchById(int id)
+    public Observable<SearchItem> searchById(int id, String token)
     {
         Log.d(TAG, "OnSearchMethod");
-        Observable<SearchItem> call = api.getSearchItem(id);
+        Observable<SearchItem> call = api.getSearchItem(token, id);
         return call;
     }
 
-    public Observable<String> sendUserLocations(List<UserLocationModel> locations)
+    public Observable<String> sendUserLocations(String token, List<UserLocationModel> locations)
     {
         Gson gson = new Gson();
         String listString = gson.toJson(locations, new TypeToken<List<UserLocationModel>>() {}.getType()).toString();
-        return  api.sendUserLocations(Constants.RETROFIT_CONTENT_TYPE,"dsdv", Uri.encode(listString));
+        return  api.sendUserLocations(Constants.RETROFIT_CONTENT_TYPE,token, Uri.encode(listString));
     }
     public Observable<Response<Void>> uploadFile(MultipartBody.Part body)
     {

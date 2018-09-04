@@ -1,6 +1,7 @@
 package com.kandaidea.mobilegis.DataModel.Retrofit;
 
 
+import com.kandaidea.mobilegis.DataModel.Models.Address;
 import com.kandaidea.mobilegis.DataModel.Models.LoginResponse;
 import com.kandaidea.mobilegis.DataModel.Models.SearchItem;
 import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
@@ -34,6 +35,7 @@ public interface API
     @FormUrlEncoded
     Observable<List<SearchResult>> getSearchResult
     (
+            @Header("Token") String token,
             @Field("searchTerm") String searchString
     );
 
@@ -41,6 +43,7 @@ public interface API
     @FormUrlEncoded
     Observable<SearchItem> getSearchItem
     (
+            @Header("Token") String token,
             @Field("id") int id
     );
 
@@ -61,4 +64,11 @@ public interface API
             @Part MultipartBody.Part file
     );
 
+    @POST("GetAddress")
+    @FormUrlEncoded
+    Observable<Address> getAddress
+    (
+            @Field("latitude") String lat,
+            @Field("longitude") String lng
+    );
 }
