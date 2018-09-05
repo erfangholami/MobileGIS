@@ -69,10 +69,15 @@ public class Constants
 
 
     //navigation item numbers
-    public static final int EXIT_ITEM_NUMBER = 6;
-    public static final int SETTING_ITEM_NUMBER = 5;
-    public static final int USER_LOCATIONS_ITEM_NUMBER = 4;
+    public static final int EXIT_ITEM_NUMBER = 7;
+    public static final int SETTING_ITEM_NUMBER = 6;
+    public static final int USER_LOCATIONS_ITEM_NUMBER = 5;
+    public static final int MOVING_DETAIL_ITEM_NUMBER = 4;
+    public static final int GOTO_ITEM_NUMBER = 3;
     public static final int DRAW_ITEM_NUMBER = 2;
+    public static final int HISTOGRAM_ITEM_NUMBER = 1;
+    public static final int DIRECTION_ITEM_NUMBER = 0;
+
 
 
     //map modes

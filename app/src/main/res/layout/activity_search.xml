@@ -57,6 +57,7 @@
             android:layout_margin="@dimen/search_result_margin"
             android:scrollbars="vertical"
             android:orientation="vertical"
+            android:paddingBottom="50dp"
             android:background="@color/navigation_background"
             app:layout_constraintTop_toBottomOf="@+id/search_toolbar">
 

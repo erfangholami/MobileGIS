@@ -58,4 +58,6 @@ dependencies {
     //realm
     implementation 'io.realm:android-adapters:3.0.0'
 
+    //color picker
+    implementation 'me.priyesh:chroma:1.0.2'
 }

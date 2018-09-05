@@ -26,6 +26,7 @@
     <string name="polygon">POLYGON</string>
     <string name="polyline">POLYLINE</string>
     <string name="dialog_choise_draw_mode">Which one you want to draw ?</string>
+    <string name="dialog_goto_mode">Enter position to go</string>
     <string name="dialog_exit">Are you sure to exit?</string>
     <string name="yes">YES</string>
     <string name="no">NO</string>
@@ -43,4 +44,12 @@
     <string name="setting_my_location_text">Show my location</string>
     <string name="share_location_msg">Share via :</string>
     <string name="setting_speed_text">Show Speed and follow location</string>
+    <string name="goto_item">Go to</string>
+    <string name="goto_string">Goto</string>
+    <string name="latitude_string">Latitude :</string>
+    <string name="longitude_string">Longitude</string>
+    <string name="cancel_string">Cancel</string>
+    <string name="save_string">Save</string>
+    <string name="clear_string">Clear</string>
+    <string name="description_string">Description</string>
 </resources>

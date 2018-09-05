@@ -105,6 +105,7 @@ public class MapsActivityViewModel extends ViewModel
     {
         Log.d(TAG, "onLocationClicked" + mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER).getClass().getSimpleName());
         IGeoPoint location = ((MyLocationNewOverlay)(mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER))).getMyLocation();
+        MyLocationNewOverlay x = ((MyLocationNewOverlay)(mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER)));
         if(location != null)
         {
             mMapView.getController().animateTo(location, Constants.ANIMATE_ZOOM_LEVEL, Constants.ANIMATE_SPEED);

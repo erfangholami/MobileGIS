@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_gravity="center">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/regular_margin">
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/enter_description"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/description_string"/>
+        <Button
+            android:id="@+id/selected_color_fill"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@color/polygon_fill_color"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="@dimen/regular_margin">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stroke Size"
+            android:layout_margin="@dimen/regular_margin"/>
+        <SeekBar
+            android:id="@+id/stroke_size_seek"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/regular_margin"
+            android:max="100"
+            android:min="1"
+            android:progress="20"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="@dimen/regular_margin">
+        <Button
+            android:id="@+id/save_overlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save_string"/>
+        <Button
+            android:id="@+id/clear_overlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/clear_string"/>
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel_string"/>
+    </LinearLayout>
+</LinearLayout>

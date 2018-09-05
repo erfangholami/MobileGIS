@@ -2,8 +2,13 @@ package com.kandaidea.mobilegis.View;
 
 import android.arch.lifecycle.ViewModel;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
+import android.provider.Settings;
 import android.support.design.widget.TextInputEditText;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -71,7 +76,6 @@ public class LoginActivity extends AppCompatActivity
                 {
                     progressBar.setVisibility(View.VISIBLE);
                     loginViewModel.login(username, password);
-
                 }
             }
         });
