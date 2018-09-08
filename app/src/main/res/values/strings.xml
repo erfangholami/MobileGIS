@@ -52,4 +52,6 @@
     <string name="save_string">Save</string>
     <string name="clear_string">Clear</string>
     <string name="description_string">Description</string>
+    <string name="source_point_text_hint">Enter first point</string>
+    <string name="destination_point_text_hint">Enter second point</string>
 </resources>

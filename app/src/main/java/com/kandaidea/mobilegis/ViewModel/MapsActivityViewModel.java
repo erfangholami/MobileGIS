@@ -6,9 +6,11 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.widget.ThemedSpinnerAdapter;
 
 import com.google.gson.Gson;
 import com.kandaidea.mobilegis.DataModel.CalculateOverlay;
@@ -25,6 +27,9 @@ import com.kandaidea.mobilegis.MainActivity;
 import com.kandaidea.mobilegis.R;
 
 import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.bonuspack.routing.OSRMRoadManager;
+import org.osmdroid.bonuspack.routing.Road;
+import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Overlay;
@@ -159,23 +164,23 @@ public class MapsActivityViewModel extends ViewModel
         userLocationRealm.commitTransaction();
     }
 
-    public void saveUserOverlay(Polygon overlay)
+    public void saveUserOverlay(Polygon overlay, String description)
     {
         Date now = new Date();
         android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
         String x = new OverlayString().polygonToString(overlay);
-        UserOverlayModel model = new UserOverlayModel(now.toString(),Constants.POLYGON_TYPE , x);
+        UserOverlayModel model = new UserOverlayModel(now.toString(), description, Constants.POLYGON_TYPE , x);
         mMapView.invalidate();
         realmUserOverlays.addOverlay(model);
     }
-    public void saveUserOverlay(Polyline overlay)
+    public void saveUserOverlay(Polyline overlay, String description)
     {
         //TODO save overlay in DB
         Date now = new Date();
         android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
         String x = new OverlayString().polylineToString(overlay);
         Log.d(TAG, x);
-        UserOverlayModel model = new UserOverlayModel(now.toString(), Constants.POLYLINE_TYPE, x);
+        UserOverlayModel model = new UserOverlayModel(now.toString(), description, Constants.POLYLINE_TYPE, x);
         realmUserOverlays.addOverlay(model);
     }
     public List<UserOverlayItem> getUserOverlays(int type)
@@ -200,6 +205,46 @@ public class MapsActivityViewModel extends ViewModel
         ((MainActivity)mActivity).updateSpeed(moving.speed);
     }
 
+    public void getRoad(GeoPoint start, GeoPoint end)
+    {
+        new GetRoad().execute(start, end);
+    }
+
+    class GetRoad extends AsyncTask<GeoPoint, Void, Void>
+    {
+        Road road[];
+
+        @Override
+        protected Void doInBackground(GeoPoint... strings)
+        {
+            RoadManager roadManager = new OSRMRoadManager(mActivity.getApplicationContext());
+            ArrayList<GeoPoint> wayPoints = new ArrayList<>();
+            wayPoints.add(strings[0]);
+            wayPoints.add(strings[1]);
+
+            road = roadManager.getRoads(wayPoints);
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid)
+        {
+            Polyline roadOverlay = RoadManager.buildRoadOverlay(road[0], Color.RED, 15f);
+            List<Polyline> roads = new ArrayList<>();
+            roads.add(roadOverlay);
+            for(int i = 1; i < road.length; i++)
+            {
+                roadOverlay = RoadManager.buildRoadOverlay(road[i], Color.BLUE, 5f);
+                roads.add(roadOverlay);
+            }
+            mMapView.getOverlays().remove(Constants.ROAD_ITEM_OVERLAY_NUMBER);
+            mMapView.getOverlays().addAll(Constants.ROAD_ITEM_OVERLAY_NUMBER, roads);
+            mMapView.invalidate();
+            super.onPostExecute(aVoid);
+        }
+    }
     //region GetterSetter
     public boolean isRecordEnable()
     {

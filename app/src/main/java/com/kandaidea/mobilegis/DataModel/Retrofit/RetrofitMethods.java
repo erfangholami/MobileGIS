@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.DataModel.Models.LoginResponse;
@@ -14,11 +16,18 @@ import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
 import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
 
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.net.URI;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -58,7 +67,31 @@ public class RetrofitMethods
     {
         Gson gson = new Gson();
         String listString = gson.toJson(locations, new TypeToken<List<UserLocationModel>>() {}.getType()).toString();
-        return  api.sendUserLocations(Constants.RETROFIT_CONTENT_TYPE,token, Uri.encode(listString));
+        JsonArray aa = new JsonArray();
+        JSONArray array = new JSONArray();
+        for(UserLocationModel uu: locations)
+        {
+            JsonObject obj = new JsonObject();
+            obj.addProperty("Time", uu.getTime());
+            obj.addProperty("Lat", uu.getLat());
+
+            aa.add(obj);
+            JSONObject objj = new JSONObject();
+            try
+            {
+                objj.put("Time", uu.getTime());
+                objj.put("Lat", uu.getLat());
+                objj.put("Lng", uu.getLng());
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+            array.put(obj);
+        }
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),(array).toString().toString());
+        Log.d(TAG, "Request is : " + listString);
+        return  api.sendUserLocations(Constants.RETROFIT_CONTENT_TYPE, token, listString);
     }
     public Observable<Response<Void>> uploadFile(MultipartBody.Part body)
     {

@@ -64,8 +64,30 @@ public class UserLocationsViewModel extends ViewModel
     public boolean sendToServer(String token)
     {
         Log.d(TAG, "sendingToServer");
-        retrofitMethods.sendUserLocations(token, getLocations());
-        //clearData();
+        retrofitMethods.sendUserLocations(token, getLocations())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableObserver<String>()
+               {
+                   @Override
+                   public void onNext(String s)
+                   {
+                       Log.d(TAG, "Response is : " + s);
+                   }
+
+                   @Override
+                   public void onError(Throwable e)
+                   {
+                       Log.d(TAG, "Response is : " + e.getMessage());
+                   }
+
+                   @Override
+                   public void onComplete()
+                   {
+
+                   }
+               });
+                        //clearData();
         return true;
 
     }

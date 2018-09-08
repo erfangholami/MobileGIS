@@ -10,6 +10,8 @@ import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Overlay;
 
+import retrofit2.http.PUT;
+
 public class Constants
 {
     public static final String BASE_URL = "http://192.168.0.25/AppServer/KService.svc/";
@@ -55,6 +57,7 @@ public class Constants
     public static final int DRAW_USER_POLYGON_OVERLAY_NUMBER = 13;
     public static final int DRAW_USER_POLYLINE_OVERLAY_NUMBER = 14;
     public static final int DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER = 15;
+    public static final int ROAD_ITEM_OVERLAY_NUMBER = 16;
 
 
     //main activity start intent for result request code

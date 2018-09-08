@@ -1,6 +1,15 @@
 package com.kandaidea.mobilegis.Adapers;
 
 import android.app.Notification;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.Shader;
 import android.location.Location;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -21,13 +30,18 @@ import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.DataModel.Models.UserOverlayItem;
 import com.kandaidea.mobilegis.R;
 
+import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.Projection;
 import org.osmdroid.views.overlay.Polygon;
 import org.osmdroid.views.overlay.Polyline;
+import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.security.Policy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
@@ -38,6 +52,11 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     List<Polygon> polygons = new ArrayList<>();
     List<Polyline> polylines = new ArrayList<>();
+
+
+
+
+
 
     private ViewGroup par;
     public UserOverlayAdapter(MapView mMapView, List<UserOverlayItem> items)
@@ -110,6 +129,22 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         mMapView.invalidate();
                         Polygon x = polygons.get(position);
                         x.setEnabled(b);
+                        //
+
+
+                        Canvas canvas = new Canvas();
+                        final Bitmap patternBMP ;
+                        GeoPoint point = x.getPoints().get(0);
+                        Paint fillPaint = new Paint();
+                        fillPaint.setColor(Color.MAGENTA);
+                        canvas.drawText("drawCanvas", 200, 700, fillPaint);
+                        Paint stkPaint = new Paint();
+                        stkPaint.setStyle(Paint.Style.STROKE);
+                        stkPaint.setStrokeWidth(8);
+                        stkPaint.setColor(Color.BLACK);
+                        canvas.drawText("drawCanvas", 200, 700, stkPaint);
+                        x.draw(canvas, mMapView ,false);
+                        //
                         polygons.set(position, x);
                         mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYGON_OVERLAY_NUMBER, polygons);
                         mMapView.invalidate();
@@ -274,7 +309,6 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             extend = itemView.findViewById(R.id.show_more);
         }
     }
-
     class ExtendViewHolder extends RecyclerView.ViewHolder
     {
         TextView layerName;

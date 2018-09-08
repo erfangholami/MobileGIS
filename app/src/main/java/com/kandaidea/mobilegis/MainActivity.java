@@ -10,7 +10,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.LocationManager;
@@ -168,13 +173,16 @@ public class MainActivity extends AppCompatActivity
 
 
 
-        pointDetailCardView.findViewById(R.id.share_location_point).setOnClickListener(new View.OnClickListener()
+        pointDetailCardView.findViewById(R.id.share_location_point).setOnClickListener((View view) ->
+            shareLocation(customMarker.getPosition()));
+        pointDetailCardView.findViewById(R.id.make_direction_point).setOnClickListener((View view) ->
         {
-            @Override
-            public void onClick(View view)
-            {
-                shareLocation(customMarker.getPosition());
-            }
+            mapsViewModel.getRoad(((MyLocationNewOverlay) mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER)).getMyLocation(),
+                    customMarker.getPosition());
+            pointDetailCardView.setVisibility(View.GONE);
+            customMarker.setVisible(false);
+            mMapView.invalidate();
+            showMainTools(true);
         });
 
 
@@ -614,7 +622,8 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onClick(View view)
                     {
-                        mapsViewModel.saveUserOverlay(polygon);
+
+                        mapsViewModel.saveUserOverlay(polygon, ((TextInputEditText)dialog.findViewById(R.id.enter_description)).getText().toString());
                         mapDrawPolygon.getPoints().clear();
                         Toast.makeText(getApplicationContext(), "Polygon saved !", Toast.LENGTH_SHORT).show();
                         mapMode = Constants.NONE;
@@ -642,7 +651,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int i, boolean b)
                     {
-                        polyline.setWidth(seekBar.getProgress() / 10);
+                        polyline.setWidth(seekBar.getProgress());
                     }
 
                     @Override
@@ -704,7 +713,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onClick(View view)
                     {
-                        mapsViewModel.saveUserOverlay(polyline);
+                        mapsViewModel.saveUserOverlay(polyline, ((TextInputEditText)dialog.findViewById(R.id.enter_description)).getText().toString());
                         Toast.makeText(getApplicationContext(), "Polyline saved !", Toast.LENGTH_SHORT).show();
                         mapMode = Constants.NONE;
                         drawInformation.setVisibility(View.GONE);
@@ -739,6 +748,7 @@ public class MainActivity extends AppCompatActivity
         mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYGON_OVERLAY_NUMBER, items);
         mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYLINE_OVERLAY_NUMBER, itemss);
         mMapView.getOverlays().addAll(Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER, searchOverlays);
+        mMapView.getOverlays().add(Constants.ROAD_ITEM_OVERLAY_NUMBER, customMarker);
         //TODO add marker list draw to the map
         mMapView.invalidate();
     }

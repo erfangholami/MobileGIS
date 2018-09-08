@@ -47,7 +47,7 @@ public interface API
             @Field("id") int id
     );
 
-    @POST("SendUserLocations")
+    @POST("MySendUserLocations")
     Observable<String> sendUserLocations
     (
             @Header("Content-Type") String type,

@@ -37,7 +37,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     style="@style/actionbar_style"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:visibility="visible">
                     <android.support.constraint.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
@@ -111,7 +112,67 @@
                     </android.support.constraint.ConstraintLayout>
 
                 </android.support.v7.widget.Toolbar>
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/direction_toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/direction_toolbar_height"
+                    android:background="@xml/direction_layer_item"
+                    android:elevation="@dimen/action_bar_elevation"
+                    android:layout_margin="@dimen/action_bar_margin"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:visibility="gone">
+                    <android.support.constraint.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/direction_toolbar_height"
+                        android:gravity="left"
+                        android:foregroundGravity="left">
+                        <ImageButton
+                            android:id="@+id/back_arrow_direction_bar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@mipmap/ic_back_arrow"
+                            android:background="@android:color/transparent"
+                            android:scaleX=".8"
+                            android:scaleY=".8"
+                            android:scaleType="center"
+                            android:gravity="left"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent" />
 
+                        <TextView
+                            android:id="@+id/source_point_text_view"
+                            android:layout_width="200dp"
+                            android:layout_height="25dp"
+                            android:background="@xml/actionbar_layer_list"
+                            android:hint="@string/source_point_text_hint"
+                            android:layout_margin="@dimen/regular_margin"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintLeft_toRightOf="@+id/back_arrow_direction_bar"/>
+                        <TextView
+                            android:id="@+id/destination_point_text_view"
+                            android:layout_width="200dp"
+                            android:layout_height="25dp"
+                            android:background="@xml/actionbar_layer_list"
+                            android:hint="@string/destination_point_text_hint"
+                            android:layout_margin="@dimen/regular_margin"
+                            app:layout_constraintTop_toBottomOf="@+id/source_point_text_view"
+                            app:layout_constraintLeft_toRightOf="@+id/back_arrow_direction_bar"/>
+                        <ImageButton
+                            android:id="@+id/change_source_destination"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@mipmap/ic_swap"
+                            android:layout_margin="@dimen/regular_margin"
+                            android:background="@android:color/transparent"
+                            android:scaleType="fitStart"
+                            android:scaleX=".8"
+                            android:scaleY=".8"
+                            app:layout_constraintBottom_toBottomOf="@+id/destination_point_text_view"
+                            app:layout_constraintTop_toTopOf="@+id/source_point_text_view"
+                            app:layout_constraintLeft_toRightOf="@+id/source_point_text_view"/>
+                    </android.support.constraint.ConstraintLayout>
+
+                </android.support.v7.widget.Toolbar>
 
                 <TextView
                     android:id="@+id/draw_information"
