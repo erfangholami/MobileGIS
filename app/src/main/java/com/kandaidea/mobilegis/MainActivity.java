@@ -19,13 +19,17 @@ import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TextInputEditText;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -81,7 +85,12 @@ import org.osmdroid.views.overlay.TilesOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import me.priyesh.chroma.ChromaDialog;
@@ -118,6 +127,10 @@ public class MainActivity extends AppCompatActivity
     private ImageButton zoomOut;
     private TextView speed;
 
+    //menu items
+    MenuItem takePhotoItem;
+
+
     //vars
     private int mapMode = Constants.NONE;
     private Polyline mapDrawPolyline = new Polyline();
@@ -128,6 +141,7 @@ public class MainActivity extends AppCompatActivity
     private Draw polylineDraw;
     private Marker customMarker;
     private List<Overlay> searchOverlays = new ArrayList<>();
+    private String mCurrentPhotoPath;
 
     private Polygon.OnClickListener mapDrawPolygonListener;
     private Polyline.OnClickListener mapDrawPolylineListener;
@@ -156,6 +170,9 @@ public class MainActivity extends AppCompatActivity
         mNavigationView= findViewById(R.id.nav_view);
         drawerlayout = findViewById(R.id.drawer_layout);
         speed = findViewById(R.id.speed);
+
+        //initial menu items
+        takePhotoItem = mNavigationView.getMenu().getItem(Constants.TAKE_PHOTO_ITEM_NUMBER);
 
         //mainTools
         zoomIn = findViewById(R.id.zoom_in_button);
@@ -237,51 +254,56 @@ public class MainActivity extends AppCompatActivity
             }
         });
         mSearchItem = mToolbar.findViewById(R.id.search_item);
-        mSearchItem.setOnClickListener(new View.OnClickListener()
+        mSearchItem.setOnClickListener((View view) ->
         {
-            @Override
-            public void onClick(View view)
-            {
                 Intent intent = new Intent(getApplicationContext(), SearchActivity.class);
                 intent.putExtra(Constants.TOKEN_KEY, mapsViewModel.token);
                 startActivityForResult(intent, Constants.SEARCH_ACTIVITY_REQUEST_CODE);
-            }
+
         });
 
-
-        mNavigationView.getMenu().getItem(Constants.EXIT_ITEM_NUMBER).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        takePhotoItem.setOnMenuItemClickListener((MenuItem item) ->
         {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem)
+            Intent takePhoto = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePhoto.resolveActivity(getPackageManager()) != null)
             {
-                drawerlayout.closeDrawer(findViewById(R.id.nav_view));
-                new AlertDialog.Builder(MainActivity.this)
-                        .setTitle(R.string.exit_item)
-                        .setMessage(R.string.dialog_exit)
-                        .setCancelable(false)
-                        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i)
-                            {
-
-                            }
-                        })
-                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i)
-                            {
-                                finish();
-                                Intent intent = new Intent(Intent.ACTION_MAIN);
-                                intent.addCategory(Intent.CATEGORY_HOME);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                            }
-                        })
-                        .show();
-                return false;
+                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                String imageFileName = "JPEG_" + timeStamp + "_";
+                File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                File image = null;
+                try
+                {
+                    image = File.createTempFile(imageFileName, ".jpg", storageDir);
+                    mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+                takePhoto.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(image));
+                startActivityForResult(takePhoto, Constants.IMAGE_CAPTURE_REQUEST_CODE);
             }
+            return false;
+        });
+        mNavigationView.getMenu().getItem(Constants.EXIT_ITEM_NUMBER).setOnMenuItemClickListener((MenuItem item) ->
+        {
+            drawerlayout.closeDrawer(findViewById(R.id.nav_view));
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle(R.string.exit_item)
+                    .setMessage(R.string.dialog_exit)
+                    .setCancelable(false)
+                    .setNegativeButton(R.string.no, (DialogInterface dialogInterface, int i) -> {})
+                    .setPositiveButton(R.string.yes, (DialogInterface dialogInterface, int i) ->
+                    {
+                        finish();
+                        Intent intent = new Intent(Intent.ACTION_MAIN);
+                        intent.addCategory(Intent.CATEGORY_HOME);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    })
+                    .show();
+            return false;
+
         });
         mNavigationView.getMenu().getItem(Constants.USER_LOCATIONS_ITEM_NUMBER).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
         {
@@ -898,6 +920,24 @@ public class MainActivity extends AppCompatActivity
                         speed.setVisibility(View.GONE);
                     }
                     mMapView.invalidate();
+                }
+                break;
+            }
+            case Constants.IMAGE_CAPTURE_REQUEST_CODE:
+            {
+                if(resultCode == RESULT_OK && data != null)
+                {
+                    Bitmap mImageBitmap = null;
+                    try
+                    {
+                        mImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(mCurrentPhotoPath));
+                    }
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    new ScreenShot(mImageBitmap).savePhoto();
                 }
                 break;
             }

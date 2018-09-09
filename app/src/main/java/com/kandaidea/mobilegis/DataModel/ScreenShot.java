@@ -7,6 +7,7 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ScreenShot
@@ -39,6 +40,30 @@ public class ScreenShot
             // Several error may come out with file handling or DOM
             e.printStackTrace();
             Log.d(TAG, "screenshotFailed");
+            return false;
+        }
+    }
+    public boolean savePhoto()
+    {
+        String now = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        try
+        {
+            String mPath = Environment.getExternalStorageDirectory().toString() + "/" + Constants.MAIN_FOLDER + "/"+ Constants.PHOTO_FOLDER + "/" + now + ".jpg";
+            Log.d(TAG, mPath);
+            File imageFile = new File(mPath);
+
+            FileOutputStream outputStream = new FileOutputStream(imageFile);
+            int quality = 100;
+            mBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+            outputStream.flush();
+            outputStream.close();
+            Log.d(TAG, "photoSavedSuccessfully");
+            return true;
+        }
+        catch (Throwable e) {
+            // Several error may come out with file handling or DOM
+            e.printStackTrace();
+            Log.d(TAG, "photoSavingFailed");
             return false;
         }
     }

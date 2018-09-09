@@ -88,6 +88,10 @@ public class MapsActivityViewModel extends ViewModel
         if (!f1l.exists()) {
             f1l.mkdirs();
         }
+        File f1ll = new File(Environment.getExternalStorageDirectory() + "/" + Constants.MAIN_FOLDER, Constants.PHOTO_FOLDER);
+        if (!f1ll.exists()) {
+            f1ll.mkdirs();
+        }
         moving = new MovingDetails();
         token = new Token(mActivity.getApplicationContext()).readToken();
     }

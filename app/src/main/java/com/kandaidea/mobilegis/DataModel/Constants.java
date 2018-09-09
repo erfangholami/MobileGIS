@@ -63,11 +63,13 @@ public class Constants
     //main activity start intent for result request code
     public static final int SEARCH_ACTIVITY_REQUEST_CODE = 1000;
     public static final int SETTING_ACTIVITY_REQUEST_CODE = 1001;
+    public static final int IMAGE_CAPTURE_REQUEST_CODE = 1002;
 
 
     //save data in storage folder names
     public static final String MAIN_FOLDER = "MobileGIS";
     public static final String SCREENSHOT_FOLDER = "Screenshots";
+    public static final String PHOTO_FOLDER = "Camera";
     public static final String USER_LOCATIONS_FOLDER = "UserLocations";
 
 
@@ -75,7 +77,7 @@ public class Constants
     public static final int EXIT_ITEM_NUMBER = 7;
     public static final int SETTING_ITEM_NUMBER = 6;
     public static final int USER_LOCATIONS_ITEM_NUMBER = 5;
-    public static final int MOVING_DETAIL_ITEM_NUMBER = 4;
+    public static final int TAKE_PHOTO_ITEM_NUMBER = 4;
     public static final int GOTO_ITEM_NUMBER = 3;
     public static final int DRAW_ITEM_NUMBER = 2;
     public static final int HISTOGRAM_ITEM_NUMBER = 1;
