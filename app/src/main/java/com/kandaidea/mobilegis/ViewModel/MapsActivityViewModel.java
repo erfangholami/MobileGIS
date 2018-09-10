@@ -15,6 +15,8 @@ import android.widget.ThemedSpinnerAdapter;
 import com.google.gson.Gson;
 import com.kandaidea.mobilegis.DataModel.CalculateOverlay;
 import com.kandaidea.mobilegis.DataModel.Constants;
+import com.kandaidea.mobilegis.DataModel.Models.Sector;
+import com.kandaidea.mobilegis.DataModel.Models.SectorModel;
 import com.kandaidea.mobilegis.DataModel.Models.Token;
 import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
 import com.kandaidea.mobilegis.DataModel.Models.UserOverlayItem;
@@ -22,6 +24,7 @@ import com.kandaidea.mobilegis.DataModel.Models.UserOverlayModel;
 import com.kandaidea.mobilegis.DataModel.MovingDetails;
 import com.kandaidea.mobilegis.DataModel.OverlayString;
 import com.kandaidea.mobilegis.DataModel.Realm.RealmUserOverlays;
+import com.kandaidea.mobilegis.DataModel.Retrofit.RetrofitMethods;
 import com.kandaidea.mobilegis.DataModel.ScreenShot;
 import com.kandaidea.mobilegis.MainActivity;
 import com.kandaidea.mobilegis.R;
@@ -31,6 +34,7 @@ import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.util.MyMath;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
@@ -44,9 +48,14 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.internal.observers.DisposableLambdaObserver;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -57,6 +66,7 @@ public class MapsActivityViewModel extends ViewModel
     private MapView mMapView;
     public Realm userLocationRealm;
     public RealmUserOverlays realmUserOverlays;
+    private RetrofitMethods retrofitMethods;
     private MovingDetails moving;
     public String token;
 
@@ -72,6 +82,7 @@ public class MapsActivityViewModel extends ViewModel
                 .name("user_locations.realm")
                 .schemaVersion(1)
                 .build();
+        retrofitMethods = new RetrofitMethods();
         userLocationRealm = Realm.getInstance(userLocationRealmConfig);
         mMapView = (this.mActivity.getWindow().getDecorView().findViewById(android.R.id.content)).findViewById(R.id.map_view_main);
 
@@ -119,34 +130,33 @@ public class MapsActivityViewModel extends ViewModel
         {
             mMapView.getController().animateTo(location, Constants.ANIMATE_ZOOM_LEVEL, Constants.ANIMATE_SPEED);
         }
-        ((MyLocationNewOverlay)(mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER))).getMyLocationProvider().startLocationProvider(new IMyLocationConsumer()
+        ((MyLocationNewOverlay)(mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER))).getMyLocationProvider().startLocationProvider((Location newLocation, IMyLocationProvider source) ->
         {
-            @Override
-            public void onLocationChanged(Location location, IMyLocationProvider source)
+
+            if(newLocation != null)
             {
-                if(location != null)
+                if(speedEnable)
                 {
-                    if(speedEnable)
+                    if(moving.start && (newLocation.getLongitude() != moving.firstPoint.getLongitude() ||
+                                        newLocation.getLatitude() != moving.firstPoint.getLatitude()))
                     {
-                        if(moving.start)
-                        {
-                            calculateAndUpdateSpeed(location);
-                            mMapView.getController().animateTo(new GeoPoint(location.getLatitude(), location.getLongitude()), Constants.ANIMATE_ZOOM_LEVEL, Constants.ANIMATE_SPEED);
-                        }
-                        else
-                        {
-                            moving.firstPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                            moving.firstTime = System.currentTimeMillis();
-                            moving.start = true;
-                        }
+                        calculateAndUpdateSpeed(newLocation);
+                        mMapView.getController().animateTo(new GeoPoint(newLocation.getLatitude(), newLocation.getLongitude()), Constants.ANIMATE_ZOOM_LEVEL, Constants.ANIMATE_SPEED);
                     }
-                    if(recordEnable)
+                    else
                     {
-                        saveUserLocation(location);
-                        ((MyLocationNewOverlay) (mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER))).onLocationChanged(location, source);
+                        moving.firstPoint = new GeoPoint(newLocation.getLatitude(), newLocation.getLongitude());
+                        moving.firstTime = System.currentTimeMillis();
+                        moving.start = true;
                     }
                 }
+                if(recordEnable)
+                {
+                    saveUserLocation(newLocation);
+                    ((MyLocationNewOverlay) (mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER))).onLocationChanged(newLocation, source);
+                }
             }
+
         });
     }
     public boolean takeScreenshot()
@@ -161,7 +171,7 @@ public class MapsActivityViewModel extends ViewModel
     public void saveUserLocation(Location location)
     {
         Date now = new Date();
-        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+        android.text.format.DateFormat.format("yyyyMMdd_HHmmss", now);
         userLocationRealm.beginTransaction();
         Log.d(TAG, "addedLocation" + now.toString());
         userLocationRealm.insert(new UserLocationModel(now.toString(), location.getLatitude(), location.getLongitude()));
@@ -171,7 +181,7 @@ public class MapsActivityViewModel extends ViewModel
     public void saveUserOverlay(Polygon overlay, String description)
     {
         Date now = new Date();
-        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+        android.text.format.DateFormat.format("yyyyMMdd_HHmmss", now);
         String x = new OverlayString().polygonToString(overlay);
         UserOverlayModel model = new UserOverlayModel(now.toString(), description, Constants.POLYGON_TYPE , x);
         mMapView.invalidate();
@@ -181,7 +191,7 @@ public class MapsActivityViewModel extends ViewModel
     {
         //TODO save overlay in DB
         Date now = new Date();
-        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+        android.text.format.DateFormat.format("yyyyMMdd_HHmmss", now);
         String x = new OverlayString().polylineToString(overlay);
         Log.d(TAG, x);
         UserOverlayModel model = new UserOverlayModel(now.toString(), description, Constants.POLYLINE_TYPE, x);
@@ -204,9 +214,12 @@ public class MapsActivityViewModel extends ViewModel
         moving.AvSpeed = moving.calculateAvSpeed();
         moving.AvAcc = moving.calculateAvAcc();
         Log.d(TAG, "movingDetails is : " + moving.speed + " " + moving.AvSpeed + " " + moving.acc + " " + moving.AvAcc);
-        moving.firstTime = secondTime;
-        moving.firstPoint.setCoords(location.getLatitude(), location.getLongitude());
-        ((MainActivity)mActivity).updateSpeed(moving.speed);
+        if(moving.speed != 0)
+        {
+            moving.firstTime = secondTime;
+            moving.firstPoint.setCoords(location.getLatitude(), location.getLongitude());
+            ((MainActivity) mActivity).updateSpeed(moving.speed);
+        }
     }
 
     public void getRoad(GeoPoint start, GeoPoint end)
@@ -214,6 +227,36 @@ public class MapsActivityViewModel extends ViewModel
         new GetRoad().execute(start, end);
     }
 
+    public void getSectors()
+    {
+        mMapView.getOverlays().remove(Constants.SECTOR_ITEM_OVERLAY_NUMBER);
+        mMapView.invalidate();
+        retrofitMethods.getSectors("TOKEN")
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new DisposableObserver<List<SectorModel>>()
+                {
+                    @Override
+                    public void onNext(List<SectorModel> sectorModels)
+                    {
+                        for(SectorModel model:sectorModels)
+                        {
+                            Log.d(TAG, model.toString());
+                        }
+                        mMapView.getOverlays().addAll(Constants.SECTOR_ITEM_OVERLAY_NUMBER, new Sector().makeSector(sectorModels));
+                    }
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.d(TAG, "ErrorWhileGettingSectors : " + e.getMessage());
+                    }
+                    @Override
+                    public void onComplete()
+                    {
+                        Log.d(TAG, "onCompleteGettingSectors : ");
+                    }
+                });
+    }
     class GetRoad extends AsyncTask<GeoPoint, Void, Void>
     {
         Road road[];

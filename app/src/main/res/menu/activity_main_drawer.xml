@@ -41,6 +41,12 @@
             android:title="@string/user_locations_item" />
     </group>
     <group android:checkableBehavior="single"
+        android:id="@+id/kml">
+        <item
+            android:icon="@mipmap/ic_kml"
+            android:title="@string/open_kml_item" />
+    </group>
+    <group android:checkableBehavior="single"
         android:id="@+id/group6">
         <item
             android:icon="@mipmap/ic_setting"

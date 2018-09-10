@@ -13,6 +13,7 @@ import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.DataModel.Models.LoginResponse;
 import com.kandaidea.mobilegis.DataModel.Models.SearchItem;
 import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
+import com.kandaidea.mobilegis.DataModel.Models.SectorModel;
 import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
 
 
@@ -67,34 +68,16 @@ public class RetrofitMethods
     {
         Gson gson = new Gson();
         String listString = gson.toJson(locations, new TypeToken<List<UserLocationModel>>() {}.getType()).toString();
-        JsonArray aa = new JsonArray();
-        JSONArray array = new JSONArray();
-        for(UserLocationModel uu: locations)
-        {
-            JsonObject obj = new JsonObject();
-            obj.addProperty("Time", uu.getTime());
-            obj.addProperty("Lat", uu.getLat());
-
-            aa.add(obj);
-            JSONObject objj = new JSONObject();
-            try
-            {
-                objj.put("Time", uu.getTime());
-                objj.put("Lat", uu.getLat());
-                objj.put("Lng", uu.getLng());
-            }
-            catch (JSONException e)
-            {
-                e.printStackTrace();
-            }
-            array.put(obj);
-        }
-        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),(array).toString().toString());
         Log.d(TAG, "Request is : " + listString);
         return  api.sendUserLocations(Constants.RETROFIT_CONTENT_TYPE, token, listString);
     }
-    public Observable<Response<Void>> uploadFile(MultipartBody.Part body)
+    public Observable<Response<Void>> uploadFile(String token, MultipartBody.Part body)
     {
-        return api.uploadFile(Constants.RETROFIT_CONTENT_TYPE,"dsjknkl", body);
+        return api.uploadFile(Constants.RETROFIT_CONTENT_TYPE,token, body);
+    }
+
+    public Observable<List<SectorModel>> getSectors(String token)
+    {
+        return api.getSector(token);
     }
 }

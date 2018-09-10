@@ -20,6 +20,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -40,6 +41,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -69,12 +71,14 @@ import com.kandaidea.mobilegis.databinding.ActivityMainBinding;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.BuildConfig;
+import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
@@ -128,7 +132,18 @@ public class MainActivity extends AppCompatActivity
     private TextView speed;
 
     //menu items
-    MenuItem takePhotoItem;
+    private Menu drawerMenu;
+    private MenuItem directionItem;
+    private MenuItem sectorItem;
+    private MenuItem drawItem;
+    private MenuItem gotoItem;
+    private MenuItem takePhotoItem;
+    private MenuItem userLocationsItem;
+    private MenuItem kmlItem;
+    private MenuItem settingsItem;
+    private MenuItem exitItem;
+
+
 
 
     //vars
@@ -171,8 +186,22 @@ public class MainActivity extends AppCompatActivity
         drawerlayout = findViewById(R.id.drawer_layout);
         speed = findViewById(R.id.speed);
 
-        //initial menu items
-        takePhotoItem = mNavigationView.getMenu().getItem(Constants.TAKE_PHOTO_ITEM_NUMBER);
+        //main tool bar items
+        mMapItem = mToolbar.findViewById(R.id.map_item);
+        mSearchItem = mToolbar.findViewById(R.id.search_item);
+
+        //initial drawerMenu items
+        drawerMenu = mNavigationView.getMenu();
+        directionItem = drawerMenu.getItem(Constants.DIRECTION_ITEM_NUMBER);
+        sectorItem = drawerMenu.getItem(Constants.HISTOGRAM_ITEM_NUMBER);
+        drawItem = drawerMenu.getItem(Constants.DRAW_ITEM_NUMBER);
+        gotoItem = drawerMenu.getItem(Constants.GOTO_ITEM_NUMBER);
+        takePhotoItem = drawerMenu.getItem(Constants.TAKE_PHOTO_ITEM_NUMBER);
+        userLocationsItem = drawerMenu.getItem(Constants.USER_LOCATIONS_ITEM_NUMBER);
+        kmlItem = drawerMenu.getItem(Constants.OPEN_KML_ITEM_NUMBER);
+        settingsItem = drawerMenu.getItem(Constants.SETTING_ITEM_NUMBER);
+        exitItem = drawerMenu.getItem(Constants.EXIT_ITEM_NUMBER);
+
 
         //mainTools
         zoomIn = findViewById(R.id.zoom_in_button);
@@ -205,63 +234,106 @@ public class MainActivity extends AppCompatActivity
 
         setAdapters();
 
-        //region Toolbar
+        //region Toolbar Items
 
-        navigationDrawer.setOnClickListener(new View.OnClickListener()
+        navigationDrawer.setOnClickListener((View view) ->
         {
-            @Override
-            public void onClick(View view)
+            drawerlayout.openDrawer(findViewById(R.id.nav_view));
+        });
+        mScreenShot.setOnClickListener((View view) ->
+        {
+            View v1 = getWindow().getDecorView().getRootView();
+            v1.setDrawingCacheEnabled(true);
+            Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
+            if(new ScreenShot(bitmap).takeScreenshot())
             {
-                drawerlayout.openDrawer(findViewById(R.id.nav_view));
+                Toast.makeText(getApplicationContext(), R.string.screenshot_ok_msg, Toast.LENGTH_SHORT).show();
             }
         });
-        mScreenShot.setOnClickListener(new View.OnClickListener()
+        mMapItem.setOnClickListener((View view) ->
         {
-            @Override
-            public void onClick(View view)
+            Log.d(TAG, "mMapItemClicked");
+            showMainTools(false);
+            if(pointDetailCardView.getVisibility() == View.VISIBLE)
             {
-                View v1 = getWindow().getDecorView().getRootView();
-                v1.setDrawingCacheEnabled(true);
-                Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
-                if(new ScreenShot(bitmap).takeScreenshot())
-                {
-                    Toast.makeText(getApplicationContext(), R.string.screenshot_ok_msg, Toast.LENGTH_SHORT).show();
-                    //TODO show screenshot for moments
-                }
+                customMarker.setVisible(false);
+                pointDetailCardView.setVisibility(View.GONE);
+                mMapView.invalidate();
             }
+            mapSetting.setVisibility(View.VISIBLE);
+            ((RecyclerView)mapSetting.findViewById(R.id.tile_recycler_view)).getAdapter().notifyDataSetChanged();
+            ((UserOverlayAdapter)mapSettingPolygonRecycler.getAdapter()).updateDataSet(mapsViewModel.getUserOverlays(Constants.POLYGON_TYPE));
+            ((UserOverlayAdapter)mapSettingPolylineRecycler.getAdapter()).updateDataSet(mapsViewModel.getUserOverlays(Constants.POLYLINE_TYPE));
+            ((UserOverlayAdapter)mapSettingMarkerRecycler.getAdapter()).updateDataSet(mapsViewModel.getUserOverlays(Constants.MARKER_TYPE));
         });
-        mMapItem = mToolbar.findViewById(R.id.map_item);
-        mMapItem.setOnClickListener(new View.OnClickListener()
-        {
-            @SuppressLint("ResourceType")
-            @Override
-            public void onClick(View view)
-            {
-                Log.d(TAG, "mMapItemClicked");
-                showMainTools(false);
-                if(pointDetailCardView.getVisibility() == View.VISIBLE)
-                {
-                    customMarker.setVisible(false);
-                    pointDetailCardView.setVisibility(View.GONE);
-                    mMapView.invalidate();
-                }
-                mapSetting.setVisibility(View.VISIBLE);
-                ((RecyclerView)mapSetting.findViewById(R.id.tile_recycler_view)).getAdapter().notifyDataSetChanged();
-                ((UserOverlayAdapter)mapSettingPolygonRecycler.getAdapter()).updateDataSet(mapsViewModel.getUserOverlays(0));
-                ((UserOverlayAdapter)mapSettingPolylineRecycler.getAdapter()).updateDataSet(mapsViewModel.getUserOverlays(1));
-                ((UserOverlayAdapter)mapSettingMarkerRecycler.getAdapter()).updateDataSet(mapsViewModel.getUserOverlays(2));
-
-            }
-        });
-        mSearchItem = mToolbar.findViewById(R.id.search_item);
         mSearchItem.setOnClickListener((View view) ->
         {
                 Intent intent = new Intent(getApplicationContext(), SearchActivity.class);
                 intent.putExtra(Constants.TOKEN_KEY, mapsViewModel.token);
                 startActivityForResult(intent, Constants.SEARCH_ACTIVITY_REQUEST_CODE);
-
         });
 
+        //endregion
+
+        //region Drawer Items
+        directionItem.setOnMenuItemClickListener((MenuItem menuItem) ->
+        {
+            return false;
+        });
+        sectorItem.setOnMenuItemClickListener((MenuItem menuItem) ->
+        {
+            mapsViewModel.getSectors();
+            return false;
+        });
+        drawItem.setOnMenuItemClickListener((MenuItem menuItem) ->
+        {
+            drawerlayout.closeDrawer(findViewById(R.id.nav_view));
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("Draw")
+                    .setMessage(R.string.dialog_choise_draw_mode)
+                    .setCancelable(false)
+                    .setNeutralButton("cancel", null)
+                    .setNegativeButton(R.string.polygon, (DialogInterface dialogInterface, int i) ->
+                    {
+                        mapMode = Constants.DRAW_POLYGON_MODE;
+                        mapDrawPolygon.setPoints(new ArrayList<>());
+                    })
+                    .setPositiveButton(R.string.polyline, (DialogInterface dialogInterface, int i) ->
+                    {
+                        mapMode = Constants.DRAW_POLYLINE_MODE;
+                        mapDrawPolyline.setPoints(new ArrayList<>());
+                    })
+                    .show();
+            return false;
+        });
+        gotoItem.setOnMenuItemClickListener((MenuItem menuItem) ->
+        {
+            drawerlayout.closeDrawer(findViewById(R.id.nav_view));
+            final Dialog dialog = new Dialog(MainActivity.this);
+            dialog.setContentView(R.layout.goto_layout);
+            dialog.setCancelable(false);
+            final TextInputEditText lat = dialog.findViewById(R.id.get_latitude);
+            final TextInputEditText lng = dialog.findViewById(R.id.get_longitude);
+            Button cancel = dialog.findViewById(R.id.cancel);
+            cancel.setOnClickListener((View view) ->
+            {
+                dialog.dismiss();
+            });
+            dialog.findViewById(R.id.goto_location).setOnClickListener((View view) ->
+            {
+                if(lat.getText().length() != 0 && lng.getText().length() != 0 )
+                {
+                    GeoPoint p = new GeoPoint(Double.valueOf(lat.getText().toString()), Double.valueOf(lng.getText().toString()));
+                    showPointPopup(p);
+                    mMapView.getController().animateTo(p, Constants.ANIMATE_ZOOM_LEVEL, Constants.ANIMATE_SPEED);
+                    showMainTools(false);
+                    dialog.dismiss();
+                }
+
+            });
+            dialog.show();
+            return false;
+        });
         takePhotoItem.setOnMenuItemClickListener((MenuItem item) ->
         {
             Intent takePhoto = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
@@ -285,7 +357,30 @@ public class MainActivity extends AppCompatActivity
             }
             return false;
         });
-        mNavigationView.getMenu().getItem(Constants.EXIT_ITEM_NUMBER).setOnMenuItemClickListener((MenuItem item) ->
+        userLocationsItem.setOnMenuItemClickListener((MenuItem menuItem) ->
+        {
+            Intent intent = new Intent(getApplicationContext(), UserLocations.class);
+            intent.putExtra(Constants.TOKEN_KEY, mapsViewModel.token);
+            startActivity(intent);
+            return false;
+        });
+        kmlItem.setOnMenuItemClickListener((MenuItem menuItem) ->
+        {
+            new GetKml().execute();
+            return false;
+        });
+        settingsItem.setOnMenuItemClickListener((MenuItem menuItem) ->
+        {
+            drawerlayout.closeDrawer(findViewById(R.id.nav_view));
+            Intent intent = new Intent(getApplicationContext(), SettingActivity.class);
+            intent.putExtra(Constants.MY_LOCATION_ENABLE_VALUE, mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER).isEnabled());
+            intent.putExtra(Constants.SCALE_BAR_ENABLE_VALUE, mMapView.getOverlays().get(Constants.SCALE_BAR_OVERLAY_NUMBER).isEnabled());
+            intent.putExtra(Constants.FOLLOW_LOCATION_ENABLE_VALUE, mapsViewModel.isRecordEnable());
+            intent.putExtra(Constants.SPEED_ENABLE_VALUE, mapsViewModel.isSpeedEnable());
+            startActivityForResult(intent, Constants.SETTING_ACTIVITY_REQUEST_CODE);
+            return false;
+        });
+        exitItem.setOnMenuItemClickListener((MenuItem item) ->
         {
             drawerlayout.closeDrawer(findViewById(R.id.nav_view));
             new AlertDialog.Builder(MainActivity.this)
@@ -305,113 +400,9 @@ public class MainActivity extends AppCompatActivity
             return false;
 
         });
-        mNavigationView.getMenu().getItem(Constants.USER_LOCATIONS_ITEM_NUMBER).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem)
-            {
-                Intent intent = new Intent(getApplicationContext(), UserLocations.class);
-                intent.putExtra(Constants.TOKEN_KEY, mapsViewModel.token);
-                startActivity(intent);
-                return false;
-            }
-        });
-        mNavigationView.getMenu().getItem(Constants.DRAW_ITEM_NUMBER).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem)
-            {
-                drawerlayout.closeDrawer(findViewById(R.id.nav_view));
-                new AlertDialog.Builder(MainActivity.this)
-                        .setTitle("Draw")
-                        .setMessage(R.string.dialog_choise_draw_mode)
-                        .setCancelable(false)
-                        .setNeutralButton("cancel", null)
-                        .setNegativeButton(R.string.polygon, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i)
-                            {
-                                mapMode = Constants.DRAW_POLYGON_MODE;
-                                mapDrawPolygon.setPoints(new ArrayList<GeoPoint>());
-                            }
-                        })
-                        .setPositiveButton(R.string.polyline, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i)
-                            {
-                                mapMode = Constants.DRAW_POLYLINE_MODE;
-                                mapDrawPolyline.setPoints(new ArrayList<GeoPoint>());
-                            }
-                        })
-                        .show();
-                return false;
-            }
-        });
-        mNavigationView.getMenu().getItem(Constants.SETTING_ITEM_NUMBER).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem)
-            {
-                drawerlayout.closeDrawer(findViewById(R.id.nav_view));
-                Intent intent = new Intent(getApplicationContext(), SettingActivity.class);
-                intent.putExtra(Constants.MY_LOCATION_ENABLE_VALUE, mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER).isEnabled());
-                intent.putExtra(Constants.SCALE_BAR_ENABLE_VALUE, mMapView.getOverlays().get(Constants.SCALE_BAR_OVERLAY_NUMBER).isEnabled());
-                intent.putExtra(Constants.FOLLOW_LOCATION_ENABLE_VALUE, mapsViewModel.isRecordEnable());
-                intent.putExtra(Constants.SPEED_ENABLE_VALUE, mapsViewModel.isSpeedEnable());
-                startActivityForResult(intent, Constants.SETTING_ACTIVITY_REQUEST_CODE);
-                return false;
-            }
-        });
 
-        mNavigationView.getMenu().getItem(Constants.GOTO_ITEM_NUMBER).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem)
-            {
-                drawerlayout.closeDrawer(findViewById(R.id.nav_view));
-                final Dialog dialog = new Dialog(MainActivity.this);
-                dialog.setContentView(R.layout.goto_layout);
-                dialog.setCancelable(false);
-                final TextInputEditText lat = dialog.findViewById(R.id.get_latitude);
-                final TextInputEditText lng = dialog.findViewById(R.id.get_longitude);
-                Button cancel = dialog.findViewById(R.id.cancel);
-                cancel.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View view)
-                    {
-                        dialog.dismiss();
-                    }
-                });
-                dialog.findViewById(R.id.goto_location).setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View view)
-                    {
-                        if(lat.getText().length() != 0 && lng.getText().length() != 0 )
-                        {
-                            GeoPoint p = new GeoPoint(Double.valueOf(lat.getText().toString()), Double.valueOf(lng.getText().toString()));
-                            showPointPopup(p);
-                            mMapView.getController().animateTo(p, Constants.ANIMATE_ZOOM_LEVEL, Constants.ANIMATE_SPEED);
-                            showMainTools(false);
-                            dialog.dismiss();
-                        }
-                    }
-                });
-                dialog.show();
-                return false;
-            }
-        });
         //endregion
-
-
-
     }
-
-
-
 
     private void initialScreenSettings()
     {
@@ -771,6 +762,10 @@ public class MainActivity extends AppCompatActivity
         mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYLINE_OVERLAY_NUMBER, itemss);
         mMapView.getOverlays().addAll(Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER, searchOverlays);
         mMapView.getOverlays().add(Constants.ROAD_ITEM_OVERLAY_NUMBER, customMarker);
+        mMapView.getOverlays().addAll(Constants.SECTOR_ITEM_OVERLAY_NUMBER, items);
+
+        FolderOverlay kmlOverlay = new FolderOverlay();
+        mMapView.getOverlays().add(Constants.KML_OVERLAY_NUMBER, kmlOverlay);
         //TODO add marker list draw to the map
         mMapView.invalidate();
     }
@@ -998,4 +993,25 @@ public class MainActivity extends AppCompatActivity
     }
     //endregion
 
+    class GetKml extends AsyncTask<Void, Void, Void>
+    {
+
+        @Override
+        protected Void doInBackground(Void... voids)
+        {
+            KmlDocument kmlDocument = new KmlDocument();
+            kmlDocument.parseKMLUrl("http://mapsengine.google.com/map/kml?forcekml=1&mid=z6IJfj90QEd4.kUUY9FoHFRdE");
+            FolderOverlay kmlOverlay = (FolderOverlay)kmlDocument.mKmlRoot.buildOverlay(mMapView, null, null, kmlDocument);
+            mMapView.getOverlays().remove(Constants.KML_OVERLAY_NUMBER);
+            mMapView.getOverlays().add(Constants.KML_OVERLAY_NUMBER, kmlOverlay);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid)
+        {
+            mMapView.invalidate();
+            super.onPostExecute(aVoid);
+        }
+    }
 }

@@ -21,7 +21,7 @@ public class ScreenShot
     public boolean takeScreenshot()
     {
         Date now = new Date();
-        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+        android.text.format.DateFormat.format("yyyyMMdd_HHmmss", now);
         try
         {
             String mPath = Environment.getExternalStorageDirectory().toString() + "/" + Constants.MAIN_FOLDER + "/"+ Constants.SCREENSHOT_FOLDER + "/" + now.toString() + ".jpg";

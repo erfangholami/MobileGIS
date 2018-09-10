@@ -54,4 +54,5 @@
     <string name="description_string">Description</string>
     <string name="source_point_text_hint">Enter first point</string>
     <string name="destination_point_text_hint">Enter second point</string>
+    <string name="open_kml_item">Open Kml</string>
 </resources>

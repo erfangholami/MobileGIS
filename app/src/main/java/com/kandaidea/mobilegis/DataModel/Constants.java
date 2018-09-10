@@ -58,6 +58,8 @@ public class Constants
     public static final int DRAW_USER_POLYLINE_OVERLAY_NUMBER = 14;
     public static final int DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER = 15;
     public static final int ROAD_ITEM_OVERLAY_NUMBER = 16;
+    public static final int SECTOR_ITEM_OVERLAY_NUMBER = 17;
+    public static final int KML_OVERLAY_NUMBER = 18;
 
 
     //main activity start intent for result request code
@@ -74,8 +76,9 @@ public class Constants
 
 
     //navigation item numbers
-    public static final int EXIT_ITEM_NUMBER = 7;
-    public static final int SETTING_ITEM_NUMBER = 6;
+    public static final int EXIT_ITEM_NUMBER = 8;
+    public static final int SETTING_ITEM_NUMBER = 7;
+    public static final int OPEN_KML_ITEM_NUMBER = 6;
     public static final int USER_LOCATIONS_ITEM_NUMBER = 5;
     public static final int TAKE_PHOTO_ITEM_NUMBER = 4;
     public static final int GOTO_ITEM_NUMBER = 3;

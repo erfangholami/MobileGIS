@@ -5,6 +5,7 @@ import com.kandaidea.mobilegis.DataModel.Models.Address;
 import com.kandaidea.mobilegis.DataModel.Models.LoginResponse;
 import com.kandaidea.mobilegis.DataModel.Models.SearchItem;
 import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
+import com.kandaidea.mobilegis.DataModel.Models.SectorModel;
 
 
 import java.util.List;
@@ -70,5 +71,12 @@ public interface API
     (
             @Field("latitude") String lat,
             @Field("longitude") String lng
+    );
+
+
+    @POST("GetSector")
+    Observable<List<SectorModel>> getSector
+    (
+            @Header("Token") String token
     );
 }
