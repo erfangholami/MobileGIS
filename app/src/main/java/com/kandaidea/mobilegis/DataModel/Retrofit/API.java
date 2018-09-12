@@ -69,8 +69,9 @@ public interface API
     @FormUrlEncoded
     Observable<Address> getAddress
     (
-            @Field("latitude") String lat,
-            @Field("longitude") String lng
+            @Header("Token") String token,
+            @Field("lat") double lat,
+            @Field("long") double lng
     );
 
 

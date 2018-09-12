@@ -15,6 +15,8 @@ import android.widget.ThemedSpinnerAdapter;
 import com.google.gson.Gson;
 import com.kandaidea.mobilegis.DataModel.CalculateOverlay;
 import com.kandaidea.mobilegis.DataModel.Constants;
+import com.kandaidea.mobilegis.DataModel.LayerManager;
+import com.kandaidea.mobilegis.DataModel.Models.Address;
 import com.kandaidea.mobilegis.DataModel.Models.Sector;
 import com.kandaidea.mobilegis.DataModel.Models.SectorModel;
 import com.kandaidea.mobilegis.DataModel.Models.Token;
@@ -50,9 +52,15 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableConverter;
+import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.internal.observers.DisposableLambdaObserver;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -68,6 +76,7 @@ public class MapsActivityViewModel extends ViewModel
     public RealmUserOverlays realmUserOverlays;
     private RetrofitMethods retrofitMethods;
     private MovingDetails moving;
+    public LayerManager mLayerManager;
     public String token;
 
     private boolean recordEnable = true;
@@ -85,7 +94,7 @@ public class MapsActivityViewModel extends ViewModel
         retrofitMethods = new RetrofitMethods();
         userLocationRealm = Realm.getInstance(userLocationRealmConfig);
         mMapView = (this.mActivity.getWindow().getDecorView().findViewById(android.R.id.content)).findViewById(R.id.map_view_main);
-
+        mLayerManager = new LayerManager(new HashMap<>(), mMapView);
         //make directory for screenshots
         File f = new File(Environment.getExternalStorageDirectory(), Constants.MAIN_FOLDER);
         if (!f.exists()) {
@@ -123,14 +132,14 @@ public class MapsActivityViewModel extends ViewModel
     }
     public void goMyLocation()
     {
-        Log.d(TAG, "onLocationClicked" + mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER).getClass().getSimpleName());
-        IGeoPoint location = ((MyLocationNewOverlay)(mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER))).getMyLocation();
-        MyLocationNewOverlay x = ((MyLocationNewOverlay)(mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER)));
+        Log.d(TAG, "onLocationClicked" + mLayerManager.getOverlay(Constants.MY_LOCATION_OVERLAY_STRING).getClass().getSimpleName());
+        IGeoPoint location = ((MyLocationNewOverlay)(mLayerManager.getOverlay(Constants.MY_LOCATION_OVERLAY_STRING))).getMyLocation();
+        MyLocationNewOverlay x = ((MyLocationNewOverlay)(mLayerManager.getOverlay(Constants.MY_LOCATION_OVERLAY_STRING)));
         if(location != null)
         {
             mMapView.getController().animateTo(location, Constants.ANIMATE_ZOOM_LEVEL, Constants.ANIMATE_SPEED);
         }
-        ((MyLocationNewOverlay)(mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER))).getMyLocationProvider().startLocationProvider((Location newLocation, IMyLocationProvider source) ->
+        ((MyLocationNewOverlay)(mLayerManager.getOverlay(Constants.MY_LOCATION_OVERLAY_STRING))).getMyLocationProvider().startLocationProvider((Location newLocation, IMyLocationProvider source) ->
         {
 
             if(newLocation != null)
@@ -153,7 +162,7 @@ public class MapsActivityViewModel extends ViewModel
                 if(recordEnable)
                 {
                     saveUserLocation(newLocation);
-                    ((MyLocationNewOverlay) (mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER))).onLocationChanged(newLocation, source);
+                    ((MyLocationNewOverlay) (mLayerManager.getOverlay(Constants.MY_LOCATION_OVERLAY_STRING))).onLocationChanged(newLocation, source);
                 }
             }
 
@@ -178,28 +187,32 @@ public class MapsActivityViewModel extends ViewModel
         userLocationRealm.commitTransaction();
     }
 
-    public void saveUserOverlay(Polygon overlay, String description)
+    public boolean saveUserOverlay(Polygon overlay, String name, String description)
     {
         Date now = new Date();
         android.text.format.DateFormat.format("yyyyMMdd_HHmmss", now);
         String x = new OverlayString().polygonToString(overlay);
-        UserOverlayModel model = new UserOverlayModel(now.toString(), description, Constants.POLYGON_TYPE , x);
+        UserOverlayModel model = new UserOverlayModel((name.length() != 0) ? name : now.toString(), description, Constants.POLYGON_TYPE , x);
         mMapView.invalidate();
-        realmUserOverlays.addOverlay(model);
+        return realmUserOverlays.addOverlay(model);
     }
-    public void saveUserOverlay(Polyline overlay, String description)
+    public boolean saveUserOverlay(Polyline overlay, String name, String description)
     {
         //TODO save overlay in DB
         Date now = new Date();
         android.text.format.DateFormat.format("yyyyMMdd_HHmmss", now);
         String x = new OverlayString().polylineToString(overlay);
         Log.d(TAG, x);
-        UserOverlayModel model = new UserOverlayModel(now.toString(), description, Constants.POLYLINE_TYPE, x);
-        realmUserOverlays.addOverlay(model);
+        UserOverlayModel model = new UserOverlayModel((name.length() != 0) ? name : now.toString(), description, Constants.POLYLINE_TYPE, x);
+        return realmUserOverlays.addOverlay(model);
     }
     public List<UserOverlayItem> getUserOverlays(int type)
     {
         return realmUserOverlays.getUserOverlay(type);
+    }
+    public void deleteUserOverlay(String name)
+    {
+        realmUserOverlays.deleteOverlay(name);
     }
 
     private void calculateAndUpdateSpeed(Location location)
@@ -229,8 +242,7 @@ public class MapsActivityViewModel extends ViewModel
 
     public void getSectors()
     {
-        mMapView.getOverlays().remove(Constants.SECTOR_ITEM_OVERLAY_NUMBER);
-        mMapView.invalidate();
+
         retrofitMethods.getSectors("TOKEN")
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
@@ -243,7 +255,9 @@ public class MapsActivityViewModel extends ViewModel
                         {
                             Log.d(TAG, model.toString());
                         }
-                        mMapView.getOverlays().addAll(Constants.SECTOR_ITEM_OVERLAY_NUMBER, new Sector().makeSector(sectorModels));
+                        //TODO add Sector to map
+                        mLayerManager.remmoveItem(Constants.SECTOR_ITEM_OVERLAY_STRING);
+                        mLayerManager.addAll(new Sector().makeSector(sectorModels), Constants.SECTOR_ITEM_OVERLAY_STRING);
                     }
                     @Override
                     public void onError(Throwable e)
@@ -256,6 +270,20 @@ public class MapsActivityViewModel extends ViewModel
                         Log.d(TAG, "onCompleteGettingSectors : ");
                     }
                 });
+    }
+
+
+
+    public Address getAddress(double lat, double lng)
+    {
+        return retrofitMethods.getAddress("sdd", lat, lng)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .doOnError((Throwable throwable)->
+                {
+                    Log.v(TAG, "ErrorOnGetAddress : " + throwable.getMessage());
+                })
+                .blockingFirst();
     }
     class GetRoad extends AsyncTask<GeoPoint, Void, Void>
     {
@@ -286,8 +314,10 @@ public class MapsActivityViewModel extends ViewModel
                 roadOverlay = RoadManager.buildRoadOverlay(road[i], Color.BLUE, 5f);
                 roads.add(roadOverlay);
             }
-            mMapView.getOverlays().remove(Constants.ROAD_ITEM_OVERLAY_NUMBER);
-            mMapView.getOverlays().addAll(Constants.ROAD_ITEM_OVERLAY_NUMBER, roads);
+           // mMapView.getOverlays().remove(Constants.ROAD_ITEM_OVERLAY_NUMBER);
+            //mMapView.getOverlays().addAll(Constants.ROAD_ITEM_OVERLAY_NUMBER, roads);
+            mLayerManager.remmoveItem(Constants.ROAD_ITEM_OVERLAY_STRING);
+            mLayerManager.addAll(roads, Constants.ROAD_ITEM_OVERLAY_STRING);
             mMapView.invalidate();
             super.onPostExecute(aVoid);
         }

@@ -1,12 +1,17 @@
 package com.kandaidea.mobilegis.DataModel.Realm;
 
 import com.kandaidea.mobilegis.DataModel.Constants;
+import com.kandaidea.mobilegis.DataModel.Models.UserLocationModel;
 import com.kandaidea.mobilegis.DataModel.Models.UserOverlayItem;
 import com.kandaidea.mobilegis.DataModel.Models.UserOverlayModel;
 import com.kandaidea.mobilegis.DataModel.OverlayString;
 
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.Polygon;
+import org.osmdroid.views.overlay.infowindow.InfoWindow;
+import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,11 +32,22 @@ public class RealmUserOverlays
                 .build();
         userOverlayRealm = Realm.getInstance(userOverlayConfig);
     }
-    public void addOverlay(UserOverlayModel model)
+    public boolean addOverlay(UserOverlayModel model)
     {
+        boolean returning;
         userOverlayRealm.beginTransaction();
-        userOverlayRealm.insert(model);
+        RealmResults<UserOverlayModel> result = userOverlayRealm.where(UserOverlayModel.class).equalTo("name", model.getName()).findAll();
+        if(result.isEmpty())
+        {
+            returning = true;
+            userOverlayRealm.insert(model);
+        }
+        else
+        {
+            returning = false;
+        }
         userOverlayRealm.commitTransaction();
+        return returning;
     }
 
     public List<UserOverlayItem> getUserOverlay(int type)
@@ -74,5 +90,12 @@ public class RealmUserOverlays
             returningList.add(newItem);
         }
         return returningList;
+    }
+    public void deleteOverlay(String name)
+    {
+        userOverlayRealm.beginTransaction();
+        RealmResults<UserOverlayModel> result = userOverlayRealm.where(UserOverlayModel.class).equalTo("name", name).findAll();
+        result.deleteAllFromRealm();
+        userOverlayRealm.commitTransaction();
     }
 }

@@ -35,7 +35,7 @@ public class Sector
         {
             polygon.addPoint(getEdge(base, (int) model.getR()* 2 , (i * 0.2) + model.getAzimuth() - (model.gethBW() / 2)));
         }
-        polygon.setFillColor(Color.RED);
+        polygon.setFillColor(Color.argb(127, 25, 53, 200));
         polygon.setStrokeWidth(5f);
         return polygon;
     }

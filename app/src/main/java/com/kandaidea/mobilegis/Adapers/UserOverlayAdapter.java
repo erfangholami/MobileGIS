@@ -1,16 +1,9 @@
 package com.kandaidea.mobilegis.Adapers;
 
-import android.app.Notification;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.Shader;
-import android.location.Location;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -27,40 +20,37 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.kandaidea.mobilegis.DataModel.Constants;
+import com.kandaidea.mobilegis.DataModel.LayerManager;
 import com.kandaidea.mobilegis.DataModel.Models.UserOverlayItem;
 import com.kandaidea.mobilegis.R;
+import com.kandaidea.mobilegis.ViewModel.MapsActivityViewModel;
 
-import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.Projection;
 import org.osmdroid.views.overlay.Polygon;
 import org.osmdroid.views.overlay.Polyline;
-import org.osmdroid.views.overlay.infowindow.InfoWindow;
+import org.osmdroid.views.overlay.infowindow.BasicInfoWindow;
+import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
-import java.security.Policy;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
     private static final String TAG = UserOverlayItem.class.getSimpleName();
 
+    private LayerManager manager;
+    private MapsActivityViewModel viewModel;
     private MapView mMapView;
     private List<UserOverlayItem> items ;
 
     List<Polygon> polygons = new ArrayList<>();
     List<Polyline> polylines = new ArrayList<>();
 
-
-
-
-
-
-    private ViewGroup par;
-    public UserOverlayAdapter(MapView mMapView, List<UserOverlayItem> items)
+    public UserOverlayAdapter(MapsActivityViewModel model, MapView mMapView, List<UserOverlayItem> items)
     {
+        this.manager = model.mLayerManager;
+        viewModel = model;
         this.mMapView = mMapView;
         this.items = items;
         addData();
@@ -71,7 +61,6 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
-        par = parent;
         View view;
         Log.v(TAG, "viewType is : " + viewType);
         if(viewType == Constants.COMPACT_MODE)
@@ -107,64 +96,93 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             }
             mHolder.layerName.setText(items.get(position).getName());
-            mHolder.extend.setOnClickListener(new View.OnClickListener()
+            mHolder.extend.setOnClickListener((View view) ->
             {
-                @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-                @Override
-                public void onClick(View view)
-                {
-                    items.get(position).setShowMode(Constants.EXTEND_MODE);
-                    notifyItemChanged(position, items.get(position));
-                }
+                items.get(position).setShowMode(Constants.EXTEND_MODE);
+                notifyItemChanged(position, items.get(position));
             });
-            mHolder.turnOnOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+            mHolder.remove.setOnClickListener((View view) ->
             {
-                @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean b)
+                Log.v(TAG, "remove overlay" + position);
+                if(items.get(position).getType() == Constants.POLYGON_TYPE)
                 {
-                    Log.v(TAG, "switch is : " + position + " " + b);
-                    if(items.get(position).getType() == Constants.POLYGON_TYPE)
-                    {
-                        mMapView.getOverlays().removeAll(polygons);
-                        mMapView.invalidate();
-                        Polygon x = polygons.get(position);
-                        x.setEnabled(b);
-                        //
-
-
-                        Canvas canvas = new Canvas();
-                        final Bitmap patternBMP ;
-                        GeoPoint point = x.getPoints().get(0);
-                        Paint fillPaint = new Paint();
-                        fillPaint.setColor(Color.MAGENTA);
-                        canvas.drawText("drawCanvas", 200, 700, fillPaint);
-                        Paint stkPaint = new Paint();
-                        stkPaint.setStyle(Paint.Style.STROKE);
-                        stkPaint.setStrokeWidth(8);
-                        stkPaint.setColor(Color.BLACK);
-                        canvas.drawText("drawCanvas", 200, 700, stkPaint);
-                        x.draw(canvas, mMapView ,false);
-                        //
-                        polygons.set(position, x);
-                        mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYGON_OVERLAY_NUMBER, polygons);
-                        mMapView.invalidate();
-                    }
-                    else if(items.get(position).getType() == Constants.POLYLINE_TYPE)
-                    {
-                        mMapView.getOverlays().removeAll(polylines);
-                        mMapView.invalidate();
-                        Polyline x = polylines.get(position);
-                        x.setEnabled(b);
-                        polylines.set(position, x);
-                        mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYLINE_OVERLAY_NUMBER, polylines);
-                        mMapView.invalidate();
-                    }
-                    else if(items.get(position).getType() == Constants.MARKER_TYPE)
-                    {
-                        //TODO handle change on/off switch with map
-                    }
+                    manager.remmoveItem(Constants.DRAW_USER_POLYGON_OVERLAY_STRING);
+                    mMapView.invalidate();
+                    Log.d(TAG, "overlayName is : " + items.get(position).getName());
+                    viewModel.deleteUserOverlay(items.get(position).getName());
+                    items.remove(position);
+                    polygons.remove(position);
+                    manager.addAll(polygons, Constants.DRAW_USER_POLYGON_OVERLAY_STRING);
                     mMapView.invalidate();
                 }
+                else if(items.get(position).getType() == Constants.POLYLINE_TYPE)
+                {
+                    manager.remmoveItem(Constants.DRAW_USER_POLYLINE_OVERLAY_STRING);
+                    mMapView.invalidate();
+                    viewModel.deleteUserOverlay(items.get(position).getName());
+                    items.remove(position);
+                    polylines.remove(position);
+                    manager.addAll(polylines, Constants.DRAW_USER_POLYLINE_OVERLAY_STRING);
+                    mMapView.invalidate();
+                }
+                else if(items.get(position).getType() == Constants.MARKER_TYPE)
+                {
+                    //TODO handle change on/off switch with map
+                }
+                notifyDataSetChanged();
+                mMapView.invalidate();
+            });
+            mHolder.turnOnOff.setOnCheckedChangeListener((CompoundButton compoundButton, boolean b) ->
+            {
+                Log.v(TAG, "switch is : " + position + " " + b);
+                if(items.get(position).getType() == Constants.POLYGON_TYPE)
+                {
+                    //mMapView.getOverlays().removeAll(polygons);
+                    manager.remmoveItem(Constants.DRAW_USER_POLYGON_OVERLAY_STRING);
+                    mMapView.invalidate();
+                    Polygon x = polygons.get(position);
+                    x.setEnabled(b);
+                    polygons.set(position, x);
+
+
+                    Canvas canvas = new Canvas();
+                    final Bitmap patternBMP ;
+                    GeoPoint point = x.getPoints().get(0);
+                    Paint fillPaint = new Paint();
+                    fillPaint.setColor(Color.RED);
+                    canvas.drawText("drawCanvas", 200, 700, fillPaint);
+                    Paint stkPaint = new Paint();
+                    stkPaint.setStyle(Paint.Style.STROKE);
+                    stkPaint.setStrokeWidth(8);
+                    stkPaint.setColor(Color.BLACK);
+                    canvas.drawText("drawCanvas", 200, 700, stkPaint);
+
+
+
+
+                    polygons.get(position).draw(canvas, mMapView ,false);
+
+                    //mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYGON_OVERLAY_NUMBER, polygons);
+                    manager.addAll(polygons, Constants.DRAW_USER_POLYGON_OVERLAY_STRING);
+                    mMapView.invalidate();
+                }
+                else if(items.get(position).getType() == Constants.POLYLINE_TYPE)
+                {
+                    //mMapView.getOverlays().removeAll(polylines);
+                    manager.remmoveItem(Constants.DRAW_USER_POLYLINE_OVERLAY_STRING);
+                    mMapView.invalidate();
+                    Polyline x = polylines.get(position);
+                    x.setEnabled(b);
+                    polylines.set(position, x);
+                    //mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYLINE_OVERLAY_NUMBER, polylines);
+                    manager.addAll(polylines, Constants.DRAW_USER_POLYLINE_OVERLAY_STRING);
+                    mMapView.invalidate();
+                }
+                else if(items.get(position).getType() == Constants.MARKER_TYPE)
+                {
+                    //TODO handle change on/off switch with map
+                }
+                mMapView.invalidate();
             });
         }
         else if(holder.getItemViewType() == Constants.EXTEND_MODE)
@@ -184,49 +202,45 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             }
             mHolder.layerName.setText(items.get(position).getName());
-            mHolder.extend.setOnClickListener(new View.OnClickListener()
+            mHolder.extend.setOnClickListener((View view) ->
             {
-                @Override
-                public void onClick(View view)
-                {
-                    items.get(position).setShowMode(Constants.COMPACT_MODE);
-                    notifyItemChanged(position);
-                }
+                items.get(position).setShowMode(Constants.COMPACT_MODE);
+                notifyItemChanged(position);
             });
-            mHolder.turnOnOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+            mHolder.turnOnOff.setOnCheckedChangeListener((CompoundButton compoundButton, boolean b) ->
             {
-                @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean b)
+                Log.v(TAG, "switch is : " + position + " " + b);
+                if(items.get(position).getType() == Constants.POLYGON_TYPE)
                 {
-                    Log.v(TAG, "switch is : " + position + " " + b);
-                    if(items.get(position).getType() == Constants.POLYGON_TYPE)
-                    {
-                        enableTools(mHolder, mHolder.turnOnOff.isChecked());
-                        mMapView.getOverlays().removeAll(polygons);
-                        mMapView.invalidate();
-                        Polygon x = polygons.get(position);
-                        x.setEnabled(b);
-                        polygons.set(position, x);
-                        mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYGON_OVERLAY_NUMBER, polygons);
-                        mMapView.invalidate();
-                    }
-                    else if(items.get(position).getType() == Constants.POLYLINE_TYPE)
-                    {
-                        enableTools(mHolder, mHolder.turnOnOff.isChecked());
-                        mMapView.getOverlays().removeAll(polylines);
-                        mMapView.invalidate();
-                        Polyline x = polylines.get(position);
-                        x.setEnabled(b);
-                        polylines.set(position, x);
-                        mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYLINE_OVERLAY_NUMBER, polylines);
-                        mMapView.invalidate();
-                    }
-                    else if(items.get(position).getType() == Constants.MARKER_TYPE)
-                    {
-                        //TODO handle change on/off switch with map
-                    }
+                    enableTools(mHolder, mHolder.turnOnOff.isChecked());
+                    //mMapView.getOverlays().removeAll(polygons);
+                    manager.remmoveItem(Constants.DRAW_USER_POLYGON_OVERLAY_STRING);
+                    mMapView.invalidate();
+                    Polygon x = polygons.get(position);
+                    x.setEnabled(b);
+                    polygons.set(position, x);
+                    //mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYGON_OVERLAY_NUMBER, polygons);
+                    manager.addAll(polygons, Constants.DRAW_USER_POLYGON_OVERLAY_STRING);
                     mMapView.invalidate();
                 }
+                else if(items.get(position).getType() == Constants.POLYLINE_TYPE)
+                {
+                    enableTools(mHolder, mHolder.turnOnOff.isChecked());
+                    //mMapView.getOverlays().removeAll(polylines);
+                    manager.remmoveItem(Constants.DRAW_USER_POLYLINE_OVERLAY_STRING);
+                    mMapView.invalidate();
+                    Polyline x = polylines.get(position);
+                    x.setEnabled(b);
+                    polylines.set(position, x);
+                    //mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYLINE_OVERLAY_NUMBER, polylines);
+                    manager.addAll(polylines, Constants.DRAW_USER_POLYLINE_OVERLAY_STRING);
+                    mMapView.invalidate();
+                }
+                else if(items.get(position).getType() == Constants.MARKER_TYPE)
+                {
+                    //TODO handle change on/off switch with map
+                }
+                mMapView.invalidate();
             });
         }
 
@@ -256,13 +270,15 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         {
             if(items.get(0).getType() == Constants.POLYGON_TYPE)
             {
-                mMapView.getOverlays().removeAll(polygons);
+                //mMapView.getOverlays().removeAll(polygons);
+                manager.remmoveItem(Constants.DRAW_USER_POLYGON_OVERLAY_STRING);
                 polygons.clear();
                 for(UserOverlayItem item: items)
                 {
                     polygons.add(item.getmPolygon());
                 }
-                mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYGON_OVERLAY_NUMBER, polygons);
+                //mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYGON_OVERLAY_NUMBER, polygons);
+                manager.addAll(polygons, Constants.DRAW_USER_POLYGON_OVERLAY_STRING);
                 mMapView.invalidate();
             }
             else if(items.get(0).getType() == Constants.POLYLINE_TYPE)
@@ -273,7 +289,8 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 {
                     polylines.add(item.getmPolyline());
                 }
-                mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYLINE_OVERLAY_NUMBER, polylines);
+                //mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYLINE_OVERLAY_NUMBER, polylines);
+                manager.addAll(polylines, Constants.DRAW_USER_POLYLINE_OVERLAY_STRING);
                 mMapView.invalidate();
             }
             else if (items.get(0).getType() == Constants.MARKER_TYPE)
@@ -301,11 +318,13 @@ public class UserOverlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         TextView layerName;
         Switch turnOnOff;
         ImageButton extend;
+        ImageButton remove;
         public CompatViewHolder(View itemView)
         {
             super(itemView);
             layerName = itemView.findViewById(R.id.layer_name);
             turnOnOff = itemView.findViewById(R.id.layer_status);
+            remove = itemView.findViewById(R.id.remove);
             extend = itemView.findViewById(R.id.show_more);
         }
     }

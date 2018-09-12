@@ -34,10 +34,10 @@ public class Constants
             new String[]{"http://wms.chartbundle.com/tms/v1.0/enrl/"});
     public static final XYTileSource x2 = new XYTileSource("x2",
             3, 20, 256, ".png", new String[] {
-            "http://tile.thunderforest.com/cycle/"});
+            " http://maps.refuges.info/hiking/"});
     public static final XYTileSource x3 = new XYTileSource("x3",
             3, 20, 256, ".png", new String[] {
-            "http://tile.thunderforest.com/outdoors/"});
+            "http://toolserver.org/tiles/hikebike/"});
 
     public static final XYTileSource x4 = new XYTileSource("x4",
             3, 20, 256, ".png", new String[] {
@@ -46,20 +46,35 @@ public class Constants
             3, 20, 256, ".png", new String[] {
             "http://c.tiles.wmflabs.org/hillshading/"});
     public static final XYTileSource[] TILE_OVERLAIES = new XYTileSource[]{x1, x2, x3, x4, x5};
+    public static final String[] TILE_OVERLAIES_STRING = new String[]{"tile1", "tile2", "tile3", "tile4", "tile5"};
     public static final int MY_LOCATION_OVERLAY_NUMBER = 5;
+    public static final String MY_LOCATION_OVERLAY_STRING = "myLocationOverlay";
     public static final int SCALE_BAR_OVERLAY_NUMBER = 6;
+    public static final String SCALE_BAR_OVERLAY_STRING = "myScaleBar";
     public static final int MAP_EVENT_RECEIVER_OVERLAY_NUMBER = 7;
+    public static final String MAP_EVENT_RECEIVER_OVERLAY_STRING = "myEventReceiver";
     public static final int DRAW_POLYGON_OVERLAY_NUMBER = 8;
+    public static final String DRAW_POLYGON_OVERLAY_STRING = "drawPolygon";
     public static final int DRAW_POLYGON_MARKER_OVERLAY_NUMBER = 9;
+    public static final String DRAW_POLYGON_MARKER_OVERLAY_STRING = "drawPolygonMarker";
     public static final int DRAW_POLYLINE_OVERLAY_NUMBER = 10;
+    public static final String DRAW_POLYLINE_OVERLAY_STRING = "drawPolyline";
     public static final int DRAW_POLYLINE_MARKER_OVERLAY_NUMBER = 11;
+    public static final String DRAW_POLYLINE_MARKER_OVERLAY_STRING = "drawPolylineMarker";
     public static final int DRAW_CUSTOM_MARKER_OVERLAY_NUMBER = 12;
+    public static final String DRAW_CUSTOM_MARKER_OVERLAY_STRING = "drawCustomMarker";
     public static final int DRAW_USER_POLYGON_OVERLAY_NUMBER = 13;
+    public static final String DRAW_USER_POLYGON_OVERLAY_STRING = "drawUserPolygon";
     public static final int DRAW_USER_POLYLINE_OVERLAY_NUMBER = 14;
+    public static final String DRAW_USER_POLYLINE_OVERLAY_STRING = "drawUserPolyline";
     public static final int DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER = 15;
+    public static final String DRAW_USER_SEARCH_ITEM_OVERLAY_STRING = "drawUserSearch";
     public static final int ROAD_ITEM_OVERLAY_NUMBER = 16;
+    public static final String ROAD_ITEM_OVERLAY_STRING = "roadItem";
     public static final int SECTOR_ITEM_OVERLAY_NUMBER = 17;
+    public static final String SECTOR_ITEM_OVERLAY_STRING = "sectorItem";
     public static final int KML_OVERLAY_NUMBER = 18;
+    public static final String KML_OVERLAY_STRING = "kmlOverlay";
 
 
     //main activity start intent for result request code
@@ -95,6 +110,7 @@ public class Constants
     public static final int SHOW_SEARCH_MODE = 3;
     public static final int SHOW_MAPSETTING_MODE = 4;
     public static final int SHOW_MARKER_MODE = 5;
+    public static final int DIRECTION_MODE = 6;
 
 
     public static final float MAX_TRANSPARENCY = 1;

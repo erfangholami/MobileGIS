@@ -28,6 +28,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
+import android.support.constraint.solver.widgets.ConstraintWidget;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.content.FileProvider;
@@ -57,6 +58,8 @@ import com.kandaidea.mobilegis.Adapers.MapSettingTileAdapter;
 import com.kandaidea.mobilegis.Adapers.UserOverlayAdapter;
 import com.kandaidea.mobilegis.DataModel.CalculateOverlay;
 import com.kandaidea.mobilegis.DataModel.Constants;
+import com.kandaidea.mobilegis.DataModel.Models.Sector;
+import com.kandaidea.mobilegis.DataModel.Models.SectorModel;
 import com.kandaidea.mobilegis.DataModel.Models.UserOverlayItem;
 import com.kandaidea.mobilegis.DataModel.MovingDetails;
 import com.kandaidea.mobilegis.DataModel.ScreenShot;
@@ -68,6 +71,7 @@ import com.kandaidea.mobilegis.View.UserLocations;
 import com.kandaidea.mobilegis.ViewModel.MapsActivityViewModel;
 import com.kandaidea.mobilegis.databinding.ActivityMainBinding;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.BuildConfig;
@@ -113,6 +117,7 @@ public class MainActivity extends AppCompatActivity
 
     //Views
     private Toolbar mToolbar;
+    private Toolbar directionToolbar;
     private ImageButton navigationDrawer;
     private ImageButton mMapItem;
     private ImageButton mSearchItem;
@@ -130,6 +135,13 @@ public class MainActivity extends AppCompatActivity
     private ImageButton zoomIn;
     private ImageButton zoomOut;
     private TextView speed;
+
+    //direction toolbar view
+    private ImageButton directionBackArrow;
+    private ImageButton directionSwap;
+    private TextView directionSource;
+    private TextView directionDestination;
+
 
     //menu items
     private Menu drawerMenu;
@@ -180,6 +192,7 @@ public class MainActivity extends AppCompatActivity
         mapSettingPolylineRecycler = mapSetting.findViewById(R.id.polyline_recycler_view);
         mapSettingMarkerRecycler = mapSetting.findViewById(R.id.marker_recycler_view);
         mToolbar = findViewById(R.id.main_toolbar);
+        directionToolbar = findViewById(R.id.direction_toolbar);
         navigationDrawer = mToolbar.findViewById(R.id.navigation_drawer);
         mScreenShot = mToolbar.findViewById(R.id.screenshot_item);
         mNavigationView= findViewById(R.id.nav_view);
@@ -189,6 +202,12 @@ public class MainActivity extends AppCompatActivity
         //main tool bar items
         mMapItem = mToolbar.findViewById(R.id.map_item);
         mSearchItem = mToolbar.findViewById(R.id.search_item);
+
+        //direction toolbar items
+        directionBackArrow = findViewById(R.id.back_arrow_direction_bar);
+        directionSwap = findViewById(R.id.change_source_destination);
+        directionSource = findViewById(R.id.source_point_text_view);
+        directionDestination = findViewById(R.id.destination_point_text_view);
 
         //initial drawerMenu items
         drawerMenu = mNavigationView.getMenu();
@@ -223,8 +242,13 @@ public class MainActivity extends AppCompatActivity
             shareLocation(customMarker.getPosition()));
         pointDetailCardView.findViewById(R.id.make_direction_point).setOnClickListener((View view) ->
         {
-            mapsViewModel.getRoad(((MyLocationNewOverlay) mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER)).getMyLocation(),
-                    customMarker.getPosition());
+            mapMode = Constants.DIRECTION_MODE;
+            mToolbar.setVisibility(View.GONE);
+            directionToolbar.setVisibility(View.VISIBLE);
+            GeoPoint start = ((MyLocationNewOverlay) mapsViewModel.mLayerManager.getOverlay(Constants.MY_LOCATION_OVERLAY_STRING)).getMyLocation();
+            mapsViewModel.getRoad(start, customMarker.getPosition());
+            directionDestination.setText(customMarker.getPosition().getLatitude() + "," + customMarker.getPosition().getLongitude());
+            directionSource.setText(start.getLatitude() + "," + start.getLongitude());
             pointDetailCardView.setVisibility(View.GONE);
             customMarker.setVisible(false);
             mMapView.invalidate();
@@ -275,9 +299,33 @@ public class MainActivity extends AppCompatActivity
 
         //endregion
 
+        //region DirectionToolbarItems
+
+        directionBackArrow.setOnClickListener((View view) ->
+        {
+            mapsViewModel.mLayerManager.remmoveItem(Constants.ROAD_ITEM_OVERLAY_STRING);
+            mMapView.invalidate();
+            directionToolbar.setVisibility(View.GONE);
+            mapMode = Constants.NONE;
+            mToolbar.setVisibility(View.VISIBLE);
+        });
+        directionSwap.setOnClickListener((View view) ->
+        {
+            GeoPoint end = ((MyLocationNewOverlay) mapsViewModel.mLayerManager.getOverlay(Constants.MY_LOCATION_OVERLAY_STRING)).getMyLocation();
+            mapsViewModel.getRoad(customMarker.getPosition(), end);
+            directionSource.setText(customMarker.getPosition().getLatitude() + "," + customMarker.getPosition().getLongitude());
+            directionDestination.setText(end.getLatitude() + "," + end.getLongitude());
+            mMapView.invalidate();
+            showMainTools(true);
+        });
+
+        //endregion
+
         //region Drawer Items
         directionItem.setOnMenuItemClickListener((MenuItem menuItem) ->
         {
+            mToolbar.setVisibility(View.GONE);
+            directionToolbar.setVisibility(View.VISIBLE);
             return false;
         });
         sectorItem.setOnMenuItemClickListener((MenuItem menuItem) ->
@@ -373,8 +421,8 @@ public class MainActivity extends AppCompatActivity
         {
             drawerlayout.closeDrawer(findViewById(R.id.nav_view));
             Intent intent = new Intent(getApplicationContext(), SettingActivity.class);
-            intent.putExtra(Constants.MY_LOCATION_ENABLE_VALUE, mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER).isEnabled());
-            intent.putExtra(Constants.SCALE_BAR_ENABLE_VALUE, mMapView.getOverlays().get(Constants.SCALE_BAR_OVERLAY_NUMBER).isEnabled());
+            intent.putExtra(Constants.MY_LOCATION_ENABLE_VALUE, mapsViewModel.mLayerManager.getOverlay(Constants.MY_LOCATION_OVERLAY_STRING).isEnabled());
+            intent.putExtra(Constants.SCALE_BAR_ENABLE_VALUE, mapsViewModel.mLayerManager.getOverlay(Constants.SCALE_BAR_OVERLAY_STRING).isEnabled());
             intent.putExtra(Constants.FOLLOW_LOCATION_ENABLE_VALUE, mapsViewModel.isRecordEnable());
             intent.putExtra(Constants.SPEED_ENABLE_VALUE, mapsViewModel.isSpeedEnable());
             startActivityForResult(intent, Constants.SETTING_ACTIVITY_REQUEST_CODE);
@@ -452,16 +500,18 @@ public class MainActivity extends AppCompatActivity
         myLocationNewOverlay.setPersonHotspot(myLocationLogo.getWidth() / 2, myLocationLogo.getHeight() / 2);
         myLocationNewOverlay.setDirectionArrow(myLocationLogo, myLocationLogo);
         myLocationNewOverlay.setDrawAccuracyEnabled(true);
-        mMapView.getOverlayManager().add(Constants.MY_LOCATION_OVERLAY_NUMBER, myLocationNewOverlay);
-        mMapView.invalidate();
+        //mMapView.getOverlayManager().add(Constants.MY_LOCATION_OVERLAY_NUMBER, myLocationNewOverlay);
+        //mMapView.invalidate();
+        mapsViewModel.mLayerManager.addItem(myLocationNewOverlay, Constants.MY_LOCATION_OVERLAY_STRING);
 
         //add scale bar
         final DisplayMetrics dm = getResources().getDisplayMetrics();
         mScaleBarOverlay = new ScaleBarOverlay(mMapView);
         mScaleBarOverlay.setCentred(true);
         mScaleBarOverlay.setScaleBarOffset(300, dm.heightPixels - 150);
-        mMapView.getOverlays().add(Constants.SCALE_BAR_OVERLAY_NUMBER, mScaleBarOverlay);
-        mMapView.invalidate();
+        //mMapView.getOverlays().add(Constants.SCALE_BAR_OVERLAY_NUMBER, mScaleBarOverlay);
+        //mMapView.invalidate();
+        mapsViewModel.mLayerManager.addItem(mScaleBarOverlay, Constants.SCALE_BAR_OVERLAY_STRING);
 
         //endregion
 
@@ -474,7 +524,6 @@ public class MainActivity extends AppCompatActivity
         mMapView.setLongClickable(true);
         MapEventsReceiver eventsReceiver = new MapEventsReceiver()
         {
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p)
             {
@@ -510,7 +559,6 @@ public class MainActivity extends AppCompatActivity
                 return false;
             }
 
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public boolean longPressHelper(GeoPoint p)
             {
@@ -527,10 +575,13 @@ public class MainActivity extends AppCompatActivity
                 {
                     if(mapDrawPolygon.getPoints().size() == 0)
                     {
+                        Log.d(TAG, "drawForPolygonBefore");
                         areaPolygonMarkers.clear();
                         mMapView.invalidate();
-                        polygonDraw = new Draw(getApplicationContext(), mMapView, mapDrawPolygon, mapDrawPolyline, areaPolygonMarkers, areaPolylineMarkers, Constants.DRAW_POLYGON_MODE, mapDrawPolygonListener, mapDrawPolylineListener, drawInformation);
+                        polygonDraw = new Draw(mapsViewModel.mLayerManager, getApplicationContext(), mMapView, mapDrawPolygon, mapDrawPolyline, areaPolygonMarkers, areaPolylineMarkers, Constants.DRAW_POLYGON_MODE, mapDrawPolygonListener, mapDrawPolylineListener, drawInformation);
                         polygonDraw.drawForPolygon(p);
+
+                        Log.d(TAG, "drawForPolygon");
                     }
                 }
                 if(mapMode == Constants.DRAW_POLYLINE_MODE)
@@ -539,7 +590,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         areaPolylineMarkers.clear();
                         mMapView.invalidate();
-                        polylineDraw = new Draw(getApplicationContext(), mMapView, mapDrawPolygon, mapDrawPolyline, areaPolygonMarkers, areaPolylineMarkers, Constants.DRAW_POLYLINE_MODE, mapDrawPolygonListener, mapDrawPolylineListener, drawInformation);
+                        polylineDraw = new Draw(mapsViewModel.mLayerManager, getApplicationContext(), mMapView, mapDrawPolygon, mapDrawPolyline, areaPolygonMarkers, areaPolylineMarkers, Constants.DRAW_POLYLINE_MODE, mapDrawPolygonListener, mapDrawPolylineListener, drawInformation);
                         polylineDraw.drawForPolyline(p);
                     }
                 }
@@ -547,227 +598,226 @@ public class MainActivity extends AppCompatActivity
             }
         };
         MapEventsOverlay OverlayEvents = new MapEventsOverlay(this, eventsReceiver);
-        mMapView.getOverlays().add(Constants.MAP_EVENT_RECEIVER_OVERLAY_NUMBER, OverlayEvents);
-        Marker x = new Marker(mMapView);
-        x.setIcon(null);
-        x.setImage(null);
-        x.setVisible(false);
-        areaPolygonMarkers.add(x);
-        areaPolylineMarkers.add(x);
-        x.setIcon(getResources().getDrawable(R.mipmap.ic_custom_marker));
-        x.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        x.setInfoWindow(null);
-        customMarker = x;
-        mapDrawPolygonListener = new Polygon.OnClickListener()
+        //mMapView.getOverlays().add(Constants.MAP_EVENT_RECEIVER_OVERLAY_NUMBER, OverlayEvents);
+        mapsViewModel.mLayerManager.addItem(OverlayEvents, Constants.MAP_EVENT_RECEIVER_OVERLAY_STRING);
+        Marker x1 = new Marker(mMapView);
+        x1.setIcon(null);
+        x1.setImage(null);
+        x1.setVisible(false);
+        Marker x2= new Marker(mMapView);
+        x2.setIcon(null);
+        x2.setImage(null);
+        x2.setVisible(false);
+        Marker x3 = new Marker(mMapView);
+        x3.setIcon(null);
+        x3.setImage(null);
+        x3.setVisible(false);
+        Marker x4 = new Marker(mMapView);
+        x4.setIcon(null);
+        x4.setImage(null);
+        x4.setVisible(false);
+        areaPolygonMarkers.add(x3);
+        areaPolylineMarkers.add(x2);
+        x1.setIcon(getResources().getDrawable(R.mipmap.ic_custom_marker));
+        x1.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        x1.setInfoWindow(null);
+        customMarker = x1;
+        mapDrawPolygonListener = (final Polygon polygon, MapView mapView, GeoPoint eventPos) ->
         {
-            @Override
-            public boolean onClick(final Polygon polygon, MapView mapView, GeoPoint eventPos)
+
+            final Dialog dialog = new Dialog(MainActivity.this);
+            dialog.setContentView(R.layout.save_overlay_layout);
+            dialog.setCancelable(false);
+            ((SeekBar)dialog.findViewById(R.id.stroke_size_seek)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
             {
-                final Dialog dialog = new Dialog(MainActivity.this);
-                dialog.setContentView(R.layout.save_overlay_layout);
-                dialog.setCancelable(false);
-                ((SeekBar)dialog.findViewById(R.id.stroke_size_seek)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int i, boolean b)
                 {
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int i, boolean b)
-                    {
-                        polygon.setStrokeWidth(seekBar.getProgress() / 10);
-                    }
+                    polygon.setStrokeWidth(seekBar.getProgress() / 10);
+                }
 
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar)
-                    {
-
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar)
-                    {
-
-                    }
-                });
-                Log.d(TAG, "polygon width is : " + polygon.getStrokeWidth());
-                dialog.findViewById(R.id.selected_color_fill).setOnClickListener(new View.OnClickListener()
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar)
                 {
-                    @Override
-                    public void onClick(View view)
-                    {
-                        new ChromaDialog.Builder()
-                                .initialColor(Color.GREEN)
-                                .colorMode(ColorMode.ARGB) // There's also ARGB and HSV
-                                .onColorSelected(new ColorSelectListener()
-                                {
-                                    @Override
-                                    public void onColorSelected(int i)
-                                    {
-                                        polygon.setFillColor(i);
-                                        dialog.findViewById(R.id.selected_color_fill).setBackgroundColor(i);
-                                    }
-                                })
-                                .create()
-                                .show(getSupportFragmentManager(), "ChromaDialog");
-                    }
-                });
-                dialog.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View view)
-                    {
-                        dialog.dismiss();
-                    }
-                });
-                dialog.findViewById(R.id.clear_overlay).setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View view)
-                    {
-                        mapDrawPolygon.getPoints().clear();
-                        Toast.makeText(getApplicationContext(), "Polygon cleared ", Toast.LENGTH_SHORT).show();
-                        mapMode = Constants.NONE;
-                        drawInformation.setVisibility(View.GONE);
-                        polygonDraw.deleteForPolygon();
-                        mMapView.invalidate();
-                        dialog.dismiss();
-                    }
-                });
-                dialog.findViewById(R.id.save_overlay).setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View view)
-                    {
 
-                        mapsViewModel.saveUserOverlay(polygon, ((TextInputEditText)dialog.findViewById(R.id.enter_description)).getText().toString());
-                        mapDrawPolygon.getPoints().clear();
-                        Toast.makeText(getApplicationContext(), "Polygon saved !", Toast.LENGTH_SHORT).show();
-                        mapMode = Constants.NONE;
-                        drawInformation.setVisibility(View.GONE);
-                        polygonDraw.deleteForPolygon();
-                        mMapView.invalidate();
-                        dialog.dismiss();
-                    }
-                });
-                dialog.show();
-                return true;
-            }
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar)
+                {
+
+                }
+            });
+            Log.d(TAG, "polygon width is : " + polygon.getStrokeWidth());
+            dialog.findViewById(R.id.selected_color_fill).setOnClickListener((View view) ->
+            {
+                new ChromaDialog.Builder()
+                        .initialColor(Color.GREEN)
+                        .colorMode(ColorMode.ARGB) // There's also ARGB and HSV
+                        .onColorSelected((int i) ->
+                        {
+                            polygon.setFillColor(i);
+                            dialog.findViewById(R.id.selected_color_fill).setBackgroundColor(i);
+                        })
+                        .create()
+                        .show(getSupportFragmentManager(), "ChromaDialog");
+            });
+            dialog.findViewById(R.id.cancel).setOnClickListener((View view) ->
+            {
+                dialog.dismiss();
+            });
+            dialog.findViewById(R.id.clear_overlay).setOnClickListener((View view) ->
+            {
+                mapDrawPolygon.getPoints().clear();
+                Toast.makeText(getApplicationContext(), "Polygon cleared ", Toast.LENGTH_SHORT).show();
+                mapMode = Constants.NONE;
+                drawInformation.setVisibility(View.GONE);
+                polygonDraw.deleteForPolygon();
+                mMapView.invalidate();
+                dialog.dismiss();
+            });
+            dialog.findViewById(R.id.save_overlay).setOnClickListener((View view) ->
+            {
+                if(mapsViewModel.saveUserOverlay(polygon, ((TextInputEditText)dialog.findViewById(R.id.layer_name)).getText().toString(), ((TextInputEditText)dialog.findViewById(R.id.enter_description)).getText().toString()))
+                {
+                    mapDrawPolygon.getPoints().clear();
+                    Toast.makeText(getApplicationContext(), "Polygon saved !", Toast.LENGTH_SHORT).show();
+                    mapMode = Constants.NONE;
+                    drawInformation.setVisibility(View.GONE);
+                    polygonDraw.deleteForPolygon();
+                    mMapView.invalidate();
+                    dialog.dismiss();
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(), R.string.repetetive_name, Toast.LENGTH_SHORT).show();
+                }
+            });
+            dialog.show();
+            return true;
+
         };
         mapDrawPolygon.setOnClickListener(mapDrawPolygonListener);
-        mapDrawPolylineListener = new Polyline.OnClickListener()
+        mapDrawPolylineListener = (final Polyline polyline, MapView mapView, GeoPoint eventPos) ->
         {
-            @Override
-            public boolean onClick(final Polyline polyline, MapView mapView, GeoPoint eventPos)
+            final Dialog dialog = new Dialog(MainActivity.this);
+            dialog.setContentView(R.layout.save_overlay_layout);
+            dialog.setCancelable(false);
+            ((SeekBar)dialog.findViewById(R.id.stroke_size_seek)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
             {
-                final Dialog dialog = new Dialog(MainActivity.this);
-                dialog.setContentView(R.layout.save_overlay_layout);
-                dialog.setCancelable(false);
-                ((SeekBar)dialog.findViewById(R.id.stroke_size_seek)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int i, boolean b)
                 {
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int i, boolean b)
-                    {
-                        polyline.setWidth(seekBar.getProgress());
-                    }
+                    polyline.setWidth(seekBar.getProgress());
+                }
 
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar)
-                    {
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar)
+                {
 
-                    }
+                }
 
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar)
-                    {
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar)
+                {
 
-                    }
-                });
-                dialog.findViewById(R.id.selected_color_fill).setOnClickListener(new View.OnClickListener()
+                }
+            });
+            dialog.findViewById(R.id.selected_color_fill).setOnClickListener((View view) ->
+            {
+                new ChromaDialog.Builder()
+                        .initialColor(Color.GREEN)
+                        .colorMode(ColorMode.ARGB) // There's also ARGB and HSV
+                        .onColorSelected((int i) ->
+                        {
+                            polyline.setColor(i);
+                            dialog.findViewById(R.id.selected_color_fill).setBackgroundColor(i);
+                        })
+                        .create()
+                        .show(getSupportFragmentManager(), "ChromaDialog");
+            });
+            dialog.findViewById(R.id.cancel).setOnClickListener((View view) ->
+            {
+                dialog.dismiss();
+            });
+            dialog.findViewById(R.id.clear_overlay).setOnClickListener((View view) ->
+            {
+                Toast.makeText(getApplicationContext(), "Polyline cleared !", Toast.LENGTH_SHORT).show();
+                mapMode = Constants.NONE;
+                drawInformation.setVisibility(View.GONE);
+                polylineDraw.deleteForPolyline();
+                mMapView.invalidate();
+                dialog.dismiss();
+            });
+            dialog.findViewById(R.id.save_overlay).setOnClickListener((View view) ->
+            {
+                if(mapsViewModel.saveUserOverlay(polyline, ((TextInputEditText)dialog.findViewById(R.id.layer_name)).getText().toString(), ((TextInputEditText)dialog.findViewById(R.id.enter_description)).getText().toString()))
                 {
-                    @Override
-                    public void onClick(View view)
-                    {
-                        new ChromaDialog.Builder()
-                                .initialColor(Color.GREEN)
-                                .colorMode(ColorMode.ARGB) // There's also ARGB and HSV
-                                .onColorSelected(new ColorSelectListener()
-                                {
-                                    @Override
-                                    public void onColorSelected(int i)
-                                    {
-                                        polyline.setColor(i);
-                                        dialog.findViewById(R.id.selected_color_fill).setBackgroundColor(i);
-                                    }
-                                })
-                                .create()
-                                .show(getSupportFragmentManager(), "ChromaDialog");
-                    }
-                });
-                dialog.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener()
+                    Toast.makeText(getApplicationContext(), "Polyline saved !", Toast.LENGTH_SHORT).show();
+                    mapMode = Constants.NONE;
+                    drawInformation.setVisibility(View.GONE);
+                    polylineDraw.deleteForPolyline();
+                    mMapView.invalidate();
+                    dialog.dismiss();
+                }
+                else
                 {
-                    @Override
-                    public void onClick(View view)
-                    {
-                        dialog.dismiss();
-                    }
-                });
-                dialog.findViewById(R.id.clear_overlay).setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View view)
-                    {
-                        Toast.makeText(getApplicationContext(), "Polyline cleared !", Toast.LENGTH_SHORT).show();
-                        mapMode = Constants.NONE;
-                        drawInformation.setVisibility(View.GONE);
-                        polylineDraw.deleteForPolyline();
-                        mMapView.invalidate();
-                        dialog.dismiss();
-                    }
-                });
-                dialog.findViewById(R.id.save_overlay).setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View view)
-                    {
-                        mapsViewModel.saveUserOverlay(polyline, ((TextInputEditText)dialog.findViewById(R.id.enter_description)).getText().toString());
-                        Toast.makeText(getApplicationContext(), "Polyline saved !", Toast.LENGTH_SHORT).show();
-                        mapMode = Constants.NONE;
-                        drawInformation.setVisibility(View.GONE);
-                        polylineDraw.deleteForPolyline();
-                        mMapView.invalidate();
-                        dialog.dismiss();
-                    }
-                });
-                dialog.show();
-                return true;
-            }
+                    Toast.makeText(getApplicationContext(), R.string.repetetive_name, Toast.LENGTH_SHORT).show();
+                }
+
+            });
+            dialog.show();
+            return true;
         };
         mapDrawPolyline.setOnClickListener(mapDrawPolylineListener);
-        mMapView.getOverlays().add(Constants.DRAW_POLYGON_OVERLAY_NUMBER, mapDrawPolygon);
+
+        //should replace with layerManager
+        /*mMapView.getOverlays().add(Constants.DRAW_POLYGON_OVERLAY_NUMBER, mapDrawPolygon);
         mMapView.getOverlays().addAll(Constants.DRAW_POLYGON_MARKER_OVERLAY_NUMBER, areaPolygonMarkers);
         mMapView.getOverlays().add(Constants.DRAW_POLYLINE_OVERLAY_NUMBER, mapDrawPolyline);
         mMapView.getOverlays().addAll(Constants.DRAW_POLYLINE_MARKER_OVERLAY_NUMBER, areaPolylineMarkers);
         mMapView.getOverlays().add(Constants.DRAW_CUSTOM_MARKER_OVERLAY_NUMBER, customMarker);
         areaPolylineMarkers.clear();
         areaPolygonMarkers.clear();
+        mMapView.invalidate();*/
+        mapsViewModel.mLayerManager.addItem(mapDrawPolygon, Constants.DRAW_POLYGON_OVERLAY_STRING);
+        mapsViewModel.mLayerManager.addAll(areaPolygonMarkers, Constants.DRAW_POLYGON_MARKER_OVERLAY_STRING);
+        mapsViewModel.mLayerManager.addItem(mapDrawPolyline, Constants.DRAW_POLYLINE_OVERLAY_STRING);
+        mapsViewModel.mLayerManager.addAll(areaPolylineMarkers, Constants.DRAW_POLYLINE_MARKER_OVERLAY_STRING);
+        mapsViewModel.mLayerManager.addItem(customMarker, Constants.DRAW_CUSTOM_MARKER_OVERLAY_STRING);
+        areaPolylineMarkers.clear();
+        areaPolygonMarkers.clear();
 
-        mMapView.invalidate();
 
         //add userOverlays to map
         List<Polygon> items = new ArrayList<>();
         List<Polyline> itemss = new ArrayList<>();
         Polygon xx = new Polygon();
+        Polygon mm = new Polygon();
         Polyline xxx = new Polyline();
         items.add(xx);
         itemss.add(xxx);
-        searchOverlays.add(xx);
-        mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYGON_OVERLAY_NUMBER, items);
+        searchOverlays.add(mm);
+        /*mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYGON_OVERLAY_NUMBER, items);
         mMapView.getOverlays().addAll(Constants.DRAW_USER_POLYLINE_OVERLAY_NUMBER, itemss);
         mMapView.getOverlays().addAll(Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER, searchOverlays);
         mMapView.getOverlays().add(Constants.ROAD_ITEM_OVERLAY_NUMBER, customMarker);
-        mMapView.getOverlays().addAll(Constants.SECTOR_ITEM_OVERLAY_NUMBER, items);
+        mMapView.getOverlays().addAll(Constants.SECTOR_ITEM_OVERLAY_NUMBER, items);*/
+        mapsViewModel.mLayerManager.addAll(items, Constants.DRAW_USER_POLYGON_OVERLAY_STRING);
+        mapsViewModel.mLayerManager.addAll(itemss, Constants.DRAW_USER_POLYLINE_OVERLAY_STRING);
+        mapsViewModel.mLayerManager.addAll(searchOverlays, Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_STRING);
+        mapsViewModel.mLayerManager.addItem(x4, Constants.ROAD_ITEM_OVERLAY_STRING);
+        items.clear();
+        Polygon kk = new Polygon();
+        items.add(kk);
+        mapsViewModel.mLayerManager.addAll(items, Constants.SECTOR_ITEM_OVERLAY_STRING);
 
         FolderOverlay kmlOverlay = new FolderOverlay();
-        mMapView.getOverlays().add(Constants.KML_OVERLAY_NUMBER, kmlOverlay);
+        //mMapView.getOverlays().add(Constants.KML_OVERLAY_NUMBER, kmlOverlay);
+        mapsViewModel.mLayerManager.addItem(kmlOverlay, Constants.KML_OVERLAY_STRING);
         //TODO add marker list draw to the map
         mMapView.invalidate();
+        Log.v(TAG, "MapOverlayListSize is : " + mMapView.getOverlays().size());
     }
 
 
@@ -779,6 +829,8 @@ public class MainActivity extends AppCompatActivity
         pointDetailCardView.setVisibility(View.VISIBLE);
         TextView location = pointDetailCardView.findViewById(R.id.location_details);
         location.setText(String.valueOf(p.getLatitude() + "," + String.valueOf(p.getLongitude())));
+        TextView address = pointDetailCardView.findViewById(R.id.address_details);
+        //address.setText(mapsViewModel.getAddress(p.getLatitude(), p.getLongitude()).getAddress());
         mMapView.getController().animateTo(customMarker.getPosition());
         mMapView.invalidate();
     }
@@ -818,7 +870,8 @@ public class MainActivity extends AppCompatActivity
             tilesOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
             tilesOverlay.setColorFilter(new ColorFilter().getColorFilter());
             tilesOverlay.setEnabled(false);
-            mMapView.getOverlays().add(Constants.TILE_OVERLAIES_NUMBER[i], tilesOverlay);
+            mapsViewModel.mLayerManager.addItem(tilesOverlay, Constants.TILE_OVERLAIES_STRING[i]);
+            //mMapView.getOverlays().add(Constants.TILE_OVERLAIES_NUMBER[i], tilesOverlay);
         }
     }
     //endregion
@@ -833,17 +886,17 @@ public class MainActivity extends AppCompatActivity
 
         mapSettingPolygonRecycler.setHasFixedSize(true);
         mapSettingPolygonRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mapSettingPolygonRecycler.setAdapter(new UserOverlayAdapter(mMapView, mapsViewModel.getUserOverlays(Constants.POLYGON_TYPE)));
+        mapSettingPolygonRecycler.setAdapter(new UserOverlayAdapter(mapsViewModel, mMapView, mapsViewModel.getUserOverlays(Constants.POLYGON_TYPE)));
         mapSettingPolygonRecycler.getAdapter().notifyDataSetChanged();
 
         mapSettingPolylineRecycler.setHasFixedSize(true);
         mapSettingPolylineRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mapSettingPolylineRecycler.setAdapter(new UserOverlayAdapter(mMapView, mapsViewModel.getUserOverlays(Constants.POLYLINE_TYPE)));
+        mapSettingPolylineRecycler.setAdapter(new UserOverlayAdapter(mapsViewModel, mMapView, mapsViewModel.getUserOverlays(Constants.POLYLINE_TYPE)));
         mapSettingPolylineRecycler.getAdapter().notifyDataSetChanged();
 
         mapSettingMarkerRecycler.setHasFixedSize(true);
         mapSettingMarkerRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mapSettingMarkerRecycler.setAdapter(new UserOverlayAdapter(mMapView, mapsViewModel.getUserOverlays(Constants.MARKER_TYPE)));
+        mapSettingMarkerRecycler.setAdapter(new UserOverlayAdapter(mapsViewModel, mMapView, mapsViewModel.getUserOverlays(Constants.MARKER_TYPE)));
         mapSettingMarkerRecycler.getAdapter().notifyDataSetChanged();
     }
     //endregion
@@ -889,8 +942,10 @@ public class MainActivity extends AppCompatActivity
                     x.setPosition(new GeoPoint(15d, 15d));
                     searchOverlays.add(x);
                     mapMode = Constants.SHOW_SEARCH_MODE;
-                    mMapView.getOverlays().remove(Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER);
-                    mMapView.getOverlays().addAll(Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER, searchOverlays);
+                    //mMapView.getOverlays().remove(Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER);
+                    //mMapView.getOverlays().addAll(Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER, searchOverlays);
+                    mapsViewModel.mLayerManager.remmoveItem(Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_STRING);
+                    mapsViewModel.mLayerManager.addAll(searchOverlays, Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_STRING);
                     mMapView.getController().animateTo(x.getPosition(), Constants.ANIMATE_ZOOM_LEVEL, Constants.ANIMATE_SPEED);
                     mMapView.invalidate();
 
@@ -902,8 +957,10 @@ public class MainActivity extends AppCompatActivity
                 if(resultCode == RESULT_OK)
                 {
                     Bundle bundle = data.getExtras();
-                    mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER).setEnabled(bundle.getBoolean(Constants.MY_LOCATION_ENABLE_VALUE));
-                    mMapView.getOverlays().get(Constants.SCALE_BAR_OVERLAY_NUMBER).setEnabled(bundle.getBoolean(Constants.SCALE_BAR_ENABLE_VALUE));
+                    //mMapView.getOverlays().get(Constants.MY_LOCATION_OVERLAY_NUMBER).setEnabled(bundle.getBoolean(Constants.MY_LOCATION_ENABLE_VALUE));
+                    //mMapView.getOverlays().get(Constants.SCALE_BAR_OVERLAY_NUMBER).setEnabled(bundle.getBoolean(Constants.SCALE_BAR_ENABLE_VALUE));
+                    mapsViewModel.mLayerManager.getOverlay(Constants.MY_LOCATION_OVERLAY_STRING).setEnabled(bundle.getBoolean(Constants.MY_LOCATION_ENABLE_VALUE));
+                    mapsViewModel.mLayerManager.getOverlay(Constants.SCALE_BAR_OVERLAY_STRING).setEnabled(bundle.getBoolean(Constants.SCALE_BAR_ENABLE_VALUE));
                     mapsViewModel.setRecordEnable(bundle.getBoolean(Constants.FOLLOW_LOCATION_ENABLE_VALUE));
                     mapsViewModel.setSpeedEnable(bundle.getBoolean(Constants.SPEED_ENABLE_VALUE));
                     if(bundle.getBoolean(Constants.SPEED_ENABLE_VALUE))
@@ -944,7 +1001,8 @@ public class MainActivity extends AppCompatActivity
     {
         if(mapMode == Constants.SHOW_SEARCH_MODE)
         {
-            mMapView.getOverlays().get(Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER).setEnabled(false);
+            //mMapView.getOverlays().get(Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER).setEnabled(false);
+            mapsViewModel.mLayerManager.getOverlay(Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_STRING);
             mMapView.invalidate();
             mapMode = Constants.NONE;
         }
@@ -1002,8 +1060,10 @@ public class MainActivity extends AppCompatActivity
             KmlDocument kmlDocument = new KmlDocument();
             kmlDocument.parseKMLUrl("http://mapsengine.google.com/map/kml?forcekml=1&mid=z6IJfj90QEd4.kUUY9FoHFRdE");
             FolderOverlay kmlOverlay = (FolderOverlay)kmlDocument.mKmlRoot.buildOverlay(mMapView, null, null, kmlDocument);
-            mMapView.getOverlays().remove(Constants.KML_OVERLAY_NUMBER);
-            mMapView.getOverlays().add(Constants.KML_OVERLAY_NUMBER, kmlOverlay);
+            //mMapView.getOverlays().remove(Constants.KML_OVERLAY_NUMBER);
+            //mMapView.getOverlays().add(Constants.KML_OVERLAY_NUMBER, kmlOverlay);
+            mapsViewModel.mLayerManager.remmoveItem(Constants.KML_OVERLAY_STRING);
+            mapsViewModel.mLayerManager.addItem(kmlOverlay, Constants.KML_OVERLAY_STRING);
             return null;
         }
 
