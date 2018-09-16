@@ -8,6 +8,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -64,13 +65,16 @@ import com.kandaidea.mobilegis.DataModel.Models.UserOverlayItem;
 import com.kandaidea.mobilegis.DataModel.MovingDetails;
 import com.kandaidea.mobilegis.DataModel.ScreenShot;
 import com.kandaidea.mobilegis.View.ColorFilter;
+import com.kandaidea.mobilegis.View.ContactUsActivity;
 import com.kandaidea.mobilegis.View.Draw;
+import com.kandaidea.mobilegis.View.FeedbackActivity;
 import com.kandaidea.mobilegis.View.SearchActivity;
 import com.kandaidea.mobilegis.View.SettingActivity;
 import com.kandaidea.mobilegis.View.UserLocations;
 import com.kandaidea.mobilegis.ViewModel.MapsActivityViewModel;
 import com.kandaidea.mobilegis.databinding.ActivityMainBinding;
 
+import org.acra.annotation.AcraCore;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
@@ -104,7 +108,6 @@ import java.util.List;
 import me.priyesh.chroma.ChromaDialog;
 import me.priyesh.chroma.ColorMode;
 import me.priyesh.chroma.ColorSelectListener;
-
 
 public class MainActivity extends AppCompatActivity
 {
@@ -142,7 +145,6 @@ public class MainActivity extends AppCompatActivity
     private TextView directionSource;
     private TextView directionDestination;
 
-
     //menu items
     private Menu drawerMenu;
     private MenuItem directionItem;
@@ -153,6 +155,8 @@ public class MainActivity extends AppCompatActivity
     private MenuItem userLocationsItem;
     private MenuItem kmlItem;
     private MenuItem settingsItem;
+    private MenuItem feedbackItem;
+    private MenuItem contactUsItem;
     private MenuItem exitItem;
 
 
@@ -172,6 +176,8 @@ public class MainActivity extends AppCompatActivity
 
     private Polygon.OnClickListener mapDrawPolygonListener;
     private Polyline.OnClickListener mapDrawPolylineListener;
+
+    private GeoPoint source, destination;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -219,6 +225,8 @@ public class MainActivity extends AppCompatActivity
         userLocationsItem = drawerMenu.getItem(Constants.USER_LOCATIONS_ITEM_NUMBER);
         kmlItem = drawerMenu.getItem(Constants.OPEN_KML_ITEM_NUMBER);
         settingsItem = drawerMenu.getItem(Constants.SETTING_ITEM_NUMBER);
+        feedbackItem = drawerMenu.getItem(Constants.FEEDBACK_ITEM_NUMBER);
+        contactUsItem = drawerMenu.getItem(Constants.CONTACT_US_ITEM_NUMBER);
         exitItem = drawerMenu.getItem(Constants.EXIT_ITEM_NUMBER);
 
 
@@ -311,12 +319,25 @@ public class MainActivity extends AppCompatActivity
         });
         directionSwap.setOnClickListener((View view) ->
         {
-            GeoPoint end = ((MyLocationNewOverlay) mapsViewModel.mLayerManager.getOverlay(Constants.MY_LOCATION_OVERLAY_STRING)).getMyLocation();
-            mapsViewModel.getRoad(customMarker.getPosition(), end);
-            directionSource.setText(customMarker.getPosition().getLatitude() + "," + customMarker.getPosition().getLongitude());
-            directionDestination.setText(end.getLatitude() + "," + end.getLongitude());
+            GeoPoint temp = source;
+            source = destination;
+            destination = temp;
+            mapsViewModel.getRoad(source, destination);
+            directionSource.setText(source.getLatitude() + "," + source.getLongitude());
+            directionDestination.setText(destination.getLatitude() + "," + destination.getLongitude());
             mMapView.invalidate();
             showMainTools(true);
+        });
+        directionSource.setOnClickListener((View view) ->
+        {
+            directionToolbar.setVisibility(View.GONE);
+            mapMode = Constants.GET_SOURCE_MODE;
+
+        });
+        directionDestination.setOnClickListener((View view) ->
+        {
+            directionToolbar.setVisibility(View.GONE);
+            mapMode = Constants.GET_DESTINATION_MODE;
         });
 
         //endregion
@@ -326,11 +347,13 @@ public class MainActivity extends AppCompatActivity
         {
             mToolbar.setVisibility(View.GONE);
             directionToolbar.setVisibility(View.VISIBLE);
+            drawerlayout.closeDrawers();
             return false;
         });
         sectorItem.setOnMenuItemClickListener((MenuItem menuItem) ->
         {
             mapsViewModel.getSectors();
+            drawerlayout.closeDrawers();
             return false;
         });
         drawItem.setOnMenuItemClickListener((MenuItem menuItem) ->
@@ -415,6 +438,7 @@ public class MainActivity extends AppCompatActivity
         kmlItem.setOnMenuItemClickListener((MenuItem menuItem) ->
         {
             new GetKml().execute();
+            drawerlayout.closeDrawer(navigationDrawer);
             return false;
         });
         settingsItem.setOnMenuItemClickListener((MenuItem menuItem) ->
@@ -426,6 +450,20 @@ public class MainActivity extends AppCompatActivity
             intent.putExtra(Constants.FOLLOW_LOCATION_ENABLE_VALUE, mapsViewModel.isRecordEnable());
             intent.putExtra(Constants.SPEED_ENABLE_VALUE, mapsViewModel.isSpeedEnable());
             startActivityForResult(intent, Constants.SETTING_ACTIVITY_REQUEST_CODE);
+            return false;
+        });
+        feedbackItem.setOnMenuItemClickListener((MenuItem menuItem) ->
+        {
+            drawerlayout.closeDrawers();
+            Intent intent = new Intent(getApplicationContext(), FeedbackActivity.class);
+            startActivity(intent);
+            return false;
+        });
+        contactUsItem.setOnMenuItemClickListener((MenuItem menuItem) ->
+        {
+            drawerlayout.closeDrawers();
+            Intent intent = new Intent(getApplicationContext(), ContactUsActivity.class);
+            startActivity(intent);
             return false;
         });
         exitItem.setOnMenuItemClickListener((MenuItem item) ->
@@ -592,6 +630,30 @@ public class MainActivity extends AppCompatActivity
                         mMapView.invalidate();
                         polylineDraw = new Draw(mapsViewModel.mLayerManager, getApplicationContext(), mMapView, mapDrawPolygon, mapDrawPolyline, areaPolygonMarkers, areaPolylineMarkers, Constants.DRAW_POLYLINE_MODE, mapDrawPolygonListener, mapDrawPolylineListener, drawInformation);
                         polylineDraw.drawForPolyline(p);
+                    }
+                }
+                if(mapMode == Constants.GET_SOURCE_MODE || mapMode == Constants.GET_DESTINATION_MODE)
+                {
+                    if (mapMode == Constants.GET_DESTINATION_MODE)
+                    {
+                        destination = p;
+                        directionDestination.setText(destination.getLatitude() + "," + destination.getLongitude());
+                    }
+                    if (mapMode == Constants.GET_SOURCE_MODE)
+                    {
+                        source = p;
+                        directionSource.setText(source.getLatitude() + "," + source.getLongitude());
+                    }
+                    mapMode = Constants.DIRECTION_MODE;
+                    mToolbar.setVisibility(View.GONE);
+                    directionToolbar.setVisibility(View.VISIBLE);
+                    if(source != null && destination != null)
+                    {
+                        mapsViewModel.getRoad(source, destination);
+                        pointDetailCardView.setVisibility(View.GONE);
+                        customMarker.setVisible(false);
+                        mMapView.invalidate();
+                        showMainTools(true);
                     }
                 }
                 return false;

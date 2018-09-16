@@ -53,6 +53,18 @@
             android:title="@string/setting_item" />
     </group>
     <group android:checkableBehavior="single"
+        android:id="@+id/send_feedback">
+        <item
+            android:icon="@mipmap/ic_feedback"
+            android:title="@string/feedback" />
+    </group>
+    <group android:checkableBehavior="single"
+        android:id="@+id/contact_us">
+        <item
+            android:icon="@mipmap/ic_contact"
+            android:title="@string/contact_us" />
+    </group>
+    <group android:checkableBehavior="single"
         android:id="@+id/exit">
         <item
             android:icon="@mipmap/ic_exit"

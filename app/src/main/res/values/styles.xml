@@ -27,4 +27,8 @@
     <style name="myDialog" parent="Theme.AppCompat.Dialog">
         <item name="android:windowNoTitle">true</item>
     </style>
+
+    <style name="report_dialog_style" parent="Theme.AppCompat.Dialog.Alert">
+
+    </style>
 </resources>

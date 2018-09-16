@@ -91,7 +91,9 @@ public class Constants
 
 
     //navigation item numbers
-    public static final int EXIT_ITEM_NUMBER = 8;
+    public static final int EXIT_ITEM_NUMBER = 10;
+    public static final int CONTACT_US_ITEM_NUMBER = 9;
+    public static final int FEEDBACK_ITEM_NUMBER = 8;
     public static final int SETTING_ITEM_NUMBER = 7;
     public static final int OPEN_KML_ITEM_NUMBER = 6;
     public static final int USER_LOCATIONS_ITEM_NUMBER = 5;
@@ -111,6 +113,8 @@ public class Constants
     public static final int SHOW_MAPSETTING_MODE = 4;
     public static final int SHOW_MARKER_MODE = 5;
     public static final int DIRECTION_MODE = 6;
+    public static final int GET_SOURCE_MODE = 7;
+    public static final int GET_DESTINATION_MODE = 8;
 
 
     public static final float MAX_TRANSPARENCY = 1;

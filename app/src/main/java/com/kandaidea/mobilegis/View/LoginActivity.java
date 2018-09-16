@@ -1,6 +1,7 @@
 package com.kandaidea.mobilegis.View;
 
 import android.arch.lifecycle.ViewModel;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
@@ -25,6 +26,7 @@ import com.kandaidea.mobilegis.R;
 import com.kandaidea.mobilegis.ViewModel.LoginActivityViewModel;
 import com.kandaidea.mobilegis.databinding.ActivityLoginBinding;
 
+import org.acra.ACRA;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 

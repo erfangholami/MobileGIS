@@ -57,4 +57,9 @@
     <string name="open_kml_item">Open Kml</string>
     <string name="name_string">Name</string>
     <string name="repetetive_name">Name is repetetive</string>
+    <string name="acra_toast_text">ERROR REPORTED</string>
+    <string name="contact_us">Contact us</string>
+    <string name="feedback">Feedback</string>
+    <string name="feedback_msg">Your message</string>
+    <string name="submit_string">Submit</string>
 </resources>

@@ -85,4 +85,8 @@ public class RetrofitMethods
     {
         return api.getAddress(token, lat, lng);
     }
+    public Observable<Void> sendFeedback(String token, String message)
+    {
+        return api.sendFeedback(token, message);
+    }
 }

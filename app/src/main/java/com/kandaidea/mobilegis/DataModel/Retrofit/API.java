@@ -80,4 +80,12 @@ public interface API
     (
             @Header("Token") String token
     );
+
+    @POST("SendFeedback")
+    @FormUrlEncoded
+    Observable<Void> sendFeedback
+    (
+            @Header("Token") String token,
+            @Field("Feedback") String feedback
+    );
 }
