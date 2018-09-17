@@ -11,6 +11,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.DataModel.Models.Address;
+import com.kandaidea.mobilegis.DataModel.Models.FeedbackResponse;
 import com.kandaidea.mobilegis.DataModel.Models.LoginResponse;
 import com.kandaidea.mobilegis.DataModel.Models.SearchItem;
 import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
@@ -85,7 +86,7 @@ public class RetrofitMethods
     {
         return api.getAddress(token, lat, lng);
     }
-    public Observable<Void> sendFeedback(String token, String message)
+    public Observable<FeedbackResponse> sendFeedback(String token, String message)
     {
         return api.sendFeedback(token, message);
     }

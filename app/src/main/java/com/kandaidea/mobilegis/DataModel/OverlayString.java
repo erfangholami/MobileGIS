@@ -80,9 +80,10 @@ public class OverlayString
     public Polygon stringToPolygon(String jsonString)
     {
         Polygon polygon = new Polygon();
-        JsonObject x = new JsonParser().parse(jsonString).getAsJsonObject().getAsJsonObject("geometry");
+        JsonObject xv = new JsonParser().parse(jsonString).getAsJsonObject();
+        JsonObject x = xv.getAsJsonObject("geometry");
         KmlPolygon m = new KmlPolygon(x);
-        JsonObject properiea = new JsonParser().parse(jsonString).getAsJsonObject().getAsJsonObject("properties");
+        JsonObject properiea = xv.getAsJsonObject("properties");
         String fillColor = properiea.get(Constants.FILL_COLOR_STRING).getAsString();
         String strokeColor = properiea.get(Constants.STROKE_COLOR_STRING).getAsString();
         String strokeSize = properiea.get(Constants.STROKE_SIZE_STRING).getAsString();
@@ -90,7 +91,6 @@ public class OverlayString
         polygon.setStrokeColor(Integer.valueOf(strokeColor));
         polygon.setStrokeWidth(Float.valueOf(strokeSize));
         polygon.setPoints(m.mCoordinates);
-
         return polygon;
     }
     public Polyline stringToPolyline(String jsonString)

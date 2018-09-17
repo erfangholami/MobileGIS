@@ -60,6 +60,14 @@
     <string name="acra_toast_text">ERROR REPORTED</string>
     <string name="contact_us">Contact us</string>
     <string name="feedback">Feedback</string>
-    <string name="feedback_msg">Your message</string>
+    <string name="feedback_msg">Your Feedback</string>
     <string name="submit_string">Submit</string>
+    <string name="company_info">this is again changed text name only. i want that text as a clickable link. In my code while i click on the forget password means then it will move directly to the webpage as i mentioned it in the text background at string.xml file. Hope u understand.</string>
+    <string name="website_string">Website:</string>
+    <string name="phone_string">Phone:</string>
+    <string name="address_string">Address:</string>
+    <string name="kanda_website">kandaidea.com</string>
+    <string name="kanda_phone">+982188335022</string>
+    <string name="kanda_address">Tehran Province, Tehran, N Kargar, Iran</string>
+    <string name="feedback_msg_send">Feedback has been send.\nThanks for your opinion</string>
 </resources>

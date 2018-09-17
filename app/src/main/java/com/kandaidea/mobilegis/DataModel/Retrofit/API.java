@@ -2,6 +2,7 @@ package com.kandaidea.mobilegis.DataModel.Retrofit;
 
 
 import com.kandaidea.mobilegis.DataModel.Models.Address;
+import com.kandaidea.mobilegis.DataModel.Models.FeedbackResponse;
 import com.kandaidea.mobilegis.DataModel.Models.LoginResponse;
 import com.kandaidea.mobilegis.DataModel.Models.SearchItem;
 import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
@@ -83,7 +84,7 @@ public interface API
 
     @POST("SendFeedback")
     @FormUrlEncoded
-    Observable<Void> sendFeedback
+    Observable<FeedbackResponse> sendFeedback
     (
             @Header("Token") String token,
             @Field("Feedback") String feedback

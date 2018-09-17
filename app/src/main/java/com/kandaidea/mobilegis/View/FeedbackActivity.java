@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.view.View;
+import android.widget.Toast;
 
 import com.kandaidea.mobilegis.DataModel.Retrofit.RetrofitMethods;
 import com.kandaidea.mobilegis.R;
@@ -42,6 +43,8 @@ public class FeedbackActivity extends AppCompatActivity
             if(inputMsg.getText().toString().length() != 0)
             {
                 viewModel.sendFeedback(inputMsg.getText().toString());
+                inputMsg.setText(null);
+                Toast.makeText(getApplicationContext(), R.string.feedback_msg_send, Toast.LENGTH_LONG).show();
             }
         });
 

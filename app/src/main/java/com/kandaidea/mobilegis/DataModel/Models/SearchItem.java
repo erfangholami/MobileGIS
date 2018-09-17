@@ -12,28 +12,21 @@ public class SearchItem
     private int id;
     @SerializedName("Name")
     private String name;
+    @SerializedName("Shape")
+    private Shape shape;
 
     public SearchItem()
     {
 
     }
-    public SearchItem(String coordinates, String type, int id, String name)
+
+    public SearchItem(String coordinates, String type, int id, String name, Shape shape)
     {
         this.coordinates = coordinates;
         this.type = type;
         this.id = id;
         this.name = name;
-    }
-
-    @Override
-    public String toString()
-    {
-        return "SearchItem{" +
-                "coordinates='" + coordinates + '\'' +
-                ", type='" + type + '\'' +
-                ", id=" + id +
-                ", name='" + name + '\'' +
-                '}';
+        this.shape = shape;
     }
 
     public String getCoordinates()
@@ -74,5 +67,27 @@ public class SearchItem
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public Shape getShape()
+    {
+        return shape;
+    }
+
+    public void setShape(Shape shape)
+    {
+        this.shape = shape;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "SearchItem{" +
+                "coordinates='" + coordinates + '\'' +
+                ", type='" + type + '\'' +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                ", shape=" + shape +
+                '}';
     }
 }

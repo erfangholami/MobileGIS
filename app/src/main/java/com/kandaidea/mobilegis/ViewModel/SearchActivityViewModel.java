@@ -2,6 +2,7 @@ package com.kandaidea.mobilegis.ViewModel;
 
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModel;
+import android.net.Uri;
 import android.util.Log;
 
 import com.kandaidea.mobilegis.DataModel.Constants;
@@ -54,6 +55,7 @@ public class SearchActivityViewModel extends ViewModel
                     @Override
                     public void onError(Throwable e)
                     {
+                        Log.d(TAG, "ErrorOnGettingSearchResult " + e.getMessage());
                         mActivity.updateAdapterDataSet(results, Constants.ERROR);
                     }
 
@@ -74,7 +76,9 @@ public class SearchActivityViewModel extends ViewModel
                 @Override
                 public void onNext(SearchItem searchItem)
                 {
-                    Log.d(TAG, "final search is : " + searchItem.toString());
+                    Log.d(TAG, "FinalSearch is : " + searchItem.toString());
+                    Log.d(TAG, "FinalSearch is : " + Uri.decode(searchItem.getShape().toString()));
+
                     mActivity.finishActivity(searchItem);
                 }
 
@@ -82,12 +86,13 @@ public class SearchActivityViewModel extends ViewModel
                 public void onError(Throwable e)
                 {
                     //TODO handle error
+                    Log.d(TAG, "FinalSearch error " + e.getMessage());
                 }
 
                 @Override
                 public void onComplete()
                 {
-
+                    Log.d(TAG, "FinalSearch complete ");
                 }
             });
     }

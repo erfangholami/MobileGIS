@@ -6,4 +6,76 @@
     android:layout_height="match_parent"
     tools:context=".View.ContactUsActivity">
 
+    <ImageView
+        android:id="@+id/kanda_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/logo"
+        android:layout_marginTop="50dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/company_info"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="@string/company_info"
+        android:layout_marginTop="24dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/kanda_logo" />
+
+    <LinearLayout
+        android:id="@+id/keys"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="24dp"
+        app:layout_constraintLeft_toLeftOf="@+id/kanda_logo"
+        app:layout_constraintTop_toBottomOf="@+id/company_info"
+        app:layout_constraintRight_toLeftOf="@+id/values">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/website_string"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/phone_string"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/address_string"/>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/values"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="24dp"
+        app:layout_constraintRight_toRightOf="@+id/kanda_logo"
+        app:layout_constraintTop_toBottomOf="@+id/company_info"
+        app:layout_constraintLeft_toRightOf="@+id/keys">
+
+        <TextView
+            android:id="@+id/website"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/kanda_website"
+            android:autoLink="web"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/kanda_phone"
+            android:autoLink="phone"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/kanda_address"
+            android:autoLink="map"/>
+    </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>

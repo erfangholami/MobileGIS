@@ -156,6 +156,10 @@ public class Constants
     public static final String SEARCH_NAME_KEY = "name";
 
     public static final String RETROFIT_CONTENT_TYPE = "application/x-www-form-urlencoded";
+    public static final int RETROFIT_TIMEOUT = 10;
 
     public static final String TOKEN_KEY = "token";
+
+
+
 }

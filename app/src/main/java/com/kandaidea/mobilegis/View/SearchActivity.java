@@ -3,6 +3,7 @@ package com.kandaidea.mobilegis.View;
 import android.app.Activity;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -129,12 +130,14 @@ public class SearchActivity extends AppCompatActivity
     public void finishActivity(SearchItem item)
     {
         mProgressbar.setVisibility(View.GONE);
-        Bundle bundle = new Bundle();
-        bundle.putString(Constants.SEARCH_COORDINATES_KEY, item.getCoordinates());
-        bundle.putString(Constants.SEARCH_TYPE_KEY, item.getType());
-        bundle.putString(Constants.SEARCH_NAME_KEY, item.getName());
-        bundle.putInt(Constants.SEARCH_ID_KEY, item.getId());
-        //TODO (SEND BUNDLE) put item into bundle
-        finishActivity(bundle);
+        String x =  Uri.decode(item.getShape().toString());
+
+        Intent intent = new Intent();
+        intent.putExtra(Constants.SEARCH_COORDINATES_KEY, x);
+        intent.putExtra(Constants.SEARCH_TYPE_KEY, item.getType());
+        intent.putExtra(Constants.SEARCH_NAME_KEY, item.getName());
+        intent.putExtra(Constants.SEARCH_ID_KEY, item.getId());
+        setResult(RESULT_OK, intent);
+        finish();
     }
 }

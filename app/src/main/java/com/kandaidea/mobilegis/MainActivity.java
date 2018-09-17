@@ -63,6 +63,7 @@ import com.kandaidea.mobilegis.DataModel.Models.Sector;
 import com.kandaidea.mobilegis.DataModel.Models.SectorModel;
 import com.kandaidea.mobilegis.DataModel.Models.UserOverlayItem;
 import com.kandaidea.mobilegis.DataModel.MovingDetails;
+import com.kandaidea.mobilegis.DataModel.OverlayString;
 import com.kandaidea.mobilegis.DataModel.ScreenShot;
 import com.kandaidea.mobilegis.View.ColorFilter;
 import com.kandaidea.mobilegis.View.ContactUsActivity;
@@ -1000,15 +1001,18 @@ public class MainActivity extends AppCompatActivity
                     int id = bundle.getInt(Constants.SEARCH_ID_KEY);
                     searchOverlays.clear();
                     //add overlay to array
-                    Marker x = new Marker(mMapView);
-                    x.setPosition(new GeoPoint(15d, 15d));
-                    searchOverlays.add(x);
+                    Log.d(TAG, "shape: " + cord);
+                    if(type == "0")
+                        searchOverlays.add(new OverlayString().stringToPolygon(cord));
+                    else if(type == "1")
+                        searchOverlays.add(new OverlayString().stringToPolyline(cord));
                     mapMode = Constants.SHOW_SEARCH_MODE;
                     //mMapView.getOverlays().remove(Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER);
                     //mMapView.getOverlays().addAll(Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_NUMBER, searchOverlays);
                     mapsViewModel.mLayerManager.remmoveItem(Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_STRING);
+                    mMapView.invalidate();
                     mapsViewModel.mLayerManager.addAll(searchOverlays, Constants.DRAW_USER_SEARCH_ITEM_OVERLAY_STRING);
-                    mMapView.getController().animateTo(x.getPosition(), Constants.ANIMATE_ZOOM_LEVEL, Constants.ANIMATE_SPEED);
+                    mMapView.getController().animateTo(((Polygon)searchOverlays.get(0)).getPoints().get(0), Constants.ANIMATE_ZOOM_LEVEL, Constants.ANIMATE_SPEED);
                     mMapView.invalidate();
 
                 }
