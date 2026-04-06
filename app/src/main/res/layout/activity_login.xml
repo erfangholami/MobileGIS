@@ -7,7 +7,7 @@
     <data>
         <variable
             name="loginViewModel"
-            type="com.kandaidea.mobilegis.viewmodel.LoginActivityViewModel"/>
+            type="dev.erfangh.mobilegis.viewmodel.LoginActivityViewModel"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

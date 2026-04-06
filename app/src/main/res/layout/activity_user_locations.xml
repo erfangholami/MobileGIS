@@ -7,7 +7,7 @@
     <data>
         <variable
             name="locationViewModel"
-            type="com.kandaidea.mobilegis.viewmodel.UserLocationsViewModel"/>
+            type="dev.erfangh.mobilegis.viewmodel.UserLocationsViewModel"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

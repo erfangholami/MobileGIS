@@ -7,7 +7,7 @@
     <data>
         <variable
             name="feedbackViewModel"
-            type="com.kandaidea.mobilegis.viewmodel.FeedbackActivityViewModel"/>
+            type="dev.erfangh.mobilegis.viewmodel.FeedbackActivityViewModel"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

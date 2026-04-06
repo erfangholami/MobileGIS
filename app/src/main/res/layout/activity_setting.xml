@@ -7,7 +7,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.kandaidea.mobilegis.viewmodel.SettingActivityViewModel"/>
+            type="dev.erfangh.mobilegis.viewmodel.SettingActivityViewModel"/>
     </data>
     
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -7,7 +7,7 @@
     <data>
         <variable
             name="searchViewModel"
-            type="com.kandaidea.mobilegis.viewmodel.SearchActivityViewModel"/>
+            type="dev.erfangh.mobilegis.viewmodel.SearchActivityViewModel"/>
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
