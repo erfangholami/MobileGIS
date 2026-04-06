@@ -1,17 +1,17 @@
 package com.kandaidea.mobilegis.View;
 
-import android.databinding.DataBindingUtil;
-import android.support.design.widget.TextInputEditText;
-import android.support.v7.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+import com.google.android.material.textfield.TextInputEditText;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatButton;
+import androidx.appcompat.widget.AppCompatButton;
 import android.view.View;
 import android.widget.Toast;
 
 import com.kandaidea.mobilegis.DataModel.Retrofit.RetrofitMethods;
 import com.kandaidea.mobilegis.R;
-import com.kandaidea.mobilegis.ViewModel.FeedbackActivityViewModel;
-import com.kandaidea.mobilegis.ViewModel.LoginActivityViewModel;
+import com.kandaidea.mobilegis.viewmodel.FeedbackActivityViewModel;
+import com.kandaidea.mobilegis.viewmodel.LoginActivityViewModel;
 import com.kandaidea.mobilegis.databinding.ActivityFeedbackBinding;
 import com.kandaidea.mobilegis.databinding.ActivityLoginBinding;
 

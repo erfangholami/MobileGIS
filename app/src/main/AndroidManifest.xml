@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.kandaidea.mobilegis">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -24,25 +23,26 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".MainActivity" />
-        <activity android:name=".View.LoginActivity">
+        <activity android:name=".MainActivity" android:exported="false" />
+        <activity android:name=".View.LoginActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".View.SearchActivity" />
-        <activity android:name=".View.UserLocations" />
-        <activity android:name=".View.SettingActivity" />
+        <activity android:name=".View.SearchActivity" android:exported="false" />
+        <activity android:name=".View.UserLocations" android:exported="false" />
+        <activity android:name=".View.SettingActivity" android:exported="false" />
         <activity
             android:name=".ReportDialogActivity"
+            android:exported="false"
             android:excludeFromRecents="true"
             android:finishOnTaskLaunch="true"
             android:launchMode="singleInstance"
             android:process=":acra" />
-        <activity android:name=".View.ContactUsActivity" />
-        <activity android:name=".View.FeedbackActivity"></activity>
+        <activity android:name=".View.ContactUsActivity" android:exported="false" />
+        <activity android:name=".View.FeedbackActivity" android:exported="false" />
     </application>
 
 </manifest>

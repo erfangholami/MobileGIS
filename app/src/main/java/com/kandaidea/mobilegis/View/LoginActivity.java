@@ -1,16 +1,9 @@
 package com.kandaidea.mobilegis.View;
 
-import android.arch.lifecycle.ViewModel;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.databinding.DataBindingUtil;
-import android.net.Uri;
-import android.provider.Settings;
-import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+import com.google.android.material.textfield.TextInputEditText;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,16 +12,11 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.kandaidea.mobilegis.DataModel.Constants;
-import com.kandaidea.mobilegis.DataModel.Models.LoginResponse;
 import com.kandaidea.mobilegis.DataModel.RequestPermissions;
 import com.kandaidea.mobilegis.MainActivity;
 import com.kandaidea.mobilegis.R;
-import com.kandaidea.mobilegis.ViewModel.LoginActivityViewModel;
+import com.kandaidea.mobilegis.viewmodel.LoginActivityViewModel;
 import com.kandaidea.mobilegis.databinding.ActivityLoginBinding;
-
-import org.acra.ACRA;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 
 public class LoginActivity extends AppCompatActivity
 {

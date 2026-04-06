@@ -2,14 +2,14 @@ package com.kandaidea.mobilegis.View;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Parcelable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SearchView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -22,7 +22,7 @@ import com.kandaidea.mobilegis.DataModel.Models.SearchItem;
 import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
 import com.kandaidea.mobilegis.DataModel.Retrofit.RetrofitMethods;
 import com.kandaidea.mobilegis.R;
-import com.kandaidea.mobilegis.ViewModel.SearchActivityViewModel;
+import com.kandaidea.mobilegis.viewmodel.SearchActivityViewModel;
 import com.kandaidea.mobilegis.databinding.ActivitySearchBinding;
 
 import java.util.ArrayList;

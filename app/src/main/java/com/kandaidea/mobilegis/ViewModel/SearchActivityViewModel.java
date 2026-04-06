@@ -1,7 +1,7 @@
-package com.kandaidea.mobilegis.ViewModel;
+package com.kandaidea.mobilegis.viewmodel;
 
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModel;
 import android.net.Uri;
 import android.util.Log;
 
@@ -11,6 +11,7 @@ import com.kandaidea.mobilegis.DataModel.Models.SearchResult;
 import com.kandaidea.mobilegis.DataModel.Retrofit.RetrofitMethods;
 import com.kandaidea.mobilegis.View.SearchActivity;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,12 +25,12 @@ import io.reactivex.schedulers.Schedulers;
 public class SearchActivityViewModel extends ViewModel
 {
     private static final String TAG = SearchActivityViewModel.class.getSimpleName();
-    private SearchActivity mActivity;
+    private WeakReference<SearchActivity> mActivity;
     public RetrofitMethods retrofitMethods = new RetrofitMethods();
 
     public void init(SearchActivity mAcxtivity)
     {
-        this.mActivity = mAcxtivity;
+        this.mActivity = new WeakReference<>(mAcxtivity);
     }
 
     @SuppressLint("CheckResult")
@@ -45,7 +46,8 @@ public class SearchActivityViewModel extends ViewModel
                     @Override
                     public void onNext(List<SearchResult> searchResults)
                     {
-                        mActivity.updateAdapterDataSet(searchResults, Constants.SUCCESS);
+                        SearchActivity activity = mActivity.get();
+                        if (activity != null) activity.updateAdapterDataSet(searchResults, Constants.SUCCESS);
                         for (SearchResult res: searchResults)
                         {
                             Log.d(TAG, "res is : " + res.getName() + " " + res.getId());
@@ -56,7 +58,8 @@ public class SearchActivityViewModel extends ViewModel
                     public void onError(Throwable e)
                     {
                         Log.d(TAG, "ErrorOnGettingSearchResult " + e.getMessage());
-                        mActivity.updateAdapterDataSet(results, Constants.ERROR);
+                        SearchActivity activity = mActivity.get();
+                        if (activity != null) activity.updateAdapterDataSet(results, Constants.ERROR);
                     }
 
                     @Override
@@ -79,7 +82,8 @@ public class SearchActivityViewModel extends ViewModel
                     Log.d(TAG, "FinalSearch is : " + searchItem.toString());
                     Log.d(TAG, "FinalSearch is : " + Uri.decode(searchItem.getShape().toString()));
 
-                    mActivity.finishActivity(searchItem);
+                    SearchActivity activity = mActivity.get();
+                    if (activity != null) activity.finishActivity(searchItem);
                 }
 
                 @Override

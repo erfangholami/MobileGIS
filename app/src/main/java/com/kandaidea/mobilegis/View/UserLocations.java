@@ -1,10 +1,10 @@
 package com.kandaidea.mobilegis.View;
 
-import android.databinding.DataBindingUtil;
-import android.support.v7.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -12,7 +12,7 @@ import android.widget.Toast;
 import com.kandaidea.mobilegis.Adapers.UserLocationAdapter;
 import com.kandaidea.mobilegis.DataModel.Constants;
 import com.kandaidea.mobilegis.R;
-import com.kandaidea.mobilegis.ViewModel.UserLocationsViewModel;
+import com.kandaidea.mobilegis.viewmodel.UserLocationsViewModel;
 import com.kandaidea.mobilegis.databinding.ActivityUserLocationsBinding;
 
 public class UserLocations extends AppCompatActivity

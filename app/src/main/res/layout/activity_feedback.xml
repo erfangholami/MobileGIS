@@ -7,21 +7,21 @@
     <data>
         <variable
             name="feedbackViewModel"
-            type="com.kandaidea.mobilegis.ViewModel.FeedbackActivityViewModel"/>
+            type="com.kandaidea.mobilegis.viewmodel.FeedbackActivityViewModel"/>
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/navigation_background">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             style="@style/actionbar_style"
             app:layout_constraintTop_toTopOf="parent">
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:foregroundGravity="left">
@@ -37,9 +37,9 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"/>
-            </android.support.constraint.ConstraintLayout>
-        </android.support.v7.widget.Toolbar>
-        <android.support.design.widget.TextInputEditText
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.appcompat.widget.Toolbar>
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/feedback_msg"
             android:layout_width="match_parent"
             android:layout_height="200dp"
@@ -50,7 +50,7 @@
             app:layout_constraintTop_toBottomOf="@+id/toolbar"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"/>
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/submit_feedback"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -59,6 +59,6 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/feedback_msg"
             android:text="@string/submit_string"/>
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

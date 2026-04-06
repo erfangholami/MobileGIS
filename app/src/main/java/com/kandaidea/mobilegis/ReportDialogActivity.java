@@ -1,9 +1,7 @@
 package com.kandaidea.mobilegis;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-
-import org.acra.config.DialogConfigurationBuilder;
 
 public class ReportDialogActivity extends AppCompatActivity
 {

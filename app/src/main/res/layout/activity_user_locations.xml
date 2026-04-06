@@ -7,14 +7,14 @@
     <data>
         <variable
             name="locationViewModel"
-            type="com.kandaidea.mobilegis.ViewModel.UserLocationsViewModel"/>
+            type="com.kandaidea.mobilegis.viewmodel.UserLocationsViewModel"/>
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/navigation_background">
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/user_location_tools"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -51,9 +51,9 @@
                     android:layout_weight="1"/>
             </LinearLayout>
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/user_location_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -67,5 +67,5 @@
             android:paddingBottom="60dp"/>
 
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

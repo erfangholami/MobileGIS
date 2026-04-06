@@ -9,7 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
@@ -25,22 +25,21 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.constraint.ConstraintLayout;
-import android.support.constraint.solver.widgets.ConstraintWidget;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.TextInputEditText;
-import android.support.v4.content.FileProvider;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.textfield.TextInputEditText;
+import androidx.core.content.FileProvider;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -72,10 +71,9 @@ import com.kandaidea.mobilegis.View.FeedbackActivity;
 import com.kandaidea.mobilegis.View.SearchActivity;
 import com.kandaidea.mobilegis.View.SettingActivity;
 import com.kandaidea.mobilegis.View.UserLocations;
-import com.kandaidea.mobilegis.ViewModel.MapsActivityViewModel;
+import com.kandaidea.mobilegis.viewmodel.MapsActivityViewModel;
 import com.kandaidea.mobilegis.databinding.ActivityMainBinding;
 
-import org.acra.annotation.AcraCore;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
@@ -106,9 +104,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import me.priyesh.chroma.ChromaDialog;
-import me.priyesh.chroma.ColorMode;
-import me.priyesh.chroma.ColorSelectListener;
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -714,16 +711,18 @@ public class MainActivity extends AppCompatActivity
             Log.d(TAG, "polygon width is : " + polygon.getStrokeWidth());
             dialog.findViewById(R.id.selected_color_fill).setOnClickListener((View view) ->
             {
-                new ChromaDialog.Builder()
+                ColorPickerDialogBuilder
+                        .with(MainActivity.this)
+                        .setTitle("Pick a color")
                         .initialColor(Color.GREEN)
-                        .colorMode(ColorMode.ARGB) // There's also ARGB and HSV
-                        .onColorSelected((int i) ->
-                        {
-                            polygon.setFillColor(i);
-                            dialog.findViewById(R.id.selected_color_fill).setBackgroundColor(i);
+                        .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                        .density(12)
+                        .setOnColorSelectedListener(color -> {
+                            polygon.setFillColor(color);
+                            dialog.findViewById(R.id.selected_color_fill).setBackgroundColor(color);
                         })
-                        .create()
-                        .show(getSupportFragmentManager(), "ChromaDialog");
+                        .build()
+                        .show();
             });
             dialog.findViewById(R.id.cancel).setOnClickListener((View view) ->
             {
@@ -788,16 +787,18 @@ public class MainActivity extends AppCompatActivity
             });
             dialog.findViewById(R.id.selected_color_fill).setOnClickListener((View view) ->
             {
-                new ChromaDialog.Builder()
+                ColorPickerDialogBuilder
+                        .with(MainActivity.this)
+                        .setTitle("Pick a color")
                         .initialColor(Color.GREEN)
-                        .colorMode(ColorMode.ARGB) // There's also ARGB and HSV
-                        .onColorSelected((int i) ->
-                        {
-                            polyline.setColor(i);
-                            dialog.findViewById(R.id.selected_color_fill).setBackgroundColor(i);
+                        .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                        .density(12)
+                        .setOnColorSelectedListener(color -> {
+                            polyline.setColor(color);
+                            dialog.findViewById(R.id.selected_color_fill).setBackgroundColor(color);
                         })
-                        .create()
-                        .show(getSupportFragmentManager(), "ChromaDialog");
+                        .build()
+                        .show();
             });
             dialog.findViewById(R.id.cancel).setOnClickListener((View view) ->
             {

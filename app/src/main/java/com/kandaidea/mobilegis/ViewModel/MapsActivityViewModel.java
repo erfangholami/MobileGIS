@@ -1,7 +1,7 @@
-package com.kandaidea.mobilegis.ViewModel;
+package com.kandaidea.mobilegis.viewmodel;
 
 import android.app.Activity;
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModel;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;

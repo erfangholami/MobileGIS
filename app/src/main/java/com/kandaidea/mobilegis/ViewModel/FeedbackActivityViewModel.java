@@ -1,6 +1,6 @@
-package com.kandaidea.mobilegis.ViewModel;
+package com.kandaidea.mobilegis.viewmodel;
 
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModel;
 import android.content.Context;
 import android.util.Log;
 

@@ -6,15 +6,15 @@
     <data>
         <variable
             name="mapsViewModel"
-            type="com.kandaidea.mobilegis.ViewModel.MapsActivityViewModel"/>
+            type="com.kandaidea.mobilegis.viewmodel.MapsActivityViewModel"/>
     </data>
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".MainActivity"
         android:fitsSystemWindows="true">
 
-        <android.support.v4.widget.DrawerLayout
+        <androidx.drawerlayout.widget.DrawerLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:openDrawer="start">
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -32,14 +32,14 @@
                     android:layout_height="match_parent">
                 </org.osmdroid.views.MapView>
 
-                <android.support.v7.widget.Toolbar
+                <androidx.appcompat.widget.Toolbar
                     android:id="@+id/main_toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     style="@style/actionbar_style"
                     app:layout_constraintTop_toTopOf="parent"
                     android:visibility="visible">
-                    <android.support.constraint.ConstraintLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
                         android:gravity="right">
@@ -109,10 +109,10 @@
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintLeft_toLeftOf="parent"/>
-                    </android.support.constraint.ConstraintLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                </android.support.v7.widget.Toolbar>
-                <android.support.v7.widget.Toolbar
+                </androidx.appcompat.widget.Toolbar>
+                <androidx.appcompat.widget.Toolbar
                     android:id="@+id/direction_toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -121,7 +121,7 @@
                     android:layout_margin="@dimen/action_bar_margin"
                     app:layout_constraintTop_toTopOf="parent"
                     android:visibility="gone">
-                    <android.support.constraint.ConstraintLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/direction_toolbar_height"
                         android:gravity="left"
@@ -170,9 +170,9 @@
                             app:layout_constraintBottom_toBottomOf="@+id/destination_point_text_view"
                             app:layout_constraintTop_toTopOf="@+id/source_point_text_view"
                             app:layout_constraintLeft_toRightOf="@+id/source_point_text_view"/>
-                    </android.support.constraint.ConstraintLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                </android.support.v7.widget.Toolbar>
+                </androidx.appcompat.widget.Toolbar>
 
                 <TextView
                     android:id="@+id/draw_information"
@@ -238,8 +238,8 @@
                     android:id="@+id/map_settings_view_card"
                     layout="@layout/map_settings"/>
 
-            </android.support.constraint.ConstraintLayout>
-            <android.support.design.widget.NavigationView
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <com.google.android.material.navigation.NavigationView
                 android:id="@+id/nav_view"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -250,6 +250,6 @@
                 android:elevation="@dimen/navigation_drawer_elevation"
                 />
 
-        </android.support.v4.widget.DrawerLayout>
-    </android.support.constraint.ConstraintLayout>
+        </androidx.drawerlayout.widget.DrawerLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
